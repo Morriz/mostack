@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: default
+  name: ingress-default
+  labels:
+    app: ingress-default
+    konfd.io/template: 'true'
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: kube.dev.idiotz.nl
+    http:
+      paths:
+      - backend:
+          serviceName: kubernetes
+          servicePort: 80
+        path: /*
+  - host: api.dev.idiotz.nl
+    http:
+      paths:
+      - backend:
+          serviceName: api
+          servicePort: 80
+        path: /*
+  tls:
+  - hosts:
+    - api.dev.idiotz.nl
+    secretName: api-dev.idiotz.nl-tls

@@ -1,0 +1,3 @@
+alias k="kubectl"
+alias ks="k -n system"
+alias kd="k -n drone"

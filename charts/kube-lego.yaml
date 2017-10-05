@@ -1,0 +1,4 @@
+config:
+  LEGO_EMAIL: bla@bla.bla
+  LEGO_URL: https://acme-v01.api.letsencrypt.org/directory
+  LEGO_PORT: 8080

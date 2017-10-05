@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  labels:
+    k8s-app: kube-registry
+    version: v0
+  name: kube-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kube-registry
+      version: v0
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-registry
+        version: v0
+    spec:
+      containers:
+      - env:
+        - name: REGISTRY_HTTP_ADDR
+          value: :5000
+        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+          value: /var/lib/registry
+#        - name: REGISTRY_LOG_LEVEL
+#          value: debug
+        image: registry:2
+        imagePullPolicy: IfNotPresent
+        name: registry
+        ports:
+        - containerPort: 5000
+          name: registry
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /var/lib/registry
+          name: image-store
+      volumes:
+      - name: image-store
+        hostPath:
+          path: /data/registry/

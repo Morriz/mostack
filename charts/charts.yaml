@@ -1,0 +1,25 @@
+repositories:
+  - name: incubator
+    url: http://storage.googleapis.com/kubernetes-charts-incubator
+
+charts:
+  - name: kube-lego
+    namespace: kube-system
+    chart: stable/kube-lego
+    values: [ kube-lego.yaml ]
+#  - name: istio
+#    namespace: istio
+#    chart: incubator/istio
+#    values: [ istio.yaml ]
+#  - name: elasticsearch
+#    namespace: kube-system
+#    chart: incubator/elasticsearch
+#    values: [ elasticsearch.yaml ]
+#  - name: vault
+#    namespace: kube-system
+#    chart: incubator/vault
+#    values: [ vault.yaml ]
+#  - name: external-dns
+#    namespace: kube-system
+#    chart: stable/external-dns
+#    values: [ external-dns.yaml ]
