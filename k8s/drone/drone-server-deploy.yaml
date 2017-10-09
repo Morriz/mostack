@@ -31,11 +31,6 @@ spec:
             cpu: 40m
             memory: 32Mi
         env:
-        - name: REGISTRY_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: drone-config
-              key: server.registry.host
         - name: DRONE_HOST
           valueFrom:
             configMapKeyRef:

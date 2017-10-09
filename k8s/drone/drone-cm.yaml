@@ -10,7 +10,7 @@ data:
   #######################
 
   # server host name
-  server.host: https://drone.cluster.ip
+  server.host: https://drone.dev.idiotz.nl
   # start the server in debug mode
   server.debug: 'true'
   # open user registration
@@ -20,7 +20,7 @@ data:
   # database driver configuration string
   server.database.datasource: drone.sqlite
   # list of admin users
-  server.admin: admin
+  server.admin: Morriz
 
   # remote parameters (GitHub)
   server.remote.github: 'true'

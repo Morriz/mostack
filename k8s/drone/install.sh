@@ -12,12 +12,14 @@ printf "${COLOR_NC}"
 echo '  - now creating dependent files'
 
 # wait until pod ready
-cmd="kubectl -n drone get po -l app=drone-server"
-pod="$( $cmd )"
+cmd="kubectl -n drone get po -l app=drone-server | grep drone-server | grep 1/1"
+pod=$( eval $cmd )
+echo $pod
+
 echo "    waiting for server pods"
 if [ -z $pod ]; then
   until [ ! -z $pod ]; do
-    pod=$( $cmd )
+    pod=$( eval $cmd )
     sleep 3
   done
   sleep 20

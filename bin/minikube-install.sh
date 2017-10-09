@@ -4,8 +4,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 # install minikube
 minikube start \
     --extra-config=apiserver.Admission.PluginNames="Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,GenericAdmissionWebhook,ResourceQuota" \
-    --kubernetes-version=v1.7.5 --iso-url=https://storage.googleapis.com/minikube-builds/1998/minikube-testing.iso \
-    --vm-driver=xhyve
+    --kubernetes-version=v1.7.5
 
 # timesync
 minikube ssh -- sudo ln -sf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime

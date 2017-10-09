@@ -48,4 +48,4 @@ spec:
       volumes:
       - name: image-store
         hostPath:
-          path: /data/registry/
+          path: /data/registry
