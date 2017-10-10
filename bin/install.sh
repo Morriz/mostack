@@ -1,37 +1,29 @@
 #!/usr/bin/env bash
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 
+: "${ADMIN_EMAIL:?ADMIN_EMAIL not found in env!}"
+
 # osx only: install prerequisites if needed
 if [ "`uname -s`"=="Darwin" ]; then
   [[ -x `command -v helm` ]] || brew install helm
-  [[ -x `command -v helmfile` ]] || brew install helmfile
 fi
 
-# install helm charts
-cd $root/charts
+# install helm
 helm init
-sleep 10
+kubectl rollout status -w deployment/tiller-deploy --namespace=kube-system
+
+# deploy all charts
+cd $root/charts
 helmfile charts
-cd $root
 
-sleep 10
+[ $? -ne 0 ] && echo "Something went wrong with installing one of the charts. Inspect error and retry" && exit
 
-# wait until pod ready
-cmd="kubectl -n kube-system get po -l app=kube-lego | grep kube-lego | grep 1/1"
-pod=$( eval $cmd )
-echo "waiting for kube-lego"
-if [ -z $pod ]; then
-  until [ ! -z $pod ]; do
-    pod=$( eval $cmd )
-    sleep 3
-  done
-fi
+cd -
+# wait dependent charts ready, like lego
+echo "waiting for charts to become available:"
+kubectl rollout status -w deployment/kube-lego-kube-lego --namespace=kube-system
 
-sleep 10
-
-# port forward to lego for now, until we fix throughput
-kubectl -n kube-system port-forward $(kubectl -n kube-system get po -l app=kube-lego -o jsonpath='{.items[0].metadata.name}') 8080:8080 &
-# and run tunnel
+# and run tunnel to minikube node's port 80 and 443
 . $root/bin/tunnel-to-minikube-ingress.sh
 
 # install local k8s files

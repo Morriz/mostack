@@ -1,0 +1,54 @@
+repositories:
+  - name: incubator
+    url: http://storage.googleapis.com/kubernetes-charts-incubator
+
+charts:
+  - name: kube-lego
+    namespace: kube-system
+    chart: stable/kube-lego
+    values: [ kube-lego.yaml ]
+    env:
+      - name: config.LEGO_EMAIL
+        value: ADMIN_EMAIL
+  - name: drone
+    namespace: drone
+    chart: file://./drone
+    env:
+      - name: server.env.GITHUB_CLIENT
+        value: GITHUB_CLIENT
+      - name: server.env.GITHUB_SECRET
+        value: GITHUB_SECRET
+      - name: server.env.DRONE_ADMIN
+        value: DRONE_ADMIN
+      - name: shared_secret
+        value: DRONE_SECRET
+      - name: ingress.hostname
+        value: DRONE_HOST
+  - name: api
+    namespace: default
+    chart: file://./api
+    env:
+      - name: image.repository
+        value: API_REPO
+      - name: image.tag
+        value: API_TAG|latest
+      - name: image.pullPolicy
+        value: IfNotPresent
+      - name: ingress.hostname
+        value: API_HOST
+#  - name: istio
+#    namespace: istio
+#    chart: incubator/istio
+#    values: [ istio.yaml ]
+#  - name: elasticsearch
+#    namespace: kube-system
+#    chart: incubator/elasticsearch
+#    values: [ elasticsearch.yaml ]
+#  - name: vault
+#    namespace: kube-system
+#    chart: incubator/vault
+#    values: [ vault.yaml ]
+#  - name: external-dns
+#    namespace: kube-system
+#    chart: stable/external-dns
+#    values: [ external-dns.yaml ]

@@ -9,23 +9,11 @@ kubectl apply -f $myroot/drone-rbac.yaml
 sleep 3
 find $myroot -type f \( -iname '*.yaml' ! -iname '*-rbac.yaml' ! -iname '*agent-deploy.yaml' \) -exec kubectl apply -f {} \;
 printf "${COLOR_NC}"
-echo '  - now creating dependent files'
 
-# wait until pod ready
-cmd="kubectl -n drone get po -l app=drone-server | grep drone-server | grep 1/1"
-pod=$( eval $cmd )
-echo $pod
-
-echo "    waiting for server pods"
-if [ -z $pod ]; then
-  until [ ! -z $pod ]; do
-    pod=$( eval $cmd )
-    sleep 3
-  done
-  sleep 20
-fi
+kubectl rollout status -w deployment/drone-server --namespace=drone
 
 echo "    ready"
+echo '  - now creating dependent files'
 
 printf "${COLOR_GREEN}"
 kubectl apply -f $myroot/drone-agent-deploy.yaml

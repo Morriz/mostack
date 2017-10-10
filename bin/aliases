@@ -1,4 +1,6 @@
 alias k="kubectl"
-alias ks="k -n system"
+alias ks="k -n kube-system"
 alias kd="k -n drone"
 alias kcv="k config view"
+alias mkd="killall kubectl && sudo killall ssh &&minikube delete"
+alias hi="helm template -r mostack . | kubectl apply -f -"

@@ -1,0 +1,47 @@
+replicas: 1
+image:
+  repository: registry
+  tag: 2
+  pullPolicy: IfNotPresent
+init:
+  load: false
+  type:
+  branch:
+  image:
+    repository: centos
+    tag: latest
+  tarballURL:
+persistentVolume:
+  enabled: false
+  accessModes:
+    - ReadWriteOnce
+  existingClaim: ""
+  size: 20Gi
+  ## docker-registry data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: "-"
+  annotations: {}
+proxy:
+  enabled: false
+  image:
+    repository: gcr.io/google_containers/kube-registry-proxy
+    tag: 0.4
+    pullPolicy: IfNotPresent
+service:
+  http:
+    externalPort: 80
+ingress:
+  enabled: true
+  tls: true
+  hostname: your.doma.in
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/proxy-body-size: 20m
+

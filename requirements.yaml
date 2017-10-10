@@ -1,0 +1,16 @@
+dependencies:
+  - name: kube-lego
+    version: 0.1.12
+    repository: file://./charts/kube-lego
+#  - name: minio
+#    version: 0.3.0
+#    repository: file://./charts/minio
+  - name: docker-registry
+    version: 0.2.2
+    repository: file://./charts/docker-registry
+  - name: drone
+    version: 0.1.0
+    repository: file://./charts/drone
+  - name: api
+    version: 0.1.0
+    repository: file://./charts/api

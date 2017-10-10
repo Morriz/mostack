@@ -19,3 +19,7 @@
 .project
 .idea/
 *.tmproj
+k8s
+helmfile_old
+bin
+minidata

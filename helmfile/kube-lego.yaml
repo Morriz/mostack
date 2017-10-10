@@ -1,4 +1,2 @@
 config:
-  LEGO_EMAIL: morriz@idiotz.nl
   LEGO_URL: https://acme-v01.api.letsencrypt.org/directory
-  LEGO_PORT: 8080

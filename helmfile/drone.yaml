@@ -1,0 +1,11 @@
+image:
+  tag: 0.8
+service:
+  type: ClusterIP
+ingress:
+  enabled: true
+  tls: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /

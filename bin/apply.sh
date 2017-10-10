@@ -3,7 +3,7 @@
 folder=$1
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 k8s=$root/k8s
-folders='api cluster drone registry'
+folders='api drone registry' #cluster
 foldersArray=($folders)
 
 . $root/bin/colors.sh
@@ -11,8 +11,10 @@ foldersArray=($folders)
 if [ $# -eq 0 ]; then
   printf "applying everything for folders: ${COLOR_WHITE}$folders${COLOR_NC}\n"
   echo "------------------------------------------------------------------------"
-  k apply -f ${root}k8s/istio/istio-auth.yaml
-  k apply -f ${root}k8s/istio/addons/
+  printf "${COLOR_GREEN}"
+  kubectl apply -f $root/k8s/istio/istio-auth.yaml
+  kubectl apply -f $root/k8s/istio/addons/
+  printf "${COLOR_NC}"
 else
   foldersArray=($folder)
 fi

@@ -1,0 +1,31 @@
+{{- if .Values.proxy.enabled }}
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "fullname" . }}-proxy
+  labels:
+    app: {{ template "fullname" . }}-proxy
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  template:
+    metadata:
+      name: {{ template "fullname" . }}-proxy
+      labels:
+        name: {{ template "fullname" . }}-proxy
+    spec:
+      containers:
+      - name: {{ template "fullname" . }}-proxy
+        image: "{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
+        imagePullPolicy: {{ .Values.proxy.image.pullPolicy }}
+        env:
+        - name: REGISTRY_HOST
+          value: {{ template "fullname" . }}
+        - name: REGISTRY_PORT
+          value: {{ .Values.service.http.externalPort | quote }}
+        ports:
+        - name: registry
+          containerPort: {{ .Values.service.http.externalPort }}
+          hostPort: 5000
+{{- end }}
