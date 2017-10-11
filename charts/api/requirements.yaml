@@ -1,4 +1,7 @@
 dependencies:
   - name: kube-lego
     version: 0.1.12
-    repository: stable/kube-lego
+    repository: file://../kube-lego/
+  - name: docker-registry
+    version: 0.2.2
+    repository: file://../docker-registry

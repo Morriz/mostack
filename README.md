@@ -8,7 +8,7 @@ Using the following (mostly open source) technologies:
 
 Running the following Kubernetes applications/tools:
 * [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements
-* [ExternalDNS](https://github.com/kubernetes-incubator/external-dns) for making our services accesible at our FQDN
+* *COMING SOON:* [ExternalDNS](https://github.com/kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 * Docker Registry for storing locally built images, and as a proxy + storage for external ones.
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-docker](https://github.com/drone-plugins/drone-docker) for pushing new image
@@ -16,35 +16,65 @@ Running the following Kubernetes applications/tools:
     *
 
 ## 1. Install
-### 1.1 Install your bare kubernetes cluster
+### 1.1 Install your kubernetes cluster
 
 Please read up on booting your cluster with [Kops] or minikube.
 
-Make sure you boot the cluster with a main nginx ingress controller:
+Make sure you boot the cluster with a main nginx ingress controller. Minikube does this by default.
 
-For kops, see:
-#### Minikube prerequisites
 ### 1.2 Configure your cluster
 
-When you have a running cluster you can set your public cluster host in main-config.yaml.
-This domain must point to the main public nginx controller, which will serve all our public ingresses.
+While you're waiting you can
 
-### Local development: Portforward port 80 and 443
+    cp values.sample.yaml values.yaml
 
-In case you run minikube or another local cluster behind nat/firewall, make sure that:
-- port 80 and 443 are portforwarded to your local machine
-- both those ports are tunneled to your cluster's master nginx controller
+And start editing values.yaml
 
-By executing:
+IMPORTANT: The subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
 
-    cluster_ip=$(minikube ip) # or another ip when not using minikube
-    local_ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | sed -n '1 p')
-    sudo ssh -N -p 22 -g $USER@$local_ip -L $local_ip:80:$cluster_ip:80 -L $local_ip:443:$cluster_ip:443 &
+### 1.3 Install everything
 
-## CI/CD Steps
+PREREQUISITES:
+- helm (if on osx it will detect and autoinstall)
+- forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
+- [letsencrypt staging ca](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager)
+- In case you run minikube or another local cluster behind nat/firewall, make sure that port 80 and 443 are portforwarded to your local machine
+
+Running the main installer with:
+
+    bin/install.sh
+will install everything. Please edit `bin/install.sh` to comment out the minikube installer if needed
+If on minikube, the script will also set up port forwarding to the lego node, and an ssh tunnel for the incoming traffic on your laptop
+
+## 2. Apps
+
+Please check if all apps are running:
+
+    kubectl get all --all-namespaces
+
+and wait...then test the following web apps:
+
+## 2.1 Drone CI/CD
+
+### 2.1.1 Configure Drone
+
+1. Go to your public drone url (https://drone.dev.yourdoma.in) and select the repo `nodejs-demo-api`.
+2. Go to the 'Secrets' menu and create the following:
+KUBERNETES_CERT=
+KUBERNETES_TOKEN=
+KUBERNETES_DNS=10.0.0.10 # or custom
+REGISTRY=localhost:5000 # or public
+
+For getting the right cert and token please read last paragraph here: https://github.com/honestbee/drone-kubernetes
+
+## 2.1.2 Trigger pipeline
 
 1. Commit to repo of choice and trigger build in our Drone.
 2. Drone builds and does tests
 3. Drone pushes docker image artifact to our private docker registry
 4. Drone updates our running k8s deployment to use the new version
 5. Kubernetes detects config change and does an automated rolling update/rollback.
+
+### 2.2 API
+
+Check output for the following url: https://api.dev.yourdoma.in/api/publicmethod
