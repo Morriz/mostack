@@ -11,7 +11,19 @@ haveMiniRunning=1
 
 # osx only: install prerequisites if needed
 if [ "`uname -s`"=="Darwin" ]; then
-  [[ -x `command -v helm` ]] || brew install helm
+  which helm > /dev/null
+  if [ $? -ne 0 ]; then
+    printf "${COLOR_BLUE}installing helm${COLOR_GREEN}\n"
+    [[ -x `command -v helm` ]] || brew install helm
+    printf "${COLOR_NC}"
+  fi
+fi
+
+helm plugin list | grep template > /dev/null
+if [ $? -ne 0 ]; then
+  printf "${COLOR_BLUE}installing helm template plugin${COLOR_GREEN}\n"
+  helm plugin install https://github.com/technosophos/helm-template
+  printf "${COLOR_NC}"
 fi
 
 if [ $haveMiniRunning -ne 1 ]; then
@@ -34,7 +46,7 @@ helm template -r mostack $root | kubectl apply -f -
 printf "${COLOR_NC}"
 
 # wait dependent charts ready, like lego
-printf "${COLOR_BLUE}waiting for charts to become available${COLOR_YELLOW}\n"
+printf "${COLOR_BLUE}waiting for charts to become available${COLOR_BROWN}\n"
 kubectl rollout status -w deployment/mostack-kube-lego
 printf "${COLOR_NC}"
 

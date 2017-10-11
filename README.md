@@ -47,6 +47,7 @@ IMPORTANT: The subdomains must all point to the main public nginx controller, wh
 
 PREREQUISITES:
 - Helm (if on osx it will detect and autoinstall)
+- helm template plugin (if on osx it will detect and autoinstall)
 - Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
 - [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager)
 - In case you run minikube or another local cluster behind nat/firewall, make sure that port 80 and 443 are portforwarded to your local machine
