@@ -23,15 +23,15 @@ Running the following Kubernetes applications/tools:
     * [drone-kubernetes](https://github.com/honestbee/drone-kubernetes) to deploy
     *
 
-## 1. Installing
+### 1. Installing
 
-### 1.1 Install your kubernetes cluster
+#### 1.1 Install your kubernetes cluster
 
 Please read up on booting your cluster with [Kops] or minikube.
 
 Make sure you boot the cluster with a main nginx ingress controller. Minikube does this by default.
 
-### 1.2 Configure your cluster
+#### 1.2 Configure your cluster
 
 While you're waiting you can
 
@@ -43,7 +43,7 @@ Also `export CLUSTER_HOST=...` with whatever cluster domain you want to point to
 
 IMPORTANT: The subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
 
-### 1.3 Install everything
+#### 1.3 Install everything
 
 PREREQUISITES:
 - Helm (if on osx it will detect and autoinstall)
@@ -55,7 +55,7 @@ PREREQUISITES:
 Running the main installer with `bin/install.sh` will install everything. Please edit that script to enable/disable minikube settings if needed.
 If on minikube, the script will also set up port forwarding to the lego node, and an ssh tunnel for the incoming traffic on your local machine.
 
-## 2. Apps
+### 2. Apps
 
 Please check if all apps are running:
 
@@ -63,20 +63,21 @@ Please check if all apps are running:
 
 and wait...then test the following web apps:
 
-## 2.1 Drone CI/CD
+#### 2.1 Drone CI/CD
 
-### 2.1.1 Configure Drone
+##### 2.1.1 Configure Drone
 
 1. Go to your public drone url (https://drone.dev.yourdoma.in) and select the repo `nodejs-demo-api`.
 2. Go to the 'Secrets' menu and create the following:
-KUBERNETES_CERT=
-KUBERNETES_TOKEN=
-KUBERNETES_DNS=10.0.0.10 # or custom
-REGISTRY=localhost:5000 # or public
+
+        KUBERNETES_CERT=...
+        KUBERNETES_TOKEN=...
+        KUBERNETES_DNS=10.0.0.10 # or custom
+        REGISTRY=localhost:5000 # or public
 
 For getting the right cert and token please read last paragraph here: https://github.com/honestbee/drone-kubernetes
 
-## 2.1.2 Trigger pipeline
+##### 2.1.2 Trigger pipeline
 
 1. Commit to repo of choice and trigger build in our Drone.
 2. Drone builds and does tests
@@ -84,6 +85,6 @@ For getting the right cert and token please read last paragraph here: https://gi
 4. Drone updates our running k8s deployment to use the new version
 5. Kubernetes detects config change and does an automated rolling update/rollback.
 
-### 2.2 API
+#### 2.2 API
 
 Check output for the following url: https://api.dev.yourdoma.in/api/publicmethod
