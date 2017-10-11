@@ -43,9 +43,14 @@ spec:
         resources:
 {{ toYaml .Values.server.resources | indent 10 }}
         volumeMounts:
+        - mountPath: /etc/ssl/certs/ca-certificates.crt
+          name: certs
         - mountPath: /var/lib/drone
           name: persistentdata
       volumes:
+      - name: certs
+        hostPath:
+          path: /etc/ssl/certs/ca-certificates.crt
       - name: persistentdata
       {{- if .Values.persistentVolume.enabled }}
         persistentVolumeClaim:

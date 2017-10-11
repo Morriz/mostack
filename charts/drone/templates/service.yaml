@@ -13,5 +13,8 @@ spec:
   - name: http
     port: {{ .Values.service.http.externalPort }}
     targetPort: {{ .Values.service.http.internalPort }}
+  - name: grpc
+    port: {{ .Values.service.grpc.externalPort }}
+    targetPort: {{ .Values.service.grpc.internalPort }}
   selector:
     app: {{ template "fullname" . }}-server

@@ -15,23 +15,6 @@ spec:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
     spec:
-      initContainers:
-      - name: {{ template "fullname" . }}-init
-        image: "{{ .Values.init.image.repository }}:{{ .Values.init.image.tag }}"
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/bash
-          - -ec
-          - |
-{{- if .Values.init.load }}
-            fn='{{ .Values.init.image.repository }}-{{ .Values.init.type }}-registry-{{ .Values.init.branch }}.tar.gz';
-            echo $fn;
-            curl {{ .Values.init.tarballURL }}$fn | tar -C /var/lib/registry/ -xzvf -;
-{{- end }}
-            echo Registry is all ready serving images...;
-        volumeMounts:
-        - name: image-store
-          mountPath: /var/lib/registry
       containers:
       - name: registry
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

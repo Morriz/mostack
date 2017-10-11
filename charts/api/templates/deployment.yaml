@@ -14,6 +14,19 @@ spec:
       labels:
         app: {{ template "name" . }}
         release: {{ .Release.Name }}
+      annotations:
+        pod.beta.kubernetes.io/init-containers: |-
+          [
+            {
+              "name": "registry-listener",
+              "image": "sequenceiq/alpine-dig",
+              "imagePullPolicy": "IfNotPresent",
+              "command": [
+                "sh", "-c",
+                "for i in {1..100}; do sleep 1; if dig {{ .Release.Name }}-docker-registry; then exit 0; fi; done; sleep 5"
+              ]
+            }
+          ]
     spec:
       containers:
         - name: {{ .Chart.Name }}
