@@ -43,12 +43,21 @@ if [ $haveMiniRunning -ne 1 ]; then
   printf "${COLOR_NC}"
 fi
 
-kubectl get nodes | grep Ready > /dev/null
+kubectl get nodes | grep Ready &> /dev/null
 printf "${COLOR_BLUE}waiting for a node to talk to${COLOR_BROWN}\n"
 until [ $? -eq 0 ]; do
   echo "waiting 3 seconds..."
   sleep 3
-  kubectl get nodes | grep Ready > /dev/null
+  kubectl get nodes | grep Ready &> /dev/null
+done
+printf "${COLOR_NC}"
+
+printf "${COLOR_BLUE}waiting for kubernetes to listen${COLOR_BROWN}\n"
+kubectl rollout status -w deployment/kube-dns -n kube-system &> /dev/null
+until [ $? -eq 0 ]; do
+  echo "no response, waiting 10 secs..."
+  sleep 10
+  kubectl rollout status -w deployment/kube-dns -n kube-system &> /dev/null
 done
 printf "${COLOR_NC}"
 

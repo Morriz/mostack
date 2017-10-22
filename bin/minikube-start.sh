@@ -4,7 +4,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 # start minikube cluster
 minikube start \
     --extra-config=apiserver.Admission.PluginNames="Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,GenericAdmissionWebhook,ResourceQuota" \
-    --kubernetes-version=v1.7.5 --memory 4096
+    --kubernetes-version=v1.7.5
 
 # timesync
 minikube ssh -- sudo ln -sf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
