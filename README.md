@@ -27,8 +27,9 @@ Running the following Kubernetes applications/tools:
 
 #### 1.1 Install your kubernetes cluster
 
-Please read up on booting your cluster with [Kops] or minikube.
+The `bin/install.sh` script will start the minikube cluster if it has not started yet.
 
+Please read up on booting your cluster with [Kops] otherwise.
 Make sure you boot the cluster with a main nginx ingress controller. Minikube does this by default.
 
 #### 1.2 Configure your cluster
@@ -43,11 +44,14 @@ Also `export CLUSTER_HOST=...` with whatever cluster domain you want to point to
 
 IMPORTANT: The subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
 
-#### 1.3 Install everything
+And don't forget to install a webhook in the forked `Morriz/nodejs-api-demo` repo to fill in those secrets here.
+
+#### 1.3 Deploy everything
 
 PREREQUISITES:
+- A running kubernetes cluster with RBAC enabled and `kubectl` installed on your local machine.
 - Helm (if on osx it will detect and autoinstall)
-- helm template plugin (if on osx it will detect and autoinstall)
+- Helm template plugin (if on osx it will detect and autoinstall)
 - Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
 - [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager)
 - In case you run minikube or another local cluster behind nat/firewall, make sure that port 80 and 443 are portforwarded to your local machine
@@ -61,7 +65,12 @@ Please check if all apps are running:
 
     kubectl get all --all-namespaces
 
-and wait...then test the following web apps:
+and wait...
+
+The `api` deployment can't start because it can't find it's local docker image, which is not yet in the registry.
+Drone needs to build from a commit first, which we will get to later.
+
+Let's configure Drone now:
 
 #### 2.1 Drone CI/CD
 
@@ -72,14 +81,14 @@ and wait...then test the following web apps:
 
         KUBERNETES_CERT=...
         KUBERNETES_TOKEN=...
-        KUBERNETES_DNS=10.0.0.10 # or custom
+        KUBERNETES_DNS=10.0.0.10 # if minikube
         REGISTRY=localhost:5000 # or public
 
 For getting the right cert and token please read last paragraph here: https://github.com/honestbee/drone-kubernetes
 
-##### 2.1.2 Trigger pipeline
+##### 2.1.2 Trigger build pipeline
 
-1. Commit to repo of choice and trigger build in our Drone.
+1. Now commit to the forked `Morriz/nodejs-api-demo` repo and trigger a build in our Drone.
 2. Drone builds and does tests
 3. Drone pushes docker image artifact to our private docker registry
 4. Drone updates our running k8s deployment to use the new version
@@ -88,3 +97,6 @@ For getting the right cert and token please read last paragraph here: https://gi
 #### 2.2 API
 
 Check output for the following url: https://api.dev.yourdoma.in/api/publicmethod
+
+It should already be running ok, or it is in the process of detecting the new image and rolling out the update.
+Â

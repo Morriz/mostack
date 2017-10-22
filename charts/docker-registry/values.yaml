@@ -40,7 +40,9 @@ ingress:
   tls: true
   hostname: your.doma.in
   annotations:
+    sidecar.istio.io/inject: 'false'
     kubernetes.io/ingress.class: nginx
+#    kubernetes.io/ingress.class: istio
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
     ingress.kubernetes.io/proxy-body-size: 20m

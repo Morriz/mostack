@@ -31,7 +31,8 @@ nodeSelector: {}
 
 ## Annotations to be added to pods
 ##
-podAnnotations: {}
+podAnnotations:
+  sidecar.istio.io/inject: 'false'
 
 replicaCount: 1
 

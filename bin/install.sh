@@ -5,9 +5,12 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 
 printf "${COLOR_WHITE}RUNNING INSTALL:${COLOR_NC}\n"
 
-# set following to 0 if necessary:
-isMini=1
-haveMiniRunning=1
+isMini=0
+which minikube > /dev/null 2>&1
+[ $? -eq 0 ] && isMini=1
+haveMiniRunning=0
+minikube ip > /dev/null 2>&1
+[ $? -eq 0 ] && haveMiniRunning=1
 
 # osx only: install prerequisites if needed
 if [ "`uname -s`"=="Darwin" ]; then
@@ -29,16 +32,32 @@ fi
 if [ $haveMiniRunning -ne 1 ]; then
   [ -e $CLUSTER_HOST ] && printf "${COLOR_LIGHT_RED}CLUSTER_HOST not found in env! Please set as main domain for app subdomains.${COLOR_NC}\n" && exit 1
 
-  printf "${COLOR_BLUE}installing minikube${COLOR_GREEN}\n"
-  sh $root/bin/minikube-install.sh
-  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing minikube${COLOR_NC}\n" && exit 1
+  printf "${COLOR_BLUE}starting minikube cluster${COLOR_GREEN}\n"
+  sh $root/bin/minikube-start.sh
+  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong starting minikube cluster${COLOR_NC}\n" && exit 1
   printf "${COLOR_NC}"
 
   printf "${COLOR_BLUE}installing Letsencrypt Staging CA${COLOR_GREEN}\n"
   sh $root/bin/add-trusted-ca-to-docker-domains.sh
-  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing certificates${COLOR_NC}\n" && exit 1
+  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing Letsencrypt Staging CA${COLOR_NC}\n" && exit 1
   printf "${COLOR_NC}"
 fi
+
+kubectl get nodes | grep Ready > /dev/null
+printf "${COLOR_BLUE}waiting for a node to talk to${COLOR_BROWN}\n"
+until [ $? -eq 0 ]; do
+  echo "waiting 3 seconds..."
+  sleep 3
+  kubectl get nodes | grep Ready > /dev/null
+done
+printf "${COLOR_NC}"
+
+#printf "${COLOR_BLUE}deploying istio\n${COLOR_GREEN}"
+#kubectl apply -f $root/k8s/istio/istio-auth.yaml
+#kubectl apply -f $root/k8s/istio/istio-initializer.yaml
+#kubectl apply -f $root/k8s/istio/addons/
+#[ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing istio${COLOR_NC}\n" && exit 1
+#printf "${COLOR_NC}"
 
 printf "${COLOR_BLUE}deploying all charts\n${COLOR_GREEN}"
 helm template -r mostack $root | kubectl apply -f -
@@ -46,7 +65,7 @@ helm template -r mostack $root | kubectl apply -f -
 printf "${COLOR_NC}"
 
 # wait dependent charts ready, like lego
-printf "${COLOR_BLUE}waiting for charts to become available${COLOR_BROWN}\n"
+printf "${COLOR_BLUE}waiting for kube-lego to become available${COLOR_BROWN}\n"
 kubectl rollout status -w deployment/mostack-kube-lego
 printf "${COLOR_NC}"
 

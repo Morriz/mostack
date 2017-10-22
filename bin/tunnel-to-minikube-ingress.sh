@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 cluster_ip=$(minikube ip) # or another ip when not using minikube
 local_ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | sed -n '1 p')
+#echo "local_ip: $local_ip"
+#echo "cluster_ip: $cluster_ip"
 
 # the next line should suffice once we have lego receiving incoming correctly
 #sudo ssh -N -p 22 -g $USER@$local_ip -L $local_ip:80:$cluster_ip:80 -L $local_ip:443:$cluster_ip:443 &

@@ -18,5 +18,9 @@ ingress:
 #  hostname:
   annotations:
     kubernetes.io/ingress.class: nginx
+#    kubernetes.io/ingress.class: istio
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
+deployment:
+  annotations:
+    sidecar.istio.io/inject: 'false'
