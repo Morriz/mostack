@@ -27,12 +27,12 @@ Running the following Kubernetes applications/tools:
 
 #### 1.1 Install your kubernetes cluster
 
-The `bin/install.sh` script will start the minikube cluster if it has not started yet.
+The `bin/install.sh` script will start the minikube cluster if it has not started yet. Please read up on 1.2 first for configuration.
 
 Please read up on booting your cluster with [Kops] otherwise.
 Make sure you boot the cluster with a main nginx ingress controller. Minikube does this by default.
 
-#### 1.2 Configure your cluster
+#### 1.2 Configure the apps
 
 While you're waiting you can
 

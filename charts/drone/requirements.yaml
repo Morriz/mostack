@@ -1,4 +1,0 @@
-dependencies:
-  - name: kube-lego
-    version: 0.1.12
-    repository: stable/kube-lego

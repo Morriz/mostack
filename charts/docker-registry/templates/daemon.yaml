@@ -1,4 +1,4 @@
-{{- if .Values.proxy.enabled }}
+{{- if .Values.localproxy.enabled }}
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       - name: {{ template "fullname" . }}-proxy
-        image: "{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
-        imagePullPolicy: {{ .Values.proxy.image.pullPolicy }}
+        image: "{{ .Values.localproxy.image.repository }}:{{ .Values.localproxy.image.tag }}"
+        imagePullPolicy: {{ .Values.localproxy.image.pullPolicy }}
         env:
         - name: REGISTRY_HOST
           value: {{ template "fullname" . }}
@@ -27,5 +27,5 @@ spec:
         ports:
         - name: registry
           containerPort: {{ .Values.service.http.externalPort }}
-          hostPort: 5000
+          hostPort: {{ .Values.localproxy.port }}
 {{- end }}

@@ -28,6 +28,20 @@ spec:
           value: ":5000"
         - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
           value: "/var/lib/registry"
+{{- if .Values.proxy.enabled }}
+        - name: REGISTRY_STORAGE_DELETE_ENABLED
+          value: "true"
+        - name: REGISTRY_PROXY_REMOTEURL
+          value: {{ .Values.proxy.url }}
+  {{- if .Values.proxy.username }}
+        - name: REGISTRY_PROXY_USERNAME
+          value: {{ .Values.proxy.username }}
+  {{- end -}}
+  {{- if .Values.proxy.password }}
+        - name: REGISTRY_PROXY_PASSWORD
+          value: {{ .Values.proxy.password }}
+  {{- end -}}
+{{- end }}
         volumeMounts:
         - name: image-store
           mountPath: /var/lib/registry
