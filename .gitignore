@@ -1,2 +1,2 @@
 .env.sh
-values.yaml
+values/drone.yaml

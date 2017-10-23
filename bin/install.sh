@@ -22,12 +22,12 @@ if [ "`uname -s`"=="Darwin" ]; then
   fi
 fi
 
-helm plugin list | grep template > /dev/null
-if [ $? -ne 0 ]; then
-  printf "${COLOR_BLUE}installing helm template plugin${COLOR_GREEN}\n"
-  helm plugin install https://github.com/technosophos/helm-template
-  printf "${COLOR_NC}"
-fi
+#helm plugin list | grep template > /dev/null
+#if [ $? -ne 0 ]; then
+#  printf "${COLOR_BLUE}installing helm template plugin${COLOR_GREEN}\n"
+#  helm plugin install https://github.com/technosophos/helm-template
+#  printf "${COLOR_NC}"
+#fi
 
 if [ $haveMiniRunning -ne 1 ]; then
   [ -e $CLUSTER_HOST ] && printf "${COLOR_LIGHT_RED}CLUSTER_HOST not found in env! Please set as main domain for app subdomains.${COLOR_NC}\n" && exit 1
@@ -37,10 +37,11 @@ if [ $haveMiniRunning -ne 1 ]; then
   [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong starting minikube cluster${COLOR_NC}\n" && exit 1
   printf "${COLOR_NC}"
 
-  printf "${COLOR_BLUE}installing Letsencrypt Staging CA${COLOR_GREEN}\n"
-  sh $root/bin/add-trusted-ca-to-docker-domains.sh
-  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing Letsencrypt Staging CA${COLOR_NC}\n" && exit 1
-  printf "${COLOR_NC}"
+# disabling while we use localhost:5000
+#  printf "${COLOR_BLUE}installing Letsencrypt Staging CA${COLOR_GREEN}\n"
+#  sh $root/bin/add-trusted-ca-to-docker-domains.sh
+#  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing Letsencrypt Staging CA${COLOR_NC}\n" && exit 1
+#  printf "${COLOR_NC}"
 fi
 
 kubectl get nodes | grep Ready &> /dev/null
@@ -69,7 +70,11 @@ printf "${COLOR_NC}"
 #printf "${COLOR_NC}"
 
 printf "${COLOR_BLUE}deploying all charts\n${COLOR_GREEN}"
-helm template -r mostack $root | kubectl apply -f -
+helm template -n mostack $root/charts/kube-lego -f $root/values/kube-lego.yaml | kubectl apply -f -
+helm template -n mostack-cache $root/charts/docker-registry -f $root/values/docker-registry-cache.yaml | kubectl apply -f -
+helm template -n mostack $root/charts/docker-registry -f $root/values/docker-registry.yaml | kubectl apply -f -
+helm template -n mostack $root/charts/drone -f $root/values/drone.yaml | kubectl apply -f -
+helm template -n mostack $root/charts/api -f $root/values/api.yaml | kubectl apply -f -
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing charts${COLOR_NC}\n" && exit 1
 printf "${COLOR_NC}"
 

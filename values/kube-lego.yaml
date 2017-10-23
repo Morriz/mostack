@@ -1,0 +1,5 @@
+config:
+  LEGO_EMAIL: morriz@idiotz.nl
+#  LEGO_URL: https://acme-v01.api.letsencrypt.org/directory
+rbac:
+  create: true

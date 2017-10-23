@@ -26,8 +26,9 @@ persistentVolume:
   ##
   storageClass: "-"
   annotations: {}
-proxy:
+localproxy:
   enabled: false
+  port: 5000
   image:
     repository: gcr.io/google_containers/kube-registry-proxy
     tag: 0.4
@@ -36,7 +37,7 @@ service:
   http:
     externalPort: 80
 ingress:
-  enabled: true
+  enabled: false
   tls: true
   hostname: your.doma.in
   annotations:
@@ -46,4 +47,9 @@ ingress:
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
     ingress.kubernetes.io/proxy-body-size: 20m
+proxy:
+  enabled: false
+  url: https://registry-1.docker.io
+#  username: bla
+#  password: bla
 

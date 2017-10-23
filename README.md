@@ -9,51 +9,60 @@ I'd like to avoid imperatively wiring parts together or operating on parts alone
 Therefor I would like the result to be a git repo allowing us to transform every git push into the next app state.
 
 So far I am using the following (mostly open source) technologies:
-* [Kubernetes](https://github.com/kubernetes/kubernetes) for describing our container infrastructure.
-* [Kops](https://github.com/kubernetes/kops) for installing Kubernetes (anywhere you want) on [CoreOS](https//coreos.com) nodes
-* Or [Minikube](https://github.com/kubernetes/minikube) for running a local k8s cluster
-* [Helm](https://github.com/kubernetes/helm) for packaging and deploying of kubernetes apps and subapps.
+* [Kubernetes](https://github.com/Kubernetes/Kubernetes) for describing our container infrastructure.
+* [Kops](https://github.com/Kubernetes/kops) for installing Kubernetes (anywhere you want) on [CoreOS](https//coreos.com) nodes
+* Or [Minikube](https://github.com/Kubernetes/minikube) for running a local k8s cluster
+* [Helm](https://github.com/Kubernetes/helm) for packaging and deploying of Kubernetes apps and subapps.
 
 Running the following Kubernetes applications/tools:
 * *DISABLED FOR NOW:* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements
-* *COMING SOON:* [ExternalDNS](https://github.com/kubernetes-incubator/external-dns) for making our services accesible at our FQDN
+* *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 * Docker Registry for storing locally built images, and as a proxy + storage for external ones.
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-docker](https://github.com/drone-plugins/drone-docker) for pushing new image
-    * [drone-kubernetes](https://github.com/honestbee/drone-kubernetes) to deploy
+    * [drone-Kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
     *
+
+We will be going through the following workflow:
+
+1. Installing the cluster
+2. Deploying the apps
+3. Destroying the cluster
+
+At any point can any step be re-run to result in the same (idempotent) state.
+After destroying the cluster, and then running install again, all storage endpoints will still contain the previously built/cached artifacts and configuration.
+The next boot should thus be much faster :)
 
 ### 1. Installing
 
-#### 1.1 Install your kubernetes cluster
+#### 1.1 Install a (bare) Kubernetes cluster
 
-The `bin/install.sh` script will start the minikube cluster if it has not started yet.
+The `bin/install.sh` script will start the minikube cluster if it has not started yet. Please read up on 1.2 first for configuration.
 
 Please read up on booting your cluster with [Kops] otherwise.
 Make sure you boot the cluster with a main nginx ingress controller. Minikube does this by default.
 
-#### 1.2 Configure your cluster
+#### 1.2 Configure the apps
 
 While you're waiting you can
 
-    cp values.sample.yaml values.yaml
+    cp values/drone.sample.yaml values/drone.yaml
 
-And start editing values.yaml
+And start editing values/*.yaml (see all the options in `charts/*/values.yaml`).
 
 Also `export CLUSTER_HOST=...` with whatever cluster domain you want to point to.
 
-IMPORTANT: The subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
+IMPORTANT: The `CLUSTER_HOST` subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
 
-And don't forget to install a webhook in the forked `Morriz/nodejs-api-demo` repo to fill in those secrets here.
+And don't forget to install a webhook in the forked `Morriz/nodejs-api-demo` repo and to fill in those secrets in the `drone.yaml` values.
 
 #### 1.3 Deploy everything
 
 PREREQUISITES:
-- A running kubernetes cluster with RBAC enabled and `kubectl` installed on your local machine.
-- Helm (if on osx it will detect and autoinstall)
-- Helm template plugin (if on osx it will detect and autoinstall)
+- A running Kubernetes cluster with RBAC enabled and `kubectl` installed on your local machine.
+- Helm ^2.7.0 (this version depends on `template` functionality, if on osx it will detect and autoinstall)
 - Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
-- [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager)
+- [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager temporarily if you like to bypass browser https warnings)
 - In case you run minikube or another local cluster behind nat/firewall, make sure that port 80 and 443 are portforwarded to your local machine
 
 Running the main installer with `bin/install.sh` will install everything. Please edit that script to enable/disable minikube settings if needed.
@@ -84,7 +93,7 @@ Let's configure Drone now:
         KUBERNETES_DNS=10.0.0.10 # if minikube
         REGISTRY=localhost:5000 # or public
 
-For getting the right cert and token please read last paragraph here: https://github.com/honestbee/drone-kubernetes
+For getting the right cert and token please read last paragraph here: https://github.com/honestbee/drone-Kubernetes
 
 ##### 2.1.2 Trigger build pipeline
 
@@ -99,4 +108,3 @@ For getting the right cert and token please read last paragraph here: https://gi
 Check output for the following url: https://api.dev.yourdoma.in/api/publicmethod
 
 It should already be running ok, or it is in the process of detecting the new image and rolling out the update.
-Â
