@@ -3,6 +3,7 @@ localproxy:
   port: 6000
 proxy:
   enabled: true
-hostPath:
-  enabled: true
-  path: /Users/Morriz/Documents/Workspace/playground/mostack/minidata/registry-cache
+persistentVolume:
+  existingClaim: mostack-pvc
+  size: 10Gi
+  subPath: registry-cache

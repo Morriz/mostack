@@ -45,6 +45,7 @@ spec:
         volumeMounts:
         - name: image-store
           mountPath: /var/lib/registry
+          subPath: "{{ .Values.persistentVolume.subPath }}"
         ports:
         - containerPort: 5000
           name: registry
@@ -54,9 +55,6 @@ spec:
       {{- if .Values.persistentVolume.enabled }}
         persistentVolumeClaim:
           claimName: {{ if .Values.persistentVolume.existingClaim }}{{ .Values.persistentVolume.existingClaim }}{{- else }}{{ template "fullname" . }}{{- end }}
-      {{- else if .Values.hostPath.enabled }}
-        hostPath:
-          path: {{ if .Values.hostPath.path }}{{ .Values.hostPath.path }}{{- else }}/data/registry{{- end }}
       {{- else }}
         emptyDir: {}
       {{- end -}}

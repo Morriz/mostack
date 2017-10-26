@@ -7,10 +7,12 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 apps=(api drone reg)
 pem=`cat $root/fakelerootx1.pem`
 
-minikube ssh "echo \"$pem\" | grep -f /etc/ssl/certs/ca-certificates.crt" > /dev/null
-if [ $? -ne 0 ]; then
+caExists=`minikube ssh "echo '$pem' | tail -n +2 | head -n -1 | grep -f /etc/ssl/certs/ca-certificates.crt"`
+if [ "$caExists" ]; then
+  echo "LetsEncrypt staging CA already appended to /etc/ssl/certs/ca-certificates.crt, skipping..."
+else
   echo "LetsEncrypt staging CA is not yet appended to /etc/ssl/certs/ca-certificates.crt in minikube, appending..."
-  minikube ssh "echo \"$pem\" | tee -a /etc/ssl/certs/ca-certificates.crt" > /dev/null
+  minikube ssh "echo \"$pem\" | sudo tee -a /etc/ssl/certs/ca-certificates.crt" > /dev/null
 fi
 
 for app in "${apps[@]}"

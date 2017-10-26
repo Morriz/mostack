@@ -16,23 +16,15 @@ spec:
       labels:
         app: {{ template "name" . }}
         release: {{ .Release.Name }}
-      annotations:
-        pod.beta.kubernetes.io/init-containers: |-
-          [
-            {
-              "name": "registry-listener",
-              "image": "sequenceiq/alpine-dig",
-              "imagePullPolicy": "IfNotPresent",
-              "command": [
-                "sh", "-c",
-                "for i in {1..100}; do sleep 1; if dig {{ .Release.Name }}-docker-registry; then exit 0; fi; done; sleep 5"
-              ]
-            }
-          ]
     spec:
+      initContainers:
+      - name: registry-listener
+        image: sequenceiq/alpine-dig
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nslookup {{ .Release.Name }}-docker-registry.default.svc.cluster.local; do echo waiting for {{ .Release.Name }}-docker-registry.default.svc.cluster.local; sleep 2; done;']
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}

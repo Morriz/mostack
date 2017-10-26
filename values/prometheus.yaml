@@ -1,0 +1,12 @@
+rbac:
+  create: false
+alertmanager:
+  persistentVolume:
+    existingClaim: mostack-pvc
+    size: 1Gi
+    subPath: prometheus-alertmanager
+server:
+  persistentVolume:
+    existingClaim: mostack-pvc
+    size: 1Gi
+    subPath: prometheus-server

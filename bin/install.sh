@@ -69,6 +69,10 @@ printf "${COLOR_NC}"
 #[ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing istio${COLOR_NC}\n" && exit 1
 #printf "${COLOR_NC}"
 
+printf "${COLOR_BLUE}claiming persistent volume\n${COLOR_GREEN}"
+kubectl apply -f $root/k8s/pvc.yaml
+printf "${COLOR_NC}"
+
 printf "${COLOR_BLUE}deploying registry cache chart first\n${COLOR_GREEN}"
 helm template -n mostack-cache $root/charts/docker-registry -f $root/values/docker-registry-cache.yaml | kubectl apply -f -
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing registry cache chart${COLOR_NC}\n" && exit 1
@@ -78,12 +82,20 @@ printf "${COLOR_BLUE}waiting for registry cache to become available${COLOR_BROWN
 kubectl rollout status -w deployment/mostack-cache-docker-registry
 printf "${COLOR_NC}"
 
-printf "${COLOR_BLUE}now deploying rest of the charts\n${COLOR_GREEN}"
+printf "${COLOR_BLUE}now deploying rest of the local charts\n${COLOR_GREEN}"
 helm template -n mostack $root/charts/kube-lego -f $root/values/kube-lego.yaml | kubectl apply -f -
 helm template -n mostack $root/charts/docker-registry -f $root/values/docker-registry.yaml | kubectl apply -f -
 helm template -n mostack $root/charts/drone -f $root/values/drone.yaml | kubectl apply -f -
 helm template -n mostack $root/charts/api -f $root/values/api.yaml | kubectl apply -f -
+helm template -n mostack $root/charts/prometheus -f $root/values/prometheus.yaml | kubectl apply -f -
+kubectl delete jobs/mostack-grafana-set-datasource > /dev/null
+helm template -n mostack $root/charts/grafana -f $root/values/grafana.yaml | kubectl apply -f -
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing app charts${COLOR_NC}\n" && exit 1
+printf "${COLOR_NC}"
+
+printf "${COLOR_BLUE}now deploying extra k8s/ files\n${COLOR_GREEN}"
+#sh $root/bin/helm-remotes.sh
+sh $root/bin/logging.sh
 printf "${COLOR_NC}"
 
 printf "${COLOR_BLUE}waiting for kube-lego to become available${COLOR_BROWN}\n"

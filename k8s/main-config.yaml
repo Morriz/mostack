@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  annotations:
-  name: main-config
-  namespace: default
-data:
-  cluster.host: dev.idiotz.nl
-

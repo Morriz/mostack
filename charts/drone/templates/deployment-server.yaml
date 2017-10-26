@@ -46,6 +46,7 @@ spec:
         - mountPath: /etc/ssl/certs/ca-certificates.crt
           name: certs
         - mountPath: /var/lib/drone
+          subPath: "{{ .Values.persistentVolume.subPath }}"
           name: persistentdata
       volumes:
       - name: certs
@@ -55,9 +56,6 @@ spec:
       {{- if .Values.persistentVolume.enabled }}
         persistentVolumeClaim:
           claimName: {{ if .Values.persistentVolume.existingClaim }}{{ .Values.persistentVolume.existingClaim }}{{- else }}{{ template "fullname" . }}{{- end }}
-      {{- else if .Values.hostPath.enabled }}
-        hostPath:
-          path: {{ if .Values.hostPath.path }}{{ .Values.hostPath.path }}{{- else }}/data/registry{{- end }}
       {{- else }}
         emptyDir: {}
       {{- end -}}

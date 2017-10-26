@@ -18,6 +18,8 @@ Running the following Kubernetes applications/tools:
 * *DISABLED FOR NOW:* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements
 * *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 * Docker Registry for storing locally built images, and as a proxy + storage for external ones.
+* [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com)
+* [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-docker](https://github.com/drone-plugins/drone-docker) for pushing new image
     * [drone-Kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
@@ -56,6 +58,9 @@ IMPORTANT: The `CLUSTER_HOST` subdomains must all point to the main public nginx
 
 And don't forget to install a webhook in the forked `Morriz/nodejs-api-demo` repo and to fill in those secrets in the `drone.yaml` values.
 
+EXCEPTIONAL: The ElasticSearch + Kibana configuration is not yet *helmified* and needs to be edited here:
+`k8s/elk` (specifically the service url is to be found here: `k8s/elk/elk-ing.yaml`)
+
 #### 1.3 Deploy everything
 
 PREREQUISITES:
@@ -77,7 +82,8 @@ Please check if all apps are running:
 and wait...
 
 The `api` deployment can't start because it can't find it's local docker image, which is not yet in the registry.
-Drone needs to build from a commit first, which we will get to later.
+Drone needs to build from a commit first, which we will get to later. After that the `api:latest` tag is permanently stored in the registry's file storage,
+which survives cluster deletion, and will thus be immediately used upon cluster re-creation.
 
 Let's configure Drone now:
 
@@ -108,3 +114,16 @@ For getting the right cert and token please read last paragraph here: https://gi
 Check output for the following url: https://api.dev.yourdoma.in/api/publicmethod
 
 It should already be running ok, or it is in the process of detecting the new image and rolling out the update.
+
+#### 2.3 Prometheus stats in Grafana
+
+Look at a pre-installed [Grafana dashboard](https://grafana.dev.yourdoma.in) showing the cluster metrics.
+Use the following default creds if not changed already in `values/grafana.yaml`:
+
+* username: Admin
+* password: jaja
+
+#### 2.4 Kibana log view
+
+Look at a pre-installed [Kibana dashboard](https://kibana.dev.yourdoma.in) showing the cluster metrics.
+Use the following index pattern 'filebeat-*` and select one of the time formats and go to "Discover".

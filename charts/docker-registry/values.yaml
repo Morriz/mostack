@@ -12,7 +12,7 @@ init:
     tag: latest
   tarballURL:
 persistentVolume:
-  enabled: false
+  enabled: true
   accessModes:
     - ReadWriteOnce
   existingClaim: ""
@@ -26,6 +26,7 @@ persistentVolume:
   ##
   storageClass: "-"
   annotations: {}
+  subPath: registry
 localproxy:
   enabled: false
   port: 5000

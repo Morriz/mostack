@@ -66,6 +66,7 @@ persistentVolume:
   ##
   storageClass: "-"
   annotations: {}
+  subPath: drone
 
 agent:
   # Drone agent configuration. Values in here get injected as environment variables.

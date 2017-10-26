@@ -1,9 +1,10 @@
 localproxy:
   enabled: true
-ingress:
-  enabled: false
-  tls: false
-  hostname: reg.dev.idiotz.nl
-hostPath:
-  enabled: true
-  path: /Users/Morriz/Documents/Workspace/playground/mostack/minidata/registry
+#ingress:
+#  enabled: true
+#  tls: false
+#  hostname: reg.dev.idiotz.nl
+persistentVolume:
+  existingClaim: mostack-pvc
+  size: 3Gi
+  subPath: registry
