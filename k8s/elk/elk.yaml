@@ -5,6 +5,165 @@ kind: Namespace
 metadata:
   name: logging
 ---
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: logging
+  labels:
+    app: filebeat
+    kubernetes.io/cluster-service: "true"
+data:
+  filebeat.yml: |-
+    filebeat.config:
+      prospectors:
+        # Mounted `filebeat-prospectors` configmap:
+        path: ${path.config}/prospectors.d/*.yml
+        # Reload prospectors configs as they change:
+        reload.enabled: false
+      modules:
+        path: ${path.config}/modules.d/*.yml
+        # Reload module configs as they change:
+        reload.enabled: false
+
+    processors:
+      - add_cloud_metadata:
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-prospectors
+  namespace: logging
+  labels:
+    app: filebeat
+    kubernetes.io/cluster-service: "true"
+data:
+  kubernetes.yml: |-
+    - type: log
+      paths:
+        - /var/lib/docker/containers/*/*.log
+      json.message_key: log
+      json.keys_under_root: true
+      processors:
+        - add_kubernetes_metadata:
+            in_cluster: true
+            namespace: ${POD_NAMESPACE}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: logging
+  labels:
+    app: filebeat
+    kubernetes.io/cluster-service: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        app: filebeat
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: filebeat
+        image: docker.elastic.co/beats/filebeat:6.0.0-rc1
+        args: [
+          "-c", "/etc/filebeat.yml",
+          "-e",
+        ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/filebeat.yml
+          readOnly: true
+          subPath: filebeat.yml
+        - name: prospectors
+          mountPath: /usr/share/filebeat/prospectors.d
+          readOnly: true
+        - name: data
+          mountPath: /usr/share/filebeat/data
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0600
+          name: filebeat-config
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: prospectors
+        configMap:
+          defaultMode: 0600
+          name: filebeat-prospectors
+      - name: data
+        emptyDir: {}
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: filebeat
+subjects:
+- kind: ServiceAccount
+  name: filebeat
+  namespace: logging
+roleRef:
+  kind: ClusterRole
+  name: filebeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: filebeat
+  labels:
+    app: filebeat
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources:
+  - namespaces
+  - pods
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: filebeat
+  namespace: logging
+  labels:
+    app: filebeat
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -230,30 +389,26 @@ kind: Deployment
 metadata:
   name: elasticsearch
   namespace: logging
+  labels:
+    app: elasticsearch
 spec:
   template:
     metadata:
       labels:
-        component: elasticsearch
-        role: master
-      annotations:
+        app: elasticsearch
+    spec:
+      initContainers:
+      - name: sysctl
+        image: busybox
+        imagePullPolicy: IfNotPresent
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
         # and https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration-memory.html#mlockall
-        pod.beta.kubernetes.io/init-containers: '[
-          {
-          "name": "sysctl",
-            "image": "busybox",
-            "imagePullPolicy": "IfNotPresent",
-            "command": ["sysctl", "-w", "vm.max_map_count=262144"],
-            "securityContext": {
-              "privileged": true
-            }
-          }
-        ]'
-    spec:
+        command: ['sysctl', '-w', 'vm.max_map_count=262144']
+        securityContext:
+          privileged: true
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+        image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
         imagePullPolicy: IfNotPresent
         # workarounds until https://github.com/kubernetes/kubernetes/issues/30120
         env:
@@ -285,7 +440,7 @@ spec:
             cpu: 1000m
             memory: 1G
         securityContext:
-          privileged: true
+#          privileged: true
           capabilities:
             add:
             - IPC_LOCK
@@ -293,7 +448,14 @@ spec:
         # FIXME add probes
         volumeMounts:
         - name: config
-          mountPath: /usr/share/elasticsearch/config
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: config
+          mountPath: /usr/share/elasticsearch/config/log4j2.properties
+          subPath: log4j2.properties
+        - name: config
+          mountPath: /usr/share/elasticsearch/config/jvm.options
+          subPath: jvm.options
         - name: data
           mountPath: /usr/share/elasticsearch/data
       volumes:
@@ -320,6 +482,8 @@ kind: Deployment
 metadata:
   name: eventrouter
   namespace: logging
+  labels:
+    app: eventrouter
 spec:
   # TODO - Set to 2 when ConfigMap locking is merged ~1.7
   # https://github.com/kubernetes/kubernetes/pull/42666
@@ -327,7 +491,7 @@ spec:
   template:
     metadata:
       labels:
-        component: eventrouter
+        app: eventrouter
     spec:
       containers:
       - name: eventrouter
@@ -345,114 +509,111 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: filebeat
+  name: kibana-config
   namespace: logging
   labels:
-    component: filebeat
+    app: kibana
 data:
-  filebeat.yml: |
-    filebeat.prospectors:
+  logtrail.json: |
+    {
+      "index_patterns" : [
+        {
+          "es": {
+            "default_index": "filebeat-*",
+            "allow_url_parameter": false
+          },
+          "tail_interval_in_seconds": 2,
+          "es_index_time_offset_in_seconds": 0,
+          "display_timezone": "Etc/UTC",
+          "display_timestamp_format": "YYYY MMM DD HH:mm:ss",
+          "max_buckets": 500,
+          "default_time_range_in_days" : 0,
+          "max_hosts": 100,
+          "max_events_to_keep_in_viewer": 5000,
+          "nested_objects" : true,
+          "fields" : {
+            "mapping" : {
+                "timestamp" : "@timestamp",
+                "display_timestamp" : "@timestamp",
+                "hostname" : "kubernetes.pod.name",
+                "program": "kubernetes.container.name",
+                "message": "log"
+            }
+          }
+        }
+      ]
+    }
+  kibana.yml: |
+    sentinl:
+      es:
+        host: elasticsearch
+        port: 9200
+        timefield: '@timestamp'
+        default_index: filebeat-*
+        type: sentinl-watcher
+        alarm_index: watcher_alarms
+        alarm_type: sentinl-alarm
+        script_type: sentinl-script
+      sentinl:
+        history: 20
+        results: 50
+      settings:
+        email:
+          active: false
+          user: username
+          password: password
+          host: smtp.server.com
+          ssl: true
+        slack:
+          active: true
+          username: Sentinl
+          hook: 'https://hooks.slack.com/services/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'
+        webhook:
+          active: false
+          method: POST
+          host: host
+          port: 9200
+          path: ':/{{payload.watcher_id}'
+          body: '{{payload.watcher_id}}{payload.hits.total}}'
+        report:
+          active: false
+          tmp_path: /tmp/
+        pushapps:
+          active: false
+          api_key: '<pushapps API Key>'
 
-    # log lines from host
-    - input_type: log
-      tags:
-      - host
-      paths:
-      - "/hostfs/var/log"
-      - "/hostfs/var/log/*"
-      - "/hostfs/var/log/*/*"
-      # - "/hostfs/var/log/dmesg"
-      # - "/hostfs/var/log/syslog"
-      exclude_files:
-      - '\.[0-9]$'
-      - '\.[0-9]\.gz$'
+    server.host: '0.0.0.0'
+    elasticsearch.url: 'http://elasticsearch:9200'
+    # Enables you specify a file where Kibi stores log output.
+    logging.dest: stdout
 
-    # log lines from containers
-    - input_type: log
-      tags:
-      - docker
-      paths:
-      - /hostfs/var/lib/docker/containers/*/*-json.log
-      json:
-        keys_under_root: false
-        message_key: log
-        add_error_key: true
-      multiline:
-        pattern: '^[[:space:]]+|^Caused by:'
-        negate: false
-        match: after
-      # processors:
-      # - decode_json_fields:
-      #     # fields: ["log", "metadata", "json.log"]
-      #     fields: ["json.log"]
-      #     target: "test"
+    # Set the value of this setting to true to suppress all logging output.
+    logging.silent: false
 
-    output.elasticsearch:
-      hosts: ["elasticsearch:9200"]
-      template.name: "filebeat"
-      template.path: "filebeat.template.json"
-      template.overwrite: true
+    # Set the value of this setting to true to suppress all logging output other than error messages.
+    logging.quiet: false
 
-    # Available log levels are: critical, error, warning, info, debug
-    logging.level: info
----
-apiVersion: extensions/v1beta1
-kind: DaemonSet
-metadata:
-  name: filebeat
-  namespace: logging
-spec:
-  template:
-    metadata:
-      labels:
-        component: filebeat
-    spec:
-      containers:
-      - name: filebeat
-        image: giantswarm/filebeat:5.2.2
-        imagePullPolicy: IfNotPresent
-        resources:
-          # keep request = limit to keep this container in guaranteed class
-          limits:
-            cpu: 100m
-          requests:
-            cpu: 100m
-        volumeMounts:
-        - name: config
-          mountPath: /etc/filebeat
-          readOnly: true
-        - name: hostfs-var-lib-docker-containers
-          mountPath: /hostfs/var/lib/docker/containers
-          readOnly: true
-        - name: hostfs-var-log
-          mountPath: /hostfs/var/log
-          readOnly: true
-      volumes:
-      - name: config
-        configMap:
-          name: filebeat
-      - name: hostfs-var-log
-        hostPath:
-          path: /var/log
-      - name: hostfs-var-lib-docker-containers
-        hostPath:
-          path: /var/lib/docker/containers
+    # Set the value of this setting to true to log all events, including system usage information
+    # and all requests.
+    logging.verbose: true
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kibana
   namespace: logging
+  labels:
+    app: kibana
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        component: kibana
+        app: kibana
     spec:
       containers:
       - name: kibana
-        image: kibana:5.2.2
+        image: morriz/kibana-logtrail-sentinl:5.6.3
         imagePullPolicy: IfNotPresent
         resources:
           # keep request = limit to keep this container in guaranteed class
@@ -461,16 +622,21 @@ spec:
           requests:
             cpu: 100m
         env:
-        - name: "ELASTICSEARCH_URL"
-          value: "http://elasticsearch:9200"
+        - name: ELASTICSEARCH_URL
+          value: 'http://elasticsearch:9200'
+        - name: KIBANA_INDEX
+          value: 'filebeat-*'
         ports:
         - containerPort: 5601
           name: ui
           protocol: TCP
         volumeMounts:
         - name: kibana-config
-          mountPath: /etc/kibana
-          readOnly: true
+          mountPath: /usr/share/kibana/kibana.yml
+          subPath: kibana.yml
+        - name: kibana-config
+          mountPath: /usr/share/kibana/plugins/logtrail/logtrail.json
+          subPath: logtrail.json
       volumes:
       - name: kibana-config
         configMap:
@@ -482,7 +648,7 @@ metadata:
   name: kibana
   namespace: logging
   labels:
-    component: kibana
+    app: kibana
 spec:
   type: ClusterIP
   ports:
@@ -490,15 +656,13 @@ spec:
     protocol: TCP
     targetPort: ui
   selector:
-    component: kibana
+    app: kibana
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kube-events
   namespace: logging
-  labels:
-    app: kube-events
 spec:
   template:
     metadata:
@@ -561,7 +725,7 @@ metadata:
   name: elasticsearch
   namespace: logging
   labels:
-    component: elasticsearch
+    app: elasticsearch
 spec:
   type: NodePort
   ports:
@@ -569,4 +733,30 @@ spec:
     protocol: TCP
     targetPort: api
   selector:
-    component: elasticsearch
+    app: elasticsearch
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: logging
+  name: logging
+  labels:
+    app: kibana
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: logging.dev.idiotz.nl
+    http:
+      paths:
+      - backend:
+          serviceName: kibana
+          servicePort: 80
+        path: /*
+  tls:
+  - hosts:
+    - logging.dev.idiotz.nl
+    secretName: logging-dev.idiotz.nl-tls
+

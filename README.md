@@ -125,5 +125,5 @@ Use the following default creds if not changed already in `values/grafana.yaml`:
 
 #### 2.4 Kibana log view
 
-Look at a pre-installed [Kibana dashboard](https://kibana.dev.yourdoma.in) showing the cluster metrics.
+Look at a pre-installed [Kibana dashboard](https://kibana.dev.yourdoma.in) showing the cluster logs.
 Use the following index pattern 'filebeat-*` and select one of the time formats and go to "Discover".

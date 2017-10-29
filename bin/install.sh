@@ -95,7 +95,7 @@ printf "${COLOR_NC}"
 
 printf "${COLOR_BLUE}now deploying extra k8s/ files\n${COLOR_GREEN}"
 #sh $root/bin/helm-remotes.sh
-sh $root/bin/logging.sh
+kubectl apply -f $root/k8s/elk/
 printf "${COLOR_NC}"
 
 printf "${COLOR_BLUE}waiting for kube-lego to become available${COLOR_BROWN}\n"
