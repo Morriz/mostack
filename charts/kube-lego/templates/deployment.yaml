@@ -11,10 +11,8 @@ spec:
   replicas: {{ .Values.replicaCount }}
   template:
     metadata:
-    {{- if .Values.podAnnotations }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
-    {{- end }}
+{{ toYaml .Values.annotations | indent 8 }}
       labels:
         app: {{ template "name" . }}
         release: {{ .Release.Name }}

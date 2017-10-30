@@ -7,6 +7,7 @@ alertmanager:
     subPath: prometheus-alertmanager
 server:
   persistentVolume:
+    enabled: false
     existingClaim: mostack-pvc
     size: 1Gi
     subPath: prometheus-server

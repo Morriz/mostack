@@ -13,6 +13,8 @@ service:
     externalPort: 9000
     internalPort: 9000
   type: ClusterIP
+  annotations:
+    prometheus.io/scrape: 'true'
 
 ingress:
   enabled: false
@@ -25,6 +27,7 @@ ingress:
 #    kubernetes.io/ingress.class: istio
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
+    prometheus.io/scrape: 'true'
 
 server:
   # Drone server configuration. Values in here get injected as environment variables.
@@ -50,6 +53,8 @@ server:
     limits:
       memory: 1Gi
       cpu: 1
+  annotations:
+    prometheus.io/scrape: 'true'
 
 persistentVolume:
   enabled: false
@@ -80,6 +85,8 @@ agent:
     limits:
       memory: 1Gi
       cpu: 1
+  annotations:
+    prometheus.io/scrape: 'true'
 
 # Uncomment this if you want to set a specific shared secret between
 # the agents and servers, otherwise this will be auto-generated.

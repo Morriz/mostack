@@ -6,6 +6,8 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+{{ toYaml .Values.agent.annotations | indent 8 }}
       labels:
         app: {{ template "fullname" . }}-agent
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

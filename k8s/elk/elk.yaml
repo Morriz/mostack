@@ -68,6 +68,9 @@ spec:
     metadata:
       labels:
         app: filebeat
+      annotations:
+        prometheus.io/scrape: "true"
+
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
@@ -369,6 +372,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            prometheus.io/scrape: "true"
         spec:
           containers:
           - name: curator
@@ -396,6 +402,8 @@ spec:
     metadata:
       labels:
         app: elasticsearch
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       initContainers:
       - name: sysctl
@@ -492,6 +500,8 @@ spec:
     metadata:
       labels:
         app: eventrouter
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: eventrouter
@@ -545,57 +555,19 @@ data:
     }
   kibana.yml: |
     sentinl:
-      es:
-        host: elasticsearch
-        port: 9200
-        timefield: '@timestamp'
-        default_index: filebeat-*
-        type: sentinl-watcher
-        alarm_index: watcher_alarms
-        alarm_type: sentinl-alarm
-        script_type: sentinl-script
-      sentinl:
-        history: 20
-        results: 50
       settings:
-        email:
-          active: false
-          user: username
-          password: password
-          host: smtp.server.com
-          ssl: true
         slack:
           active: true
           username: Sentinl
-          hook: 'https://hooks.slack.com/services/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'
-        webhook:
-          active: false
-          method: POST
-          host: host
-          port: 9200
-          path: ':/{{payload.watcher_id}'
-          body: '{{payload.watcher_id}}{payload.hits.total}}'
-        report:
-          active: false
-          tmp_path: /tmp/
-        pushapps:
-          active: false
-          api_key: '<pushapps API Key>'
+          hook: 'https://hooks.slack.com/services/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'
 
     server.host: '0.0.0.0'
     elasticsearch.url: 'http://elasticsearch:9200'
-    # Enables you specify a file where Kibi stores log output.
-    logging.dest: stdout
-
-    # Set the value of this setting to true to suppress all logging output.
-    logging.silent: false
-
-    # Set the value of this setting to true to suppress all logging output other than error messages.
-    logging.quiet: false
-
-    # Set the value of this setting to true to log all events, including system usage information
-    # and all requests.
-    logging.verbose: true
+    #logging:
+    #  dest: stdout
+    #  silent: false
+    #  quiet: false
+    #  verbose: true
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -610,6 +582,8 @@ spec:
     metadata:
       labels:
         app: kibana
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: kibana
@@ -632,7 +606,7 @@ spec:
           protocol: TCP
         volumeMounts:
         - name: kibana-config
-          mountPath: /usr/share/kibana/kibana.yml
+          mountPath: /usr/share/kibana/config/kibana.yml
           subPath: kibana.yml
         - name: kibana-config
           mountPath: /usr/share/kibana/plugins/logtrail/logtrail.json
@@ -668,6 +642,8 @@ spec:
     metadata:
       labels:
         app: kube-events
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: kube-events
@@ -746,6 +722,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
+    prometheus.io/scrape: 'true'
 spec:
   rules:
   - host: logging.dev.idiotz.nl

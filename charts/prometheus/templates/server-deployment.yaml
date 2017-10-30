@@ -12,10 +12,11 @@ spec:
   replicas: {{ .Values.server.replicaCount }}
   template:
     metadata:
-    {{- if .Values.server.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/server-configmap.yaml") . | sha256sum }}
+        {{- if .Values.server.podAnnotations }}
 {{ toYaml .Values.server.podAnnotations | indent 8 }}
-    {{- end }}
+        {{- end }}
       labels:
         app: {{ template "prometheus.name" . }}
         component: "{{ .Values.server.name }}"

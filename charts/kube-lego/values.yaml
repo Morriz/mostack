@@ -31,8 +31,9 @@ nodeSelector: {}
 
 ## Annotations to be added to pods
 ##
-podAnnotations:
+annotations:
   sidecar.istio.io/inject: 'false'
+  prometheus.io/scrape: 'true'
 
 replicaCount: 1
 

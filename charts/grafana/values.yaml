@@ -10,6 +10,12 @@ server:
 
   nodeSelector: {}
   tolerations: []
+  annotations:
+    prometheus.io/scrape: 'true'
+
+  job:
+    annotations:
+      prometheus.io/scrape: 'true'
 
   ingress:
     ## If true, Grafana Ingress will be created
@@ -35,6 +41,11 @@ server:
     #   - secretName: grafana-server-tls
     #     hosts:
     #       - grafana.domain.com
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: 'true'
+      ingress.kubernetes.io/rewrite-target: /
+      prometheus.io/scrape: 'true'
 
   ## Grafana container name
   ##
@@ -106,7 +117,9 @@ server:
   service:
     ## Grafana service annotations
     ##
-    annotations: {}
+    annotations:
+      prometheus.io/scrape: 'true'
+
 
     ## Grafana service type
     ##

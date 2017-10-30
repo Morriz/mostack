@@ -4,10 +4,6 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  annotations:
-  {{- range $key, $value := .Values.server.ingress.annotations }}
-    {{ $key }}: {{ $value | quote }}
-  {{- end }}
   labels:
     app: {{ template "grafana.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -15,6 +11,8 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
   name: {{ template "grafana.server.fullname" . }}
+  annotations:
+{{ toYaml .Values.server.ingress.annotations | indent 4 }}
 spec:
   rules:
   {{- range .Values.server.ingress.hosts }}

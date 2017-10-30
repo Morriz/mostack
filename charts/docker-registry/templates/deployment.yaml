@@ -11,6 +11,8 @@ spec:
   replicas: {{ .Values.replicas }}
   template:
     metadata:
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}
       labels:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
