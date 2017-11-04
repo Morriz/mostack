@@ -4,6 +4,6 @@ localproxy:
 proxy:
   enabled: true
 persistentVolume:
-  existingClaim: mostack-pvc
+  existingClaim: mostack-pvc-kube-system
   size: 10Gi
   subPath: registry-cache

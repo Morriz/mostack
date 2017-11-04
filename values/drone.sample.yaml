@@ -23,8 +23,7 @@ agent:
     DRONE_DEBUG: true
 shared_secret: adsfasdfasdfasd123
 persistentVolume:
-  existingClaim: mostack-pvc
+  existingClaim: mostack-pvc-drone
   size: 1Gi
-  subPath: drone
 rbac:
   create: true

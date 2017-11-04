@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
+shopt -s expand_aliases
 . $root/bin/aliases
 
 printf "${COLOR_WHITE}RUNNING INSTALL:${COLOR_NC}\n"
@@ -16,23 +17,16 @@ minikube ip > /dev/null 2>&1
 if [ "`uname -s`"=="Darwin" ]; then
   which helm > /dev/null
   if [ $? -ne 0 ]; then
-    printf "${COLOR_BLUE}installing helm${COLOR_GREEN}\n"
+    printf "${COLOR_BLUE}Installing helm${COLOR_GREEN}\n"
     [[ -x `command -v helm` ]] || brew install helm
     printf "${COLOR_NC}"
   fi
 fi
 
-#helm plugin list | grep template > /dev/null
-#if [ $? -ne 0 ]; then
-#  printf "${COLOR_BLUE}installing helm template plugin${COLOR_GREEN}\n"
-#  helm plugin install https://github.com/technosophos/helm-template
-#  printf "${COLOR_NC}"
-#fi
-
 if [ $haveMiniRunning -ne 1 ]; then
-  [ -e $CLUSTER_HOST ] && printf "${COLOR_LIGHT_RED}CLUSTER_HOST not found in env! Please set as main domain for app subdomains.${COLOR_NC}\n" && exit 1
+#  [ -e $CLUSTER_HOST ] && printf "${COLOR_LIGHT_RED}CLUSTER_HOST not found in env! Please set as main domain for app subdomains.${COLOR_NC}\n" && exit 1
 
-  printf "${COLOR_BLUE}starting minikube cluster${COLOR_GREEN}\n"
+  printf "${COLOR_BLUE}Starting minikube cluster${COLOR_GREEN}\n"
   sh $root/bin/minikube-start.sh
   [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong starting minikube cluster${COLOR_NC}\n" && exit 1
   printf "${COLOR_NC}"
@@ -44,65 +38,77 @@ if [ $haveMiniRunning -ne 1 ]; then
 #  printf "${COLOR_NC}"
 fi
 
-kubectl get nodes | grep Ready &> /dev/null
-printf "${COLOR_BLUE}waiting for a node to talk to${COLOR_BROWN}\n"
-until [ $? -eq 0 ]; do
-  echo "waiting 3 seconds..."
-  sleep 3
-  kubectl get nodes | grep Ready &> /dev/null
-done
-printf "${COLOR_NC}"
+printf "${COLOR_PURPLE}Waiting for a node to talk to"
+until k get nodes > /dev/null 2>&1; do sleep 1; printf "."; done
 
-printf "${COLOR_BLUE}waiting for kubernetes to listen${COLOR_BROWN}\n"
-kubectl rollout status -w deployment/kube-dns -n kube-system &> /dev/null
-until [ $? -eq 0 ]; do
-  echo "no response, waiting 10 secs..."
-  sleep 10
-  kubectl rollout status -w deployment/kube-dns -n kube-system &> /dev/null
-done
-printf "${COLOR_NC}"
+printf "\n${COLOR_PURPLE}Waiting for kubernetes to listen"
+until ks rollout status -w deployment/kube-dns > /dev/null 2>&1; do sleep 1; printf "."; done
 
 #printf "${COLOR_BLUE}deploying istio\n${COLOR_GREEN}"
-#kubectl apply -f $root/k8s/istio/istio-auth.yaml
-#kubectl apply -f $root/k8s/istio/istio-initializer.yaml
-#kubectl apply -f $root/k8s/istio/addons/
+#k apply -f $root/k8s/istio/istio-auth.yaml
+#k apply -f $root/k8s/istio/istio-initializer.yaml
+#k apply -f $root/k8s/istio/addons/
 #[ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing istio${COLOR_NC}\n" && exit 1
 #printf "${COLOR_NC}"
 
-printf "${COLOR_BLUE}claiming persistent volume\n${COLOR_GREEN}"
-kubectl apply -f $root/k8s/pvc.yaml
-printf "${COLOR_NC}"
+#printf "${COLOR_BLUE}Applying RBAC for minikube asap\n${COLOR_GREEN}"
+#k apply -f $root/k8s/minikube-rbac.yaml
 
-printf "${COLOR_BLUE}deploying registry cache chart first\n${COLOR_GREEN}"
-helm template -n mostack-cache $root/charts/docker-registry -f $root/values/docker-registry-cache.yaml | kubectl apply -f -
+printf "\n${COLOR_BLUE}Claiming persistent volume\n${COLOR_GREEN}"
+k apply -f $root/k8s/pvc.yaml
+
+printf "${COLOR_BLUE}Deploying registry cache chart first\n${COLOR_GREEN}"
+helm template -n mostack-cache $root/charts/docker-registry -f $root/values/docker-registry-cache.yaml | ks apply -f -
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing registry cache chart${COLOR_NC}\n" && exit 1
-printf "${COLOR_NC}"
 
-printf "${COLOR_BLUE}waiting for registry cache to become available${COLOR_BROWN}\n"
-kubectl rollout status -w deployment/mostack-cache-docker-registry
-printf "${COLOR_NC}"
+printf "${COLOR_PURPLE}Waiting for registry cache to become available${COLOR_BROWN}\n"
+ks rollout status -w deployment/mostack-cache-docker-registry
 
-printf "${COLOR_BLUE}now deploying rest of the local charts\n${COLOR_GREEN}"
-helm template -n mostack $root/charts/kube-lego -f $root/values/kube-lego.yaml | kubectl apply -f -
-helm template -n mostack $root/charts/docker-registry -f $root/values/docker-registry.yaml | kubectl apply -f -
-helm template -n mostack $root/charts/drone -f $root/values/drone.yaml | kubectl apply -f -
-helm template -n mostack $root/charts/api -f $root/values/api.yaml | kubectl apply -f -
-helm template -n mostack $root/charts/prometheus -f $root/values/prometheus.yaml | kubectl apply -f -
-kubectl delete jobs/mostack-grafana-set-datasource > /dev/null
-helm template -n mostack $root/charts/grafana -f $root/values/grafana.yaml | kubectl apply -f -
+#printf "${COLOR_BLUE}deploying nginx controller\n${COLOR_GREEN}"
+#helm template -n mostack $root/charts/nginx-ingress -f $root/values/nginx-ingress.yaml | k apply -f -
+#[ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing nginx controller${COLOR_NC}\n" && exit 1
+#printf "${COLOR_NC}"
+#
+#printf "${COLOR_BLUE}waiting for nginx controller to become available${COLOR_BROWN}\n"
+#k rollout status -w deployment/mostack-nginx-ingress-controller
+#printf "${COLOR_NC}"
+
+printf "${COLOR_BLUE}Installing namespaces 'monitoring' and 'drone'${COLOR_GREEN}\n"
+k create namespace "monitoring" > /dev/null 2>&1
+k create namespace "drone" > /dev/null 2>&1
+
+printf "${COLOR_PURPLE}Waiting for namespaces 'monitoring' and 'drone' to become available"
+until k get namespace monitoring drone > /dev/null 2>&1; do sleep 1; printf "."; done
+
+printf "\n${COLOR_BLUE}Installing Prometheus Operator${COLOR_GREEN}\n"
+helm template -n mostack $root/charts/prometheus-operator -f $root/values/prometheus-operator.yaml | km apply -f -
+
+printf "${COLOR_PURPLE}Waiting for Prometheus Operator to register custom resource definitions"
+until km get customresourcedefinitions servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until km get customresourcedefinitions prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until km get customresourcedefinitions alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until km get servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until km get prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until km get alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+
+printf "\n${COLOR_BLUE}Installing Kube Prometheus${COLOR_GREEN}\n"
+helm template -n mostack $root/charts/kube-prometheus -f $root/values/kube-prometheus.yaml | km apply -f -
+
+printf "${COLOR_BLUE}Deploying remaining (independent) charts${COLOR_GREEN}\n"
+helm template -n mostack $root/charts/grafana -f $root/values/grafana.yaml | km apply -f -
+helm template -n mostack $root/charts/kube-lego -f $root/values/kube-lego.yaml | ks apply -f -
+helm template -n mostack $root/charts/docker-registry -f $root/values/docker-registry.yaml | ks apply -f -
+helm template -n mostack $root/charts/drone -f $root/values/drone.yaml | kd apply -f -
+helm template -n mostack $root/charts/api -f $root/values/api.yaml | k apply -f -
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing app charts${COLOR_NC}\n" && exit 1
-printf "${COLOR_NC}"
 
-printf "${COLOR_BLUE}now deploying extra k8s/ files\n${COLOR_GREEN}"
-#sh $root/bin/helm-remotes.sh
-kubectl apply -f $root/k8s/elk/
-printf "${COLOR_NC}"
+printf "${COLOR_BLUE}Deploying ELK stack\n${COLOR_GREEN}"
+k apply -f $root/k8s/elk/
 
-printf "${COLOR_BLUE}waiting for kube-lego to become available${COLOR_BROWN}\n"
-kubectl rollout status -w deployment/mostack-kube-lego
-printf "${COLOR_NC}"
+printf "${COLOR_PURPLE}Waiting for kube-lego to become available${COLOR_BROWN}\n"
+ks rollout status -w deployment/mostack-kube-lego
 
-printf "${COLOR_BLUE}starting tunnels${COLOR_NC}\n"
+printf "${COLOR_BLUE}Starting tunnels${COLOR_NC}\n"
 # and run tunnel to minikube node's port 80 and 443
 [ ! -z $isMini ]  && sh $root/bin/tunnel-to-minikube-ingress.sh
 

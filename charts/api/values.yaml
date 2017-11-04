@@ -34,3 +34,4 @@ resources:
   limits:
     memory: 100M
     cpu: 1
+team: frontend

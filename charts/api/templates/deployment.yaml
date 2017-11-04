@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    app: {{ template "name" . }}
+    app: {{ template "fullname" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -14,14 +14,14 @@ spec:
       annotations:
 {{ toYaml .Values.annotations | indent 8 }}
       labels:
-        app: {{ template "name" . }}
+        app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
     spec:
       initContainers:
       - name: registry-listener
         image: sequenceiq/alpine-dig
         imagePullPolicy: IfNotPresent
-        command: ['sh', '-c', 'until nslookup {{ .Release.Name }}-docker-registry.default.svc.cluster.local; do echo waiting for {{ .Release.Name }}-docker-registry.default.svc.cluster.local; sleep 2; done;']
+        command: ['sh', '-c', 'until nslookup {{ .Release.Name }}-docker-registry.kube-system.svc.cluster.local; do echo waiting for {{ .Release.Name }}-docker-registry.kube-system.svc.cluster.local; sleep 2; done;']
       containers:
         - name: {{ .Chart.Name }}
           image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'

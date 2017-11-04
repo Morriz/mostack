@@ -1,30 +1,29 @@
-{{- if .Values.server.ingress.enabled -}}
+{{- if .Values.ingress.enabled -}}
 {{- $releaseName := .Release.Name -}}
-{{- $servicePort := .Values.server.service.httpPort -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  annotations:
+  {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
   labels:
     app: {{ template "grafana.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Values.server.name }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
   name: {{ template "grafana.server.fullname" . }}
-  annotations:
-{{ toYaml .Values.server.ingress.annotations | indent 4 }}
 spec:
   rules:
-  {{- range .Values.server.ingress.hosts }}
-    - host: {{ . }}
+    - host: {{ .Values.ingress.fqdn }}
       http:
         paths:
-          - backend:
+          - path: /
+            backend:
               serviceName: {{ printf "%s-%s" $releaseName "grafana" | trunc 63 }}
-              servicePort: {{ $servicePort }}
-  {{- end -}}
-  {{- if .Values.server.ingress.tls }}
+              servicePort: 80
+  {{- if .Values.ingress.tls }}
   tls:
-{{ toYaml .Values.server.ingress.tls | indent 4 }}
+{{ toYaml .Values.ingress.tls | indent 4 }}
   {{- end -}}
 {{- end -}}
