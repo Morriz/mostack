@@ -13,8 +13,7 @@ service:
     externalPort: 9000
     internalPort: 9000
   type: ClusterIP
-  annotations:
-    prometheus.io/scrape: 'true'
+  annotations: {}
 
 ingress:
   enabled: false
@@ -27,7 +26,6 @@ ingress:
 #    kubernetes.io/ingress.class: istio
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
-    prometheus.io/scrape: 'true'
 
 server:
   # Drone server configuration. Values in here get injected as environment variables.
@@ -53,8 +51,7 @@ server:
     limits:
       memory: 1Gi
       cpu: 1
-  annotations:
-    prometheus.io/scrape: 'true'
+  annotations: {}
 
 persistentVolume:
   enabled: false
@@ -62,7 +59,7 @@ persistentVolume:
     - ReadWriteOnce
   existingClaim:
   size: 20Gi
-  ## docker-registry data Persistent Volume Storage Class
+  ## Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
@@ -85,8 +82,7 @@ agent:
     limits:
       memory: 1Gi
       cpu: 1
-  annotations:
-    prometheus.io/scrape: 'true'
+  annotations: {}
 
 # Uncomment this if you want to set a specific shared secret between
 # the agents and servers, otherwise this will be auto-generated.

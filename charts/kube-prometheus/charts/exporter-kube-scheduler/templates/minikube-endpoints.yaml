@@ -1,0 +1,16 @@
+{{- if .Values.isMini }}
+apiVersion: v1
+kind: Endpoints
+metadata:
+  namespace: kube-system
+  name: {{ template "fullname" . }}
+  labels:
+    k8s-app: kube-scheduler
+subsets:
+- addresses:
+  - ip: {{ .Values.minikubeIp }}
+  ports:
+  - name: http-metrics
+    port: 10251
+    protocol: TCP
+{{- end }}

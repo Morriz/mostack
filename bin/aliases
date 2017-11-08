@@ -2,12 +2,7 @@ alias k="kubectl"
 alias ks="k -n kube-system"
 alias km="k -n monitoring"
 alias kd="k -n drone"
+alias kdev="k -n dev"
+alias kprod="k -n prod"
 alias kcv="k config view"
 alias mkd="killall kubectl && sudo killall ssh && minikube delete"
-
-hta() {
-  helm template -r mostack charts/$@ | kubectl apply -f -"
-}
-htd() {
-  helm template -r mostack charts/$@ | kubectl delete -f -"
-}

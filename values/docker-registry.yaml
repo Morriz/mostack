@@ -5,6 +5,6 @@ localproxy:
 #  tls: false
 #  hostname: reg.dev.idiotz.nl
 persistentVolume:
-  existingClaim: mostack-pvc-kube-system
+  existingClaim: system-pvc-kube-system
   size: 3Gi
   subPath: registry

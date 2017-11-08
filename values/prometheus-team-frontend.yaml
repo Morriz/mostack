@@ -1,0 +1,27 @@
+rbacEnable: false
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+  fqdn: prom-frontend.dev.idiotz.nl
+  tls:
+  - secretName: prom-frontend-server-tls
+    hosts:
+    - prom-frontend.dev.idiotz.nl
+resources:
+  requests:
+    memory: 400Mi
+externalUrl: https://prom-frontend.dev.idiotz.nl
+externalLabels:
+  dev: "true"
+rules:
+  specifiedInValues: true
+  value:
+    team-frontend-api.rules: |-
+      ALERT FrontendApiDown
+        IF absent(up{job="team-frontend-api"}) or (count(up{job="team-frontend-api"} == 1) BY (cluster) == 0)
+        FOR 5m
+        LABELS {service="team-frontend", severity="critical"}
+        ANNOTATIONS {description="There is no running frontend api. Deployments and replication controllers are not making progress.", summary="Frontend API is down"}

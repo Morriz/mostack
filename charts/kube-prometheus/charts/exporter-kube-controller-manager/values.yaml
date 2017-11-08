@@ -1,5 +1,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+isMini: false
 ruleFiles:
   kube-controller-manager.rules: |-
     # NOTE: These rules were kindly contributed by the SoundCloud engineering team.

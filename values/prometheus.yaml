@@ -1,75 +1,18 @@
-rbac:
-  create: false
-alertmanager:
-  persistentVolume:
-    existingClaim: mostack-pvc-monitoring
-    size: 1Gi
-    subPath: prometheus-alertmanager
-alertmanagerFiles:
-  alertmanager.yml: |-
-    global:
-      resolve_timeout: 5m
-      slack_api_url: 'https://hooks.slack.com/services/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'
-    route:
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 12h
-      receiver: default-receiver
-      routes:
-      - match:
-          alertname: DeadMansSwitch
-        repeat_interval: 5m
-        receiver: deadmansswitch
-      - match:
-          service: api
-        routes:
-        - match:
-            severity: critical
-          receiver: team-frontend-page
-    receivers:
-    - name: deadmansswitch
-    - name: team-frontend-page
-      slack_configs:
-      - channel: '#frontend'
-        send_resolved: true
-    - name: default-receiver
-      slack_configs:
-      - channel: '#devops'
-        send_resolved: true
-
-server:
-  persistentVolume:
-    enabled: false
-    existingClaim: mostack-pvc-monitoring
-    size: 1Gi
-    subPath: prometheus-server
-  ingress:
-    enabled: true
-    tls:
-    - secretName: prometheus-server-tls
-      hosts:
-      - prometheus.dev.idiotz.nl
+rbacEnable: false
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+  fqdn: prometheus.dev.idiotz.nl
+  tls:
+  - secretName: prometheus-server-tls
     hosts:
     - prometheus.dev.idiotz.nl
-
-serverFiles:
-  alerts: |
-    # Alert for any instance that is unreachable for >5 minutes.
-    ALERT InstanceDown
-      IF up == 0
-      FOR 5m
-      LABELS { severity = "page" }
-      ANNOTATIONS {
-        summary = "Instance {{ $labels.instance }} down",
-        description = "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.",
-      }
-
-    # Alert for any instance that have a median request latency >0.2s.
-    ALERT APIHighRequestLatency
-      IF api_http_request_latencies_second{quantile="0.5"} > 0.2
-      FOR 1m
-      ANNOTATIONS {
-        summary = "High request latency on {{ $labels.instance }}",
-        description = "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)",
-      }
-  rules: ""
+resources:
+  requests:
+    memory: 400Mi
+externalUrl: https://prometheus.dev.idiotz.nl
+externalLabels:
+  system: "true"

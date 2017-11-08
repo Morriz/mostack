@@ -10,6 +10,15 @@ ingress:
     - grafana.dev.idiotz.nl
   fqdn: grafana.dev.idiotz.nl
 adminPassword: 'jaja'
+dataSource:
+  prometheus-datasource.json: |+
+    {
+      "access": "proxy",
+      "basicAuth": false,
+      "name": "prometheus",
+      "type": "prometheus",
+      "url": "http://system-prometheus.default.svc:9090"
+    }
 serverDashboardFiles:
   deployment-dashboard.json: |+
     {

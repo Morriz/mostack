@@ -3,8 +3,7 @@ image:
   repository: registry
   tag: 2
   pullPolicy: IfNotPresent
-annotations:
-  prometheus.io/scrape: 'true'
+annotations: {}
 init:
   load: false
   type:
@@ -39,8 +38,7 @@ localproxy:
 service:
   http:
     externalPort: 80
-  annotations:
-    prometheus.io/scrape: 'true'
+  annotations: {}
 ingress:
   enabled: false
   tls: true
@@ -52,7 +50,6 @@ ingress:
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
     ingress.kubernetes.io/proxy-body-size: 20m
-    prometheus.io/scrape: 'true'
 proxy:
   enabled: false
   url: https://registry-1.docker.io

@@ -1,0 +1,30 @@
+rbacEnable: false
+config:
+  global:
+    slack_api_url: 'https://hooks.slack.com/services/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'
+  route:
+    receiver: default-receiver
+    repeat_interval: 3h
+    routes:
+    - match:
+        alertname: DeadMansSwitch
+      repeat_interval: 5m
+      receiver: deadmansswitch
+  receivers:
+  - name: deadmansswitch
+  - name: default-receiver
+    slack_configs:
+    - channel: '#devops'
+      send_resolved: true
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+  fqdn: alertmanager.dev.idiotz.nl
+  tls:
+  - secretName: alertmanager-server-tls
+    hosts:
+    - alertmanager.dev.idiotz.nl
+externalUrl: https://alertmanager.dev.idiotz.nl

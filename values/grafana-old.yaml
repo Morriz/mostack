@@ -17,7 +17,7 @@ server:
     datasource:
       name: prometheus
       type: prometheus
-      url: 'http://mostack-prometheus-server.default.svc.cluster.local'
+      url: 'http://system-prometheus-server.default.svc.cluster.local'
       database:
       jsonData: null
       access: proxy

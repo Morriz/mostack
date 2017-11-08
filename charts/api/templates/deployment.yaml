@@ -17,11 +17,6 @@ spec:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
     spec:
-      initContainers:
-      - name: registry-listener
-        image: sequenceiq/alpine-dig
-        imagePullPolicy: IfNotPresent
-        command: ['sh', '-c', 'until nslookup {{ .Release.Name }}-docker-registry.kube-system.svc.cluster.local; do echo waiting for {{ .Release.Name }}-docker-registry.kube-system.svc.cluster.local; sleep 2; done;']
       containers:
         - name: {{ .Chart.Name }}
           image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
@@ -30,11 +25,11 @@ spec:
             - containerPort: {{ .Values.service.http.internalPort }}
           livenessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: {{ .Values.service.http.internalPort }}
           readinessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: {{ .Values.service.http.internalPort }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}

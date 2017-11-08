@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   namespace: kube-system
-  name: mostack-pv-kube-system
+  name: system-pv-kube-system
 spec:
   accessModes:
     - ReadWriteOnce
@@ -16,7 +16,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   namespace: kube-system
-  name: mostack-pvc-kube-system
+  name: system-pvc-kube-system
 spec:
   storageClassName: ""
   accessModes:
@@ -29,7 +29,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   namespace: drone
-  name: mostack-pv-drone
+  name: system-pv-drone
 spec:
   accessModes:
     - ReadWriteOnce
@@ -43,7 +43,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   namespace: drone
-  name: mostack-pvc-drone
+  name: system-pvc-drone
 spec:
   storageClassName: ""
   accessModes:

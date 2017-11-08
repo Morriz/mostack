@@ -33,7 +33,6 @@ nodeSelector: {}
 ##
 annotations:
   sidecar.istio.io/inject: 'false'
-  prometheus.io/scrape: 'true'
 
 replicaCount: 1
 

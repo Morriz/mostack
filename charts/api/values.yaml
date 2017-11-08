@@ -7,13 +7,12 @@ autoscaler:
   targetCPUUtilizationPercentage: 10
 annotations:
   sidecar.istio.io/inject: 'false'
-  prometheus.io/scrape: 'true'
 image:
 #  repository:
   tag: latest
   pullPolicy: Always
 service:
-  name: api
+  name: frontend-api
   http:
     externalPort: 80
     internalPort: 3000
@@ -27,11 +26,10 @@ ingress:
 #    kubernetes.io/ingress.class: istio
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
-    prometheus.io/scrape: 'true'
 resources:
   requests:
     cpu: 100m
   limits:
     memory: 100M
     cpu: 1
-team: frontend
+prometheus: prometheus
