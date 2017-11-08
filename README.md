@@ -18,7 +18,7 @@ Running the following Kubernetes applications/tools:
 * *DISABLED FOR NOW:* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements
 * *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 * Docker Registry for storing locally built images, and as a proxy + storage for external ones.
-* [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com)
+* [Prometheus Operator](https://github.com/coreos/prometheus-operator) + [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com)
 * [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-docker](https://github.com/drone-plugins/drone-docker) for pushing new image
@@ -117,13 +117,20 @@ It should already be running ok, or it is in the process of detecting the new im
 
 #### 2.3 Prometheus stats in Grafana
 
-Look at a pre-installed [Grafana dashboard](https://grafana.dev.yourdoma.in) showing the cluster metrics.
+Look at a pre-installed [Grafana dashboard](https://grafana.dev.yourdoma.in) showing the system cluster metrics.
 Use the following default creds if not changed already in `values/grafana.yaml`:
 
 * username: Admin
 * password: jaja
 
+To see the prometheus and alertmanager instances for the `system` operators go to:
+https://prometheus.dev.yourdoma.in/
+https://alertmanager.dev.yourdoma.in/
+
+To see the prometheus and alertmanager instances for `team-frontend` go to:
+https://prom-frontend.dev.yourdoma.in/
+https://alerts-frontend.dev.yourdoma.in/
+
 #### 2.4 Kibana log view
 
-Look at a pre-installed [Kibana dashboard](https://kibana.dev.yourdoma.in) showing the cluster logs.
-Use the following index pattern 'filebeat-*` and select one of the time formats and go to "Discover".
+Look at a pre-installed [Kibana dashboard with Logtrail](https://kibana.dev.yourdoma.in/app/logtrail) showing the cluster logs.
