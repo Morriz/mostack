@@ -10,7 +10,9 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
-{{ toYaml .Values.server.annotations | indent 8 }}
+        {{- range $key, $value := .Values.server.annotations }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
       labels:
         app: {{ template "fullname" . }}-server
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
