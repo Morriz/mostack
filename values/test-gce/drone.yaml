@@ -1,0 +1,30 @@
+image:
+  tag: 0.8-alpine
+service:
+  type: ClusterIP
+ingress:
+  enabled: true
+  tls: true
+  hostname: drone.test-gce.idiotz.nl
+server:
+  debug: true
+  env:
+    DRONE_DEBUG: true
+    DRONE_OPEN: true
+    DRONE_DATABASE_DRIVER: sqlite3
+    DRONE_DATABASE_DATASOURCE: /var/lib/drone/drone.sqlite
+    DRONE_GITHUB_SKIP_VERIFY: true
+    DRONE_GITHUB: true
+    DRONE_ADMIN: 'Morriz'
+    DRONE_GITHUB_CLIENT: '8512dc0d0928059b357d'
+    DRONE_GITHUB_SECRET: 'ff1be618eff56a1bd350c5c188dd4d27b61c8ac5'
+agent:
+  env:
+    DRONE_DEBUG: true
+shared_secret: adsfasdfasdfasd1234
+persistentVolume:
+  enabled: true
+  existingClaim: system-pvc-drone
+  size: 1Gi
+rbac:
+  create: true

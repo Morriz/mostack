@@ -1,0 +1,10 @@
+rbac.create: false
+constroller:
+  stats.enabled: true
+  resources:
+     limits:
+       cpu: 100m
+       memory: 64Mi
+     requests:
+       cpu: 100m
+       memory: 64Mi

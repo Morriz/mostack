@@ -18,5 +18,5 @@ spec:
     matchNames:
     - {{ .Release.Namespace | quote }}
   endpoints:
-  - port: {{ .Values.service.name }}
+  - port: http
     interval: 30s

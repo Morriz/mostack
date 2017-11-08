@@ -5,12 +5,12 @@ ingress:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
-  fqdn: prometheus.dev.idiotz.nl
+  fqdn: prometheus.test-gce.idiotz.nl
   tls:
   - secretName: prometheus-server-tls
     hosts:
-    - prometheus.dev.idiotz.nl
+    - prometheus.test-gce.idiotz.nl
 resources:
   requests:
     memory: 400Mi
-externalUrl: https://prometheus.dev.idiotz.nl
+externalUrl: https://prometheus.test-gce.idiotz.nl

@@ -24,7 +24,7 @@ spec:
       caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
       # Skip verification until we have resolved why the certificate validation
       # for the kubelet on API server nodes fail.
-      insecureSkipVerify: true
+#      insecureSkipVerify: true
     bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
   - port: cadvisor
     interval: 30s

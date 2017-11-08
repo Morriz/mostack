@@ -28,6 +28,8 @@ spec:
         env:
         - name: REGISTRY_HTTP_ADDR
           value: ":5000"
+        - name: REGISTRY_LOG_LEVEL
+          value: {{ .Values.logLevel | quote }}
         - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
           value: "/var/lib/registry"
 {{- if .Values.proxy.enabled }}
@@ -43,6 +45,10 @@ spec:
         - name: REGISTRY_PROXY_PASSWORD
           value: {{ .Values.proxy.password }}
   {{- end -}}
+        {{ range $key, $value := .Values.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{ end }}
 {{- end }}
         volumeMounts:
         - name: image-store

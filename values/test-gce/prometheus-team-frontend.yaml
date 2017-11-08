@@ -5,15 +5,15 @@ ingress:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
-  fqdn: prom-frontend.dev.idiotz.nl
+  fqdn: prom-frontend.test-gce.idiotz.nl
   tls:
   - secretName: prom-frontend-server-tls
     hosts:
-    - prom-frontend.dev.idiotz.nl
+    - prom-frontend.test-gce.idiotz.nl
 resources:
   requests:
     memory: 400Mi
-externalUrl: https://prom-frontend.dev.idiotz.nl
+externalUrl: https://prom-frontend.test-gce.idiotz.nl
 rules:
   specifiedInValues: true
   value:

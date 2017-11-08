@@ -1,3 +1,4 @@
+logLevel: info
 replicas: 1
 image:
   repository: registry
