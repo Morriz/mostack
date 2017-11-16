@@ -4,11 +4,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: {{ template "name" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     component: alertmanager
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-    prometheus: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    prometheus: {{ .Values.prometheus }}
   name: {{ template "fullname" . }}
 spec:
   jobLabel: {{ template "name" . }}

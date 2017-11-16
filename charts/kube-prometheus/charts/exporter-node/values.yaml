@@ -4,6 +4,7 @@ replicaCount: 1
 image:
   repository: quay.io/prometheus/node-exporter
   tag: v0.14.0
+#  tag: v0.15.1
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP

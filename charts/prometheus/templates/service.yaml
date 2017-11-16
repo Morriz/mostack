@@ -9,7 +9,7 @@ metadata:
     app: {{ template "name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
-    prometheus: {{ .Release.Name }}
+    prometheus: {{ .Values.prometheus }}
     release: {{ .Release.Name }}
 {{- if .Values.service.labels }}
 {{ toYaml .Values.service.labels | indent 4 }}
@@ -38,5 +38,5 @@ spec:
       protocol: TCP
   selector:
     app: {{ template "name" . }}
-    prometheus: {{ .Release.Name }}
+    prometheus: {{ .Values.prometheus }}
   type: "{{ .Values.service.type }}"

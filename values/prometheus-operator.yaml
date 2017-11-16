@@ -1,1 +1,1 @@
-rbacEnable: false
+rbacEnable: {{RBAC_ENABLE}}

@@ -1,3 +1,0 @@
-rbacEnable: false
-exporter-kube-state:
-  rbacEnable: false

@@ -1,8 +1,0 @@
-localproxy:
-  enabled: true
-  port: 6000
-proxy:
-  enabled: true
-persistentVolume:
-  existingClaim: system-pvc-kube-system-registry-cache
-  size: 10Gi

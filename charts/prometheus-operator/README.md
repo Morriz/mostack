@@ -28,7 +28,13 @@ $ kubectl -n kube-system create sa tiller
 ```console
 # kubectl v1.5.x
 $ cat <<EOF | kubectl create -f -
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
 apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}alpha1
 kind: ClusterRoleBinding
 metadata:
   name: tiller
@@ -79,9 +85,9 @@ Parameter | Description | Default
 --- | --- | ---
 `configmapReload.repository` | configmap-reload image | `quay.io/coreos/configmap-reload`
 `configmapReload.tag` | configmap-reload tag | `v0.0.1`
-`global.hyperkube.repository` | Hyperkube image | `quay.io/coreos/hyperkube`
-`global.hyperkube.tag` | Hyperkube image tag | `v1.7.6_coreos.0`
-`global.hyperkube.pullPolicy` | Hyperkube image pull policy | `IfNotPresent`
+`hyperkube.repository` | Hyperkube image | `quay.io/coreos/hyperkube`
+`hyperkube.tag` | Hyperkube image tag | `v1.7.6_coreos.0`
+`hyperkube.pullPolicy` | Hyperkube image pull policy | `IfNotPresent`
 `image.repository` | Image | `quay.io/coreos/prometheus-operator`
 `image.tag` | Image tag | `v0.13.0`
 `image.pullPolicy` | Image pull policy | `IfNotPresent`

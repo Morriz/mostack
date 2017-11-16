@@ -4,6 +4,7 @@ localproxy:
 proxy:
   enabled: true
 persistentVolume:
-  existingClaim: system-pvc-kube-system
+  existingClaim: slow-pvc
+  storageClass: slow
   size: 10Gi
   subPath: registry-cache

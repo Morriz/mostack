@@ -4,8 +4,8 @@ metadata:
   labels:
     app: {{ template "grafana.fullname" . }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
   name: {{ template "grafana.server.fullname" . }}
 spec:
   replicas: 1
@@ -18,7 +18,7 @@ spec:
       {{- end }}
       labels:
         app: {{ template "grafana.fullname" . }}
-        release: "{{ .Release.Name }}"
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: grafana

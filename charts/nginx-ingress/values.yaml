@@ -243,3 +243,4 @@ tcp: {}
 ##
 udp: {}
   # 53: "kube-system/kube-dns:53"
+prometheus: prometheus

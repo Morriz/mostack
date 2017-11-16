@@ -1,9 +1,8 @@
 image:
-  repository: localhost:5000/api
+  repository: {{REGISTRY_HOST}}/api
   tag: latest
   pullPolicy: Always
 ingress:
   enabled: true
   tls: true
-  hostname: api.dev.idiotz.nl
-prometheus: team-frontend
+  hostname: api.{{CLUSTER_HOST}}

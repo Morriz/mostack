@@ -1,10 +1,9 @@
-global:
-  ## Hyperkube image to use when getting ThirdPartyResources & cleaning up
-  ##
-  hyperkube:
-    repository: quay.io/coreos/hyperkube
-    tag: v1.7.6_coreos.0
-    pullPolicy: IfNotPresent
+## Hyperkube image to use when getting ThirdPartyResources & cleaning up
+##
+hyperkube:
+  repository: quay.io/coreos/hyperkube
+  tag: v1.7.6_coreos.0
+  pullPolicy: IfNotPresent
 
 ## Prometheus-config-reloader image to use for config and rule reloading
 ##
@@ -52,3 +51,5 @@ resources: {}
   #   memory: 50Mi
 
 jobLabel: prometheus-operator
+
+prometheus: prometheus

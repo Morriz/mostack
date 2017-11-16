@@ -4,17 +4,17 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: {{ template "name" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-    prometheus: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    prometheus: {{ .Values.prometheus }}
   name: {{ template "fullname" . }}
 spec:
   jobLabel: {{ template "name" . }}
   selector:
     matchLabels:
       app: {{ template "name" . }}
-      prometheus: {{ .Release.Name }}
+      prometheus: {{ .Values.prometheus }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version }}
   namespaceSelector:
     matchNames:

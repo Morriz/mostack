@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: slow-pv
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 20Gi
+  storageClassName: slow
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /Users/Morriz/Documents/Workspace/playground/mostack/minidata/slow
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: fast-pv
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  storageClassName: fast
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /Users/Morriz/Documents/Workspace/playground/mostack/minidata/fast
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: system
+  name: slow-pvc
+spec:
+  storageClassName: slow
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: team-frontend
+  name: fast-pvc
+spec:
+  storageClassName: fast
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

@@ -5,7 +5,7 @@ metadata:
     app: {{ template "name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
-    prometheus: {{ .Release.Name }}
+    prometheus: {{ .Values.prometheus }}
     release: {{ .Release.Name }}
 {{- if .Values.labels }}
 {{ toYaml .Values.labels | indent 4 }}
@@ -20,7 +20,7 @@ spec:
   alerting:
     alertmanagers:
       - namespace: {{ .Release.Namespace }}
-        name: {{ printf "%s-alertmanager" .Release.Name | trunc 63 | trimSuffix "-" }}
+        name: {{ .Values.alertmanager }}
         port: http
 {{- end }}
   baseImage: "{{ .Values.image.repository }}"
@@ -60,7 +60,7 @@ spec:
 {{- else }}
   serviceMonitorSelector:
     matchLabels:
-      prometheus: {{ .Release.Name }}
+      prometheus: {{ .Values.prometheus }}
 {{- end }}
 {{- if .Values.rulesSelector }}
   ruleSelector:
@@ -70,7 +70,7 @@ spec:
   ruleSelector:
     matchLabels:
       app: {{ template "name" . }}
-      prometheus: {{ .Release.Name }}
+      prometheus: {{ .Values.prometheus }}
 {{- end }}
 {{- if .Values.storageSpec }}
   storage:

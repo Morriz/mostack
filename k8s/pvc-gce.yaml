@@ -19,8 +19,8 @@ parameters:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: kube-system
-  name: system-pvc-kube-system-registry-cache
+  namespace: system
+  name: system-pvc-registry-cache
 spec:
   storageClassName: "slow"
   accessModes:
@@ -32,8 +32,8 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: kube-system
-  name: system-pvc-kube-system-registry
+  namespace: system
+  name: system-pvc-registry
 spec:
   storageClassName: "slow"
   accessModes:
@@ -45,8 +45,8 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: drone
-  name: system-pvc-drone
+  namespace: team-frontend
+  name: team-frontend-pvc-drone
 spec:
   storageClassName: "fast"
   accessModes:

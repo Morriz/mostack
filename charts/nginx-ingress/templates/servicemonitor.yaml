@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  namespace: monitoring
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    prometheus: {{ .Values.prometheus }}
+  name: {{ template "fullname" . }}
+spec:
+  jobLabel: {{ template "name" . }}
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace | quote }}
+  endpoints:
+  - port: metrics
+    interval: 10s
+  - port: 10254
+    interval: 10s

@@ -3,8 +3,8 @@ localproxy:
 #ingress:
 #  enabled: true
 #  tls: false
-#  hostname: reg.dev.idiotz.nl
+#  hostname: reg.{{CLUSTER_HOST}}
 persistentVolume:
-  existingClaim: system-pvc-kube-system
+  existingClaim: slow-pvc
+  storageClass: slow
   size: 3Gi
-  subPath: registry

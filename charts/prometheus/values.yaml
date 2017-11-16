@@ -247,3 +247,5 @@ storageSpec: {}
 #     requests:
 #       storage: 16Gi
 #   selector: {}
+prometheus: prometheus
+alertmanager: alertmanager-alertmanager

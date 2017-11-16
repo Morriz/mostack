@@ -1,0 +1,24 @@
+ingress:
+  hostname: drone.{{CLUSTER_HOST}}
+server:
+  env:
+    DRONE_DEBUG: false
+    DRONE_OPEN: true
+    DRONE_DATABASE_DRIVER: sqlite3
+    DRONE_DATABASE_DATASOURCE: /var/lib/drone/drone.sqlite
+    DRONE_GITHUB_SKIP_VERIFY: true
+    DRONE_GITHUB: true
+    DRONE_ADMIN: {{DRONE_ADMIN}}
+    DRONE_GITHUB_CLIENT: {{DRONE_GITHUB_CLIENT}}
+    DRONE_GITHUB_SECRET: {{DRONE_GITHUB_SECRET}}
+agent:
+  env:
+    DRONE_DEBUG: false
+shared_secret: {{DRONE_SECRET}}
+persistentVolume:
+  enabled: true
+  existingClaim: fast-pvc
+  storageClass: fast
+  size: 1Gi
+rbac:
+  create: {{RBAC_ENABLE}}

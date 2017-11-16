@@ -1,16 +1,5 @@
-rbacEnable: false
-ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    kubernetes.io/tls-acme: 'true'
-    ingress.kubernetes.io/rewrite-target: /
-  fqdn: prometheus.dev.idiotz.nl
-  tls:
-  - secretName: prometheus-server-tls
-    hosts:
-    - prometheus.dev.idiotz.nl
+rbacEnable: {{RBAC_ENABLE}}
 resources:
   requests:
     memory: 400Mi
-externalUrl: https://prometheus.dev.idiotz.nl
+externalUrl: https://prometheus.{{CLUSTER_HOST}}

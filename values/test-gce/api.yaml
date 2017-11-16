@@ -1,9 +1,0 @@
-image:
-  repository: localhost:5000/api
-  tag: latest
-  pullPolicy: Always
-ingress:
-  enabled: true
-  tls: true
-  hostname: api.test-gce.idiotz.nl
-prometheus: team-frontend

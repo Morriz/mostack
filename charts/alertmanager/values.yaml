@@ -129,3 +129,4 @@ storageSpec: {}
 #     requests:
 #       storage: 2Gi
 #   selector: {}
+prometheus: prometheus

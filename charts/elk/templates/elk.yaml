@@ -1,0 +1,832 @@
+# Derived from ./manifests
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  labels:
+    app: filebeat
+    kubernetes.io/cluster-service: "true"
+data:
+  filebeat.yml: |-
+    filebeat.config:
+      prospectors:
+        # Mounted `filebeat-prospectors` configmap:
+        path: ${path.config}/prospectors.d/*.yml
+        # Reload prospectors configs as they change:
+        reload.enabled: false
+      modules:
+        path: ${path.config}/modules.d/*.yml
+        # Reload module configs as they change:
+        reload.enabled: false
+
+    processors:
+      - add_cloud_metadata:
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-prospectors
+  namespace: logging
+  labels:
+    app: filebeat
+    kubernetes.io/cluster-service: "true"
+data:
+  kubernetes.yml: |-
+    - type: log
+      paths:
+        - /var/lib/docker/containers/*/*.log
+      json.message_key: log
+      json.keys_under_root: true
+      processors:
+        - add_kubernetes_metadata:
+            in_cluster: true
+            namespace: ${POD_NAMESPACE}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: logging
+  labels:
+    app: filebeat
+    kubernetes.io/cluster-service: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        app: filebeat
+      annotations:
+        prometheus.io/scrape: "true"
+
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: filebeat
+        image: docker.elastic.co/beats/filebeat:6.0.0-rc1
+        args: [
+          "-c", "/etc/filebeat.yml",
+          "-e",
+        ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/filebeat.yml
+          readOnly: true
+          subPath: filebeat.yml
+        - name: prospectors
+          mountPath: /usr/share/filebeat/prospectors.d
+          readOnly: true
+        - name: data
+          mountPath: /usr/share/filebeat/data
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0600
+          name: filebeat-config
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: prospectors
+        configMap:
+          defaultMode: 0600
+          name: filebeat-prospectors
+      - name: data
+        emptyDir: {}
+---
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+kind: ClusterRoleBinding
+metadata:
+  name: filebeat
+subjects:
+- kind: ServiceAccount
+  name: filebeat
+  namespace: logging
+roleRef:
+  kind: ClusterRole
+  name: filebeat
+  apiGroup: rbac.authorization.k8s.io
+---
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+kind: ClusterRole
+metadata:
+  name: filebeat
+  labels:
+    app: filebeat
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources:
+  - namespaces
+  - events
+  - pods
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: filebeat
+  labels:
+    app: filebeat
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch
+data:
+  elasticsearch.yml: |
+    cluster.name: ${cluster_name}
+    network.host: 0.0.0.0
+
+    # minimum_master_nodes need to be explicitly set when bound on a public IP
+    # set to 1 to allow single node clusters
+    # Details: https://github.com/elastic/elasticsearch/pull/17288
+    discovery.zen.minimum_master_nodes: 1
+
+    bootstrap.memory_lock: ${bootstrap_memory_lock}
+    xpack.security.enabled: false
+
+  jvm.options: |
+    ## JVM configuration
+
+    ################################################################
+    ## IMPORTANT: JVM heap size
+    ################################################################
+    ##
+    ## You should always set the min and max JVM heap
+    ## size to the same value. For example, to set
+    ## the heap to 4 GB, set:
+    ##
+    ## -Xms4g
+    ## -Xmx4g
+    ##
+    ## See https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html
+    ## for more information
+    ##
+    ################################################################
+
+    # Xms represents the initial size of total heap space
+    # Xmx represents the maximum size of total heap space
+
+    -Xms2g
+    -Xmx2g
+
+    ################################################################
+    ## Expert settings
+    ################################################################
+    ##
+    ## All settings below this section are considered
+    ## expert settings. Don't tamper with them unless
+    ## you understand what you are doing
+    ##
+    ################################################################
+
+    ## GC configuration
+    -XX:+UseConcMarkSweepGC
+    -XX:CMSInitiatingOccupancyFraction=75
+    -XX:+UseCMSInitiatingOccupancyOnly
+
+    ## optimizations
+
+    # disable calls to System#gc
+    -XX:+DisableExplicitGC
+
+    # pre-touch memory pages used by the JVM during initialization
+    -XX:+AlwaysPreTouch
+
+    ## basic
+
+    # force the server VM (remove on 32-bit client JVMs)
+    -server
+
+    # explicitly set the stack size (reduce to 320k on 32-bit client JVMs)
+    -Xss1m
+
+    # set to headless, just in case
+    -Djava.awt.headless=true
+
+    # ensure UTF-8 encoding by default (e.g. filenames)
+    -Dfile.encoding=UTF-8
+
+    # use our provided JNA always versus the system one
+    -Djna.nosys=true
+
+    # use old-style file permissions on JDK9
+    -Djdk.io.permissionsUseCanonicalPath=true
+
+    # flags to configure Netty
+    -Dio.netty.noUnsafe=true
+    -Dio.netty.noKeySetOptimization=true
+    -Dio.netty.recycler.maxCapacityPerThread=0
+
+    # log4j 2
+    -Dlog4j.shutdownHookEnabled=false
+    -Dlog4j2.disable.jmx=true
+    -Dlog4j.skipJansi=true
+
+    ## heap dumps
+
+    # generate a heap dump when an allocation from the Java heap fails
+    # heap dumps are created in the working directory of the JVM
+    -XX:+HeapDumpOnOutOfMemoryError
+
+    # specify an alternative path for heap dumps
+    # ensure the directory exists and has sufficient space
+    #-XX:HeapDumpPath=${heap.dump.path}
+
+    ## GC logging
+
+    #-XX:+PrintGCDetails
+    #-XX:+PrintGCTimeStamps
+    #-XX:+PrintGCDateStamps
+    #-XX:+PrintClassHistogram
+    #-XX:+PrintTenuringDistribution
+    #-XX:+PrintGCApplicationStoppedTime
+
+    # log GC status to a file with time stamps
+    # ensure the directory exists
+    #-Xloggc:${loggc}
+
+    # Elasticsearch 5.0.0 will throw an exception on unquoted field names in JSON.
+    # If documents were already indexed with unquoted fields in a previous version
+    # of Elasticsearch, some operations may throw errors.
+    #
+    # WARNING: This option will be removed in Elasticsearch 6.0.0 and is provided
+    # only for migration purposes.
+    #-Delasticsearch.json.allow_unquoted_field_names=true
+
+  log4j2.properties: |
+    status = error
+
+    appender.console.type = Console
+    appender.console.name = console
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] %marker%m%n
+
+    rootLogger.level = info
+    rootLogger.appenderRef.console.ref = console
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curator-config
+data:
+  action_file.yml: |-
+    ---
+    # Remember, leave a key empty if there is no value.  None will be a string,
+    # not a Python "NoneType"
+    #
+    # Also remember that all examples have 'disable_action' set to True.  If you
+    # want to use this action as a template, be sure to set this to False after
+    # copying it.
+    actions:
+      1:
+        action: delete_indices
+        description: "Clean up ES by deleting old indices"
+        options:
+          timeout_override:
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 3
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+  config.yml: |-
+    ---
+    # Remember, leave a key empty if there is no value.  None will be a string,
+    # not a Python "NoneType"
+    client:
+      hosts:
+        - elasticsearch
+      port: 9200
+      url_prefix:
+      use_ssl: False
+      certificate:
+      client_cert:
+      client_key:
+      ssl_no_validate: False
+      http_auth:
+      timeout: 30
+      master_only: False
+
+    logging:
+      loglevel: INFO
+      logfile:
+      logformat: default
+      blacklist: ['elasticsearch', 'urllib3']
+---
+{{- if .Capabilities.APIVersions.Has "batch/v1beta1" }}
+apiVersion: batch/v1beta1
+{{- else if .Capabilities.APIVersions.Has "batch/v2alpha1" }}
+apiVersion: batch/v2alpha1
+{{- end }}
+kind: CronJob
+metadata:
+  name: curator
+spec:
+  schedule: 1 0 * * *
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            prometheus.io/scrape: "true"
+        spec:
+          containers:
+          - name: curator
+            image: bobrik/curator:4.2.6
+            imagePullPolicy: IfNotPresent
+            args: ["--config", "/etc/config/config.yml", "/etc/config/action_file.yml"]
+            volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+          volumes:
+          - name: config-volume
+            configMap:
+              name: curator-config
+          restartPolicy: OnFailure
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      initContainers:
+      - name: sysctl
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        # see https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
+        # and https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration-memory.html#mlockall
+        command: ['sysctl', '-w', 'vm.max_map_count=262144']
+        securityContext:
+          privileged: true
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
+        imagePullPolicy: IfNotPresent
+        # workarounds until https://github.com/kubernetes/kubernetes/issues/30120
+        env:
+        - name: cluster_name
+          value: kubernetes-cluster
+        - name: bootstrap_memory_lock
+          value: "false"
+          #^ unless ulimits for "memlock" can be set via kubernetes
+          # see https://github.com/kubernetes/kubernetes/issues/3595
+        # - name: transport.host
+        #   value: 127.0.0.1
+        # - name: discovery.zen.ping.unicast.hosts
+        #   value: elasticsearch_other
+        - name: "ES_JAVA_OPTS"
+          value: "-Xms1g -Xmx1g"
+        ports:
+        - containerPort: 9200
+          name: api
+          protocol: TCP
+        # - containerPort: 9300
+        #   name: transport
+        #   protocol: TCP
+        resources:
+          # keep request = limit to keep this container in guaranteed class
+          limits:
+            cpu: 1000m
+            memory: 2G
+          requests:
+            cpu: 1000m
+            memory: 1G
+        securityContext:
+#          privileged: true
+          capabilities:
+            add:
+            - IPC_LOCK
+            - SYS_RESOURCE
+        # FIXME add probes
+        volumeMounts:
+        - name: config
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: config
+          mountPath: /usr/share/elasticsearch/config/log4j2.properties
+          subPath: log4j2.properties
+        - name: config
+          mountPath: /usr/share/elasticsearch/config/jvm.options
+          subPath: jvm.options
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+      volumes:
+      - name: config
+        configMap:
+          name: elasticsearch
+      - name: "data"
+        emptyDir:
+          medium: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eventrouter
+  namespace: logging
+---
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+kind: ClusterRole
+metadata:
+  name: eventrouter
+rules:
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "watch", "list"]
+---
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+kind: ClusterRoleBinding
+metadata:
+  name: eventrouter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: eventrouter
+subjects:
+- kind: ServiceAccount
+  name: eventrouter
+  namespace: logging
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eventrouter
+data:
+  config.json: |
+    {
+      "sink": "glog"
+    }
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: eventrouter
+  labels:
+    app: eventrouter
+spec:
+  # TODO - Set to 2 when ConfigMap locking is merged ~1.7
+  # https://github.com/kubernetes/kubernetes/pull/42666
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: eventrouter
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccount: eventrouter
+      containers:
+      - name: eventrouter
+        # image: gcr.io/heptio-images/eventrouter:v0.1
+        image: giantswarm/eventrouter:0.1.2
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: config
+          mountPath: /etc/eventrouter
+      volumes:
+      - name: config
+        configMap:
+          name: eventrouter
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-auth
+type: Opaque
+data:
+  auth: {{ .Values.kibanaPassword }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kibana-config
+  labels:
+    app: kibana
+data:
+  logtrail.json: |
+    {
+      "index_patterns" : [
+        {
+          "es": {
+            "default_index": "filebeat-*",
+            "allow_url_parameter": false
+          },
+          "tail_interval_in_seconds": 2,
+          "es_index_time_offset_in_seconds": 0,
+          "display_timezone": "Etc/UTC",
+          "display_timestamp_format": "YYYY MMM DD HH:mm:ss",
+          "max_buckets": 500,
+          "default_time_range_in_days" : 0,
+          "max_hosts": 100,
+          "max_events_to_keep_in_viewer": 5000,
+          "nested_objects" : true,
+          "fields" : {
+            "mapping" : {
+                "timestamp" : "@timestamp",
+                "display_timestamp" : "@timestamp",
+                "hostname" : "kubernetes.pod.name",
+                "program": "kubernetes.container.name",
+                "message": "log"
+            }
+          }
+        }
+      ]
+    }
+  kibana.yml: |
+    sentinl:
+      settings:
+        slack:
+          active: true
+          username: Sentinl
+          hook: '{{ .Values.slackUrl }}'
+          channel: '#devops'
+
+    server.host: '0.0.0.0'
+    elasticsearch.url: 'http://elasticsearch:9200'
+    #logging:
+    #  dest: stdout
+    #  silent: false
+    #  quiet: false
+    #  verbose: true
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kibana
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: kibana
+        image: morriz/kibana-logtrail-sentinl:5.6.3
+        imagePullPolicy: IfNotPresent
+        resources:
+          # keep request = limit to keep this container in guaranteed class
+          limits:
+            cpu: 100m
+          requests:
+            cpu: 100m
+        env:
+        - name: ELASTICSEARCH_URL
+          value: 'http://elasticsearch:9200'
+        - name: KIBANA_INDEX
+          value: 'filebeat-*'
+        ports:
+        - containerPort: 5601
+          name: ui
+          protocol: TCP
+        volumeMounts:
+        - name: kibana-config
+          mountPath: /usr/share/kibana/config/kibana.yml
+          subPath: kibana.yml
+        - name: kibana-config
+          mountPath: /usr/share/kibana/plugins/logtrail/logtrail.json
+          subPath: logtrail.json
+      volumes:
+      - name: kibana-config
+        configMap:
+          name: kibana-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: ui
+  selector:
+    app: kibana
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-events
+  namespace: logging
+---
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+kind: ClusterRole
+metadata:
+  name: kube-events
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["*"]
+  verbs: ["*"]
+---
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+kind: ClusterRoleBinding
+metadata:
+  name: kube-events
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-events
+subjects:
+- kind: ServiceAccount
+  name: kube-events
+  namespace: logging
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kube-events
+spec:
+  template:
+    metadata:
+      labels:
+        app: kube-events
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccount: kube-events
+      containers:
+      - name: kube-events
+        image: giantswarm/tiny-tools:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          # keep request = limit to keep this container in guaranteed class
+          limits:
+            cpu: 100m
+          requests:
+            cpu: 100m
+        env:
+        - name: TERM
+          value: xterm
+        command:
+        - fish
+        - --command
+        - |
+          set kube_token (cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+          # FIXME move `resource_version` to a volume
+          touch ./resource_version
+          while true
+            set resource_version (cat ./resource_version)
+            echo "starting with \$resource_version: $resource_version"
+
+            curl --silent --fail --show-error --insecure --header "Authorization: Bearer $kube_token" \
+              --request GET "https://kubernetes.default.svc/api/v1/watch/events?resourceVersion=$resource_version" \
+                | while read -l event
+
+              if test (echo $event | jq -r '.object.metadata.resourceVersion') = "null"
+                echo "got \"null\""
+                sleep 10
+                break
+              end
+
+              set -l index "kube-events-"(date --utc -I)
+              while not curl --silent --fail --show-error \
+                --request POST http://elasticsearch.logging.svc:9200/$index/event --data "$event" \
+                  | read -l es_result
+                echo "\$status: $status"
+                sleep 10
+              end
+
+              set resource_version (echo $event | jq -r '.object.metadata.resourceVersion')
+              echo $resource_version > ./resource_version
+              echo "last fetched \$resource_version: $resource_version"
+            end
+
+            echo "starting over"
+          end
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  type: NodePort
+  ports:
+  - port: 9200
+    protocol: TCP
+    targetPort: api
+  selector:
+    app: elasticsearch
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: logging
+  labels:
+    app: kibana
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: basic-auth
+    ingress.kubernetes.io/auth-realm: 'Authentication Required - admin'
+    kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+    prometheus.io/scrape: 'true'
+spec:
+  rules:
+  - host: logging.dev.idiotz.nl
+    http:
+      paths:
+      - backend:
+          serviceName: kibana
+          servicePort: 80
+        path: /*
+  tls:
+  - hosts:
+    - logging.dev.idiotz.nl
+    secretName: logging-dev.idiotz.nl-tls
+

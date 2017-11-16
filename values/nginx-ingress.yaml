@@ -1,2 +1,13 @@
-rbac.create: false
-controller.stats.enabled: true
+rbac:
+  create: {{RBAC_ENABLE}}
+controller:
+  stats:
+    enabled: true
+  hostNetwork: true
+  resources:
+     limits:
+       cpu: 100m
+       memory: 64Mi
+     requests:
+       cpu: 100m
+       memory: 64Mi

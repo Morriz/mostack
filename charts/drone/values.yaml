@@ -2,7 +2,7 @@ image:
   registry: docker.io
   org: drone
   name: drone
-  tag: 0.8
+  tag: 0.8-alpine
   pullPolicy: IfNotPresent
 
 service:
@@ -16,9 +16,9 @@ service:
   annotations: {}
 
 ingress:
-  enabled: false
+  enabled: true
   # enable TLS via kube-lego
-  tls: false
+  tls: true
   hostname: drone.example.com
   annotations:
     sidecar.istio.io/inject: 'false'
@@ -68,7 +68,7 @@ persistentVolume:
   ##
   storageClass: "-"
   annotations: {}
-  subPath:
+  subPath: drone
 
 agent:
   # Drone agent configuration. Values in here get injected as environment variables.

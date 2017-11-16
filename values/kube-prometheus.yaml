@@ -1,9 +1,5 @@
-rbacEnable: false
-exporter-kube-state:
-  rbacEnable: false
-exporter-kube-controller-manager:
+rbacEnable: {{RBAC_ENABLE}}
+global:
+  prometheus: prometheus
   isMini: true
-  minikubeIp: 192.168.99.100
-exporter-kube-scheduler:
-  isMini: true
-  minikubeIp: 192.168.99.100
+  minikubeIp: {{MINIKUBE_IP}}

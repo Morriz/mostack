@@ -1,7 +1,7 @@
-rbacEnable: false
+rbacEnable: {{RBAC_ENABLE}}
 config:
   global:
-    slack_api_url: 'https://hooks.slack.com/services/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'
+    slack_api_url: '{{SLACK_API_URL}}'
   route:
     receiver: default-receiver
     repeat_interval: 3h
@@ -22,9 +22,9 @@ ingress:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
-  fqdn: alerts-frontend.dev.idiotz.nl
+  fqdn: alerts-frontend.{{CLUSTER_HOST}}
   tls:
-  - secretName: alerts-frontend-server-tls
+  - secretName: alerts-frontend-tls
     hosts:
-    - alerts-frontend.dev.idiotz.nl
-externalUrl: https://alerts-frontend.dev.idiotz.nl
+    - alerts-frontend.{{CLUSTER_HOST}}
+prometheus: team-frontend-prometheus

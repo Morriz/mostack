@@ -5,9 +5,9 @@ metadata:
   name: {{ template "fullname" . }}-proxy
   labels:
     app: {{ template "fullname" . }}-proxy
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 spec:
   template:
     metadata:

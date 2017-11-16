@@ -1,0 +1,2 @@
+slackUrl: {{SLACK_API_URL}}
+kibanaPassword: {{KIBANA_PASSWORD}}

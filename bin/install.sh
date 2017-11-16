@@ -3,12 +3,15 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
+. $root/bin/functions.sh
+
+cd $root > /dev/null
 
 printf "${COLOR_WHITE}RUNNING INSTALL:${COLOR_NC}\n"
 
 if [ -z "$1" ]; then
   k config use-context minikube
-  valuesDir=""
+  valuesDir="/_gen/minikube"
 else
   context=`k config current-context`
   # when in right context, assing to var so we can autoswitch
@@ -22,15 +25,15 @@ else
     exit 1
   fi
   k config use-context $KUBE_CONTEXT
-  valuesDir="/$1"
+  valuesDir="/_gen/$1"
 fi
 
 isMini=0
-#which minikube > /dev/null 2>&1
-#[ $? -eq 0 ] && isMini=1
-haveMiniRunning=1
-#minikube ip > /dev/null 2>&1
-#[ $? -eq 0 ] && haveMiniRunning=1
+which minikube > /dev/null 2>&1
+[ $? -eq 0 ] && isMini=1
+haveMiniRunning=0
+minikube ip > /dev/null 2>&1
+[ $? -eq 0 ] && haveMiniRunning=1
 
 # osx only: install prerequisites if needed
 if [ "`uname -s`"=="Darwin" ]; then
@@ -60,91 +63,83 @@ fi
 printf "${COLOR_PURPLE}Waiting for a node to talk to"
 until k get nodes > /dev/null 2>&1; do sleep 1; printf "."; done
 
-printf "\n${COLOR_PURPLE}Waiting for kubernetes to listen"
-until ks rollout status -w deployment/kube-dns > /dev/null 2>&1; do sleep 1; printf "."; done
+printf "\n${COLOR_WHITE}Now deploying CLUSTER packages\n"
 
-#printf "${COLOR_BLUE}deploying istio\n${COLOR_GREEN}"
-#k apply -f $root/k8s/istio/istio-auth.yaml
-#k apply -f $root/k8s/istio/istio-initializer.yaml
-#k apply -f $root/k8s/istio/addons/
-#[ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing istio${COLOR_NC}\n" && exit 1
-#printf "${COLOR_NC}"
-
-#printf "${COLOR_BLUE}Applying RBAC for minikube asap\n${COLOR_GREEN}"
-#k apply -f $root/k8s/minikube-rbac.yaml
-
-printf "\n${COLOR_BLUE}[CLUSTER] Installing namespaces${COLOR_GREEN}\n"
-k create namespace "dev" > /dev/null 2>&1
-k create namespace "monitoring" > /dev/null 2>&1
-k create namespace "drone" > /dev/null 2>&1
+printf "${COLOR_BLUE}[CLUSTER] Setting up cluster resources like namespaces and RBAC${COLOR_GREEN}\n"
+k apply -f $root/k8s/cluster.yaml
 
 printf "${COLOR_PURPLE}[CLUSTER] Waiting for namespaces to become available"
-until k get namespace dev monitoring drone > /dev/null 2>&1; do sleep 1; printf "."; done
+until k get namespace tiller system monitoring logging team-frontend > /dev/null 2>&1; do sleep 1; printf "."; done
 
 if [ $isMini -eq 1 ]; then
   printf "\n${COLOR_BLUE}[CLUSTER] Creating persistent volume for minikube${COLOR_GREEN}\n"
-  k apply -f $root/k8s/pvc.yaml
+  k apply -f $root/k8s/pvc-minikube.yaml
+  printf "\n${COLOR_BLUE}[CLUSTER] Fixing RBAC access for minikube${COLOR_GREEN}\n"
+  k apply -f $root/k8s/rbac-minikube.yaml
 else
   printf "\n${COLOR_BLUE}[CLUSTER] Creating persistent volume for GCE${COLOR_GREEN}\n"
   k apply -f $root/k8s/pvc-gce.yaml
 fi
 
-printf "${COLOR_BLUE}[KUBE-SYSTEM] Deploying Docker Registry cache first${COLOR_GREEN}\n"
-helm template -n system-cache $root/charts/docker-registry -f $root/values$valuesDir/docker-registry-cache.yaml | ks apply -f -
+# remove taint that is not removed by kubeadm because of some race condition:
+[ $haveMiniRunning -ne 1 ] && k taint node minikube node-role.kubernetes.io/master:NoSchedule-
+
+printf "${COLOR_BLUE}[CLUSTER] Installing Tiller${COLOR_GREEN}\n"
+helm init --service-account tiller --tiller-namespace=tiller --history-max 1
+
+printf "${COLOR_BLUE}waiting for Tiller to become available${COLOR_BROWN}\n"
+k -n tiller rollout status -w deploy/tiller-deploy
+
+printf "${COLOR_BLUE}[SYSTEM] Deploying Docker Registry cache first${COLOR_GREEN}\n"
+hs registry-cache $root/charts/docker-registry -f $root/values$valuesDir/docker-registry-cache.yaml
+hs registry-cache2 $root/charts/docker-registry -f $root/values$valuesDir/docker-registry-cache.yaml \
+  --set localproxy.port=6001 --set proxy.url=https://quay.io
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing Docker Registry cache${COLOR_NC}\n" && exit 1
 
-printf "${COLOR_PURPLE}[KUBE-SYSTEM] Waiting for Docker Registry cache to become available${COLOR_BROWN}\n"
-ks rollout status -w deployment/system-cache-docker-registry
+printf "${COLOR_PURPLE}[SYSTEM] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
+ks rollout status -w deploy/registry-cache-docker-registry
+ks rollout status -w deploy/registry-cache2-docker-registry
 
-if [ $isMini -ne 1 ]; then
-  printf "${COLOR_BLUE}deploying nginx controller${COLOR_GREEN}\n"
-  helm template -n system $root/charts/nginx-ingress -f $root/values$valuesDir/nginx-ingress.yaml | k apply -f -
-#  [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing nginx controller${COLOR_NC}\n" && exit 1
+printf "${COLOR_BLUE}deploying nginx controller${COLOR_GREEN}\n"
+hs nginx $root/charts/nginx-ingress -f $root/values$valuesDir/nginx-ingress.yaml
 
-  printf "${COLOR_BLUE}waiting for nginx controller to become available${COLOR_BROWN}\n"
-  k rollout status -w deployment/system-nginx-ingress-controller
-fi
+#printf "${COLOR_BLUE}waiting for nginx controller to become available${COLOR_BROWN}\n"
+#ks rollout status -w deploy/nginx-nginx-ingress-controller
 
 printf "${COLOR_BLUE}[MONITORING] Installing Prometheus Operator${COLOR_GREEN}\n"
-helm template -n system $root/charts/prometheus-operator -f $root/values$valuesDir/prometheus-operator.yaml | km apply -f -
+hm prometheus-operator $root/charts/prometheus-operator -f $root/values$valuesDir/prometheus-operator.yaml
 
-printf "${COLOR_PURPLE}[MONITORING] Waiting for Prometheus Operator to register custom resource definitions"
-until km get customresourcedefinitions servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
-until km get customresourcedefinitions prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
-until km get customresourcedefinitions alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
-until km get servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
-until km get prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
-until km get alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
-
-printf "\n${COLOR_BLUE}[KUBE_SYSTEM] Installing Kube exporters for Prometheus consumption${COLOR_GREEN}\n"
-helm template -n system $root/charts/kube-prometheus -f $root/values$valuesDir/kube-prometheus.yaml | k apply -f -
+printf "\n${COLOR_BLUE}[SYSTEM] Installing Kube exporters for Prometheus consumption${COLOR_GREEN}\n"
+hm kube-prometheus $root/charts/kube-prometheus -f $root/values$valuesDir/kube-prometheus.yaml
 
 printf "${COLOR_BLUE}[MONITORING] Installing Prometheus, Alertmanager and Grafana${COLOR_GREEN}\n"
-helm template -n system $root/charts/prometheus -f $root/values$valuesDir/prometheus.yaml | k apply -f -
-helm template -n team-frontend $root/charts/prometheus -f $root/values$valuesDir/prometheus-team-frontend.yaml | k apply -f -
-helm template -n system $root/charts/alertmanager -f $root/values$valuesDir/alertmanager.yaml | k apply -f -
-helm template -n team-frontend $root/charts/alertmanager -f $root/values$valuesDir/alertmanager-team-frontend.yaml | k apply -f -
-helm template -n system $root/charts/grafana -f $root/values$valuesDir/grafana.yaml | km apply -f -
+hm prometheus $root/charts/prometheus -f $root/values$valuesDir/prometheus.yaml
+htf team-frontend-prometheus $root/charts/prometheus -f $root/values$valuesDir/prometheus-team-frontend.yaml
+hm alertmanager $root/charts/alertmanager -f $root/values$valuesDir/alertmanager.yaml
+htf team-frontend-alertmanager $root/charts/alertmanager -f $root/values$valuesDir/alertmanager-team-frontend.yaml
+hm grafana $root/charts/grafana -f $root/values$valuesDir/grafana.yaml
 
-printf "${COLOR_BLUE}[KUBE-SYSTEM] Deploying Kube Lego${COLOR_GREEN}\n"
-helm template -n system $root/charts/kube-lego -f $root/values$valuesDir/kube-lego.yaml | ks apply -f -
+printf "${COLOR_BLUE}[SYSTEM] Deploying Kube Lego${COLOR_GREEN}\n"
+hs kube-lego $root/charts/kube-lego -f $root/values$valuesDir/kube-lego.yaml
 
-printf "${COLOR_BLUE}[KUBE-SYSTEM] Deploying Docker Registry${COLOR_GREEN}\n"
-helm template -n system $root/charts/docker-registry -f $root/values$valuesDir/docker-registry.yaml | ks apply -f -
-
-printf "${COLOR_BLUE}[DRONE] Deploying Drone${COLOR_GREEN}\n"
-helm template -n system $root/charts/drone -f $root/values$valuesDir/drone.yaml | kd apply -f -
-
-printf "${COLOR_BLUE}[DEFAULT] Deploying Frontend API${COLOR_GREEN}\n"
-helm template -n team-frontend $root/charts/api -f $root/values$valuesDir/api.yaml | k apply -f -
+printf "${COLOR_BLUE}[SYSTEM] Deploying Docker Registry${COLOR_GREEN}\n"
+hs registry $root/charts/docker-registry -f $root/values$valuesDir/docker-registry.yaml
 
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}[LOGGING] Deploying ELK stack\n${COLOR_GREEN}"
-  k apply -f $root/k8s/elk/
+  hl elk $root/charts/elk
 fi
 
-printf "${COLOR_PURPLE}[KUBE-SYSTEM] Waiting for kube-lego to become available${COLOR_BROWN}\n"
-ks rollout status -w deployment/system-kube-lego
+printf "${COLOR_WHITE}Now deploying TEAM FRONTEND packages${COLOR_GREEN}\n"
+
+printf "${COLOR_BLUE}[TEAM-FRONTEND] Deploying Drone${COLOR_GREEN}\n"
+htf drone $root/charts/drone -f $root/values$valuesDir/drone.yaml
+
+printf "${COLOR_BLUE}[TEAM-FRONTEND] Deploying Frontend API${COLOR_GREEN}\n"
+htf team-frontend-api $root/charts/api -f $root/values$valuesDir/api.yaml
+
+printf "${COLOR_PURPLE}[SYSTEM] Waiting for kube-lego to become available${COLOR_BROWN}\n"
+ks rollout status -w deploy/kube-lego-kube-lego
 
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}Starting tunnels${COLOR_NC}\n"
