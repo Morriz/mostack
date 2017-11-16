@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 export MINIKUBE_IP='192.168.99.100'
+export NGROK_TOKEN=''
 
 export LEGO_EMAIL='you@yourdoma.in'
 
@@ -21,3 +22,4 @@ export REGISTRY_HOST="localhost:5000"
 
 export RBAC_ENABLE=true
 export TLS_ENABLE=true
+[ "$TLS_ENABLE" == "true" ] && isTls=s

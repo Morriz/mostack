@@ -11,7 +11,7 @@ So far I am using the following (mostly open source) technologies:
 * [Kubernetes](https://github.com/Kubernetes/Kubernetes) for describing our container infrastructure.
 * [Minikube](https://github.com/Kubernetes/minikube) for running a local k8s cluster
 * [Helm](https://github.com/Kubernetes/helm) for packaging and deploying of Kubernetes apps and subapps.
-* A bash install script to boot everything in the right order. 
+* A bash install script to boot everything in the right order.
 
 To boot the following Kubernetes applications/tools:
 
@@ -21,9 +21,9 @@ To boot the following Kubernetes applications/tools:
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
     *
-    
+
 * *DISABLED FOR NOW:* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements. (Waiting for SNI which enables path based vhost ingress routing).
-* *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN    
+* *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 
 We will be going through the following workflow:
 
@@ -49,7 +49,9 @@ PREREQUISITES:
 * [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager temporarily if you'd like to bypass browser warnings about https)
 * In case you run minikube, for kube-lego to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are portforwarded to your local machine:
 	* by manipulating your firewall
-	* or by tunneling a random (or paid custom) domain from [ngrok](https://ngrok.io) and using that as $CLUSTER_HOST in the config below
+	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as $CLUSTER_HOST in the config below):
+	    * free account: only http works since we can't load multiple tunnels (80 & 443) for one domain
+	    * biz account: see provided `templates/ngrok.yaml`
 * Create an app key & secret for our Drone app in GitHub/BitBucket so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
 
 #### 1 Configuration
@@ -102,7 +104,7 @@ which survives cluster deletion, and will thus be immediately used upon cluster 
 When all containers are ready we can start the local service proxies:
 
 	bin/dashboards.js
-	
+
 and look at [the service index](./docgen/minikube-service-index.html)
 
 Let's configure Drone now:
@@ -112,14 +114,12 @@ Let's configure Drone now:
 ##### 3.1.1 Configure Drone
 
 1. Go to your public drone url (https://drone.dev.yourdoma.in) and select the repo `nodejs-demo-api`.
-2. Go to the 'Secrets' menu and create the following:
+2. Go to the 'Secrets' menu and create the following entries (follow the comments to get the values):
 
-        KUBERNETES_CERT=...
-        KUBERNETES_TOKEN=...
+        KUBERNETES_CERT= # ktf get secret $(ktf get sa drone-drone -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
+        KUBERNETES_TOKEN= # ktf get secret $(ktf get sa drone-drone -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
         KUBERNETES_DNS=10.0.0.10 # if minikube
         REGISTRY=localhost:5000 # or public
-
-For getting the right cert and token please read last paragraph here: https://github.com/honestbee/drone-Kubernetes
 
 ##### 3.1.2 Trigger the build pipeline
 

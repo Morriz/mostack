@@ -19,6 +19,7 @@ spec:
     {{- end }}
       labels:
         app: {{ template "name" . }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         component: "{{ .Values.defaultBackend.name }}"
         release: {{ .Release.Name }}
     spec:

@@ -821,16 +821,16 @@ metadata:
 {{- end }}
 spec:
   rules:
-  - host: logging.dev.idiotz.nl
+  - host: {{ .Values.hostname }}
     http:
       paths:
       - backend:
           serviceName: kibana
           servicePort: 80
         path: /*
-{{- if .Values.tls -}}
+{{- if .Values.tls }}
   tls:
   - hosts:
-    - logging.dev.idiotz.nl
-    secretName: logging-dev.idiotz.nl-tls
+    - {{ .Values.hostname }}
+    secretName: logging-tls
 {{- end -}}

@@ -15,11 +15,10 @@ spec:
     matchLabels:
       app: {{ template "name" . }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+      component: "{{ .Values.controller.name }}"
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace | quote }}
   endpoints:
   - port: metrics
-    interval: 10s
-  - port: 10254
     interval: 10s
