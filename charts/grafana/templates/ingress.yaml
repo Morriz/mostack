@@ -3,9 +3,14 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  {{- if or (and .Values.ingress.annotations ) (not .Values.ingress.tls) }}
   annotations:
-  {{- range $key, $value := .Values.ingress.annotations }}
+    {{- if not .Values.ingress.tls }}
+    ingress.kubernetes.io/ssl-redirect: 'false'
+    {{- end }}
+    {{- range $key, $value := .Values.ingress.annotations }}
     {{ $key }}: {{ $value | quote }}
+    {{- end }}
   {{- end }}
   labels:
     app: {{ template "grafana.fullname" . }}

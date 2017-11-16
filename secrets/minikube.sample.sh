@@ -20,3 +20,4 @@ export KIBANA_PASSWORD=''
 export REGISTRY_HOST="localhost:5000"
 
 export RBAC_ENABLE=true
+export TLS_ENABLE=true

@@ -9,6 +9,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
+    {{- if not .Values.ingress.tls }}
+    ingress.kubernetes.io/ssl-redirect: 'false'
+    {{- end }}
 {{ toYaml .Values.ingress.annotations | indent 4 }}
 spec:
   {{- if .Values.ingress.tls }}

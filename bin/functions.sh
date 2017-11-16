@@ -11,3 +11,5 @@ hs() { hi --namespace=system "$@"; }
 hm() { hi --namespace=monitoring "$@"; }
 hl() { hi --namespace=logging "$@"; }
 htf() { hi --namespace=team-frontend "$@"; }
+
+ifTls() { [ "$TLS_ENABLE" == "true" ] && print s; }

@@ -11,7 +11,7 @@ printf "${COLOR_BLUE}Starting nginx proxy${COLOR_NC}\n"
 kpk 18080 > /dev/null 2>&1
 ks port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 18080 &
 
-printf "${COLOR_BLUE}Starting nglasticsearchinx proxy${COLOR_NC}\n"
+printf "${COLOR_BLUE}Starting elasticsearch proxy${COLOR_NC}\n"
 kpk 9200 > /dev/null 2>&1
 kl port-forward $(kl get po --selector=app=elasticsearch --output=jsonpath={.items..metadata.name}) 9200 &
 

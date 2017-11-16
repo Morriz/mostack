@@ -16,15 +16,4 @@ config:
     slack_configs:
     - channel: '#frontend'
       send_resolved: true
-ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    kubernetes.io/tls-acme: 'true'
-    ingress.kubernetes.io/rewrite-target: /
-  fqdn: alerts-frontend.{{CLUSTER_HOST}}
-  tls:
-  - secretName: alerts-frontend-tls
-    hosts:
-    - alerts-frontend.{{CLUSTER_HOST}}
 prometheus: team-frontend-prometheus

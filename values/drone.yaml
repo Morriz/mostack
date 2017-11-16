@@ -1,5 +1,6 @@
 ingress:
   hostname: drone.{{CLUSTER_HOST}}
+  tls: {{TLS_ENABLE}}
 server:
   env:
     DRONE_DEBUG: false

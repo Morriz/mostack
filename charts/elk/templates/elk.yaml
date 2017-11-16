@@ -610,7 +610,7 @@ data:
         slack:
           active: true
           username: Sentinl
-          hook: '{{ .Values.slackUrl }}'
+    #      hook: '{{ .Values.slackUrl }}'
           channel: '#devops'
 
     server.host: '0.0.0.0'
@@ -816,6 +816,9 @@ metadata:
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
     prometheus.io/scrape: 'true'
+{{- if not .Values.tls }}
+    ingress.kubernetes.io/ssl-redirect: 'false'
+{{- end }}
 spec:
   rules:
   - host: logging.dev.idiotz.nl
@@ -825,8 +828,9 @@ spec:
           serviceName: kibana
           servicePort: 80
         path: /*
+{{- if .Values.tls -}}
   tls:
   - hosts:
     - logging.dev.idiotz.nl
     secretName: logging-dev.idiotz.nl-tls
-
+{{- end -}}

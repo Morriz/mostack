@@ -4,6 +4,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 shopt -s expand_aliases
 . $root/bin/aliases
 . $root/bin/functions.sh
+. $root/secrets/minikube.sh
 
 cd $root > /dev/null
 
@@ -77,6 +78,7 @@ if [ $isMini -eq 1 ]; then
   printf "\n${COLOR_BLUE}[CLUSTER] Fixing RBAC access for minikube${COLOR_GREEN}\n"
   k apply -f $root/k8s/rbac-minikube.yaml
 else
+  . $root/secrets/gce.sh
   printf "\n${COLOR_BLUE}[CLUSTER] Creating persistent volume for GCE${COLOR_GREEN}\n"
   k apply -f $root/k8s/pvc-gce.yaml
 fi
@@ -100,16 +102,16 @@ printf "${COLOR_PURPLE}[SYSTEM] Waiting for Docker Registry caches to become ava
 ks rollout status -w deploy/registry-cache-docker-registry
 ks rollout status -w deploy/registry-cache2-docker-registry
 
-printf "${COLOR_BLUE}deploying nginx controller${COLOR_GREEN}\n"
-hs nginx $root/charts/nginx-ingress -f $root/values$valuesDir/nginx-ingress.yaml
-
 #printf "${COLOR_BLUE}waiting for nginx controller to become available${COLOR_BROWN}\n"
 #ks rollout status -w deploy/nginx-nginx-ingress-controller
 
 printf "${COLOR_BLUE}[MONITORING] Installing Prometheus Operator${COLOR_GREEN}\n"
 hm prometheus-operator $root/charts/prometheus-operator -f $root/values$valuesDir/prometheus-operator.yaml
 
-printf "\n${COLOR_BLUE}[SYSTEM] Installing Kube exporters for Prometheus consumption${COLOR_GREEN}\n"
+printf "${COLOR_BLUE}[SYSTEM] Deploying Nginx controller${COLOR_GREEN}\n"
+hs nginx $root/charts/nginx-ingress -f $root/values$valuesDir/nginx-ingress.yaml
+
+printf "${COLOR_BLUE}[SYSTEM] Installing Kube exporters for Prometheus consumption${COLOR_GREEN}\n"
 hm kube-prometheus $root/charts/kube-prometheus -f $root/values$valuesDir/kube-prometheus.yaml
 
 printf "${COLOR_BLUE}[MONITORING] Installing Prometheus, Alertmanager and Grafana${COLOR_GREEN}\n"
@@ -119,15 +121,17 @@ hm alertmanager $root/charts/alertmanager -f $root/values$valuesDir/alertmanager
 htf team-frontend-alertmanager $root/charts/alertmanager -f $root/values$valuesDir/alertmanager-team-frontend.yaml
 hm grafana $root/charts/grafana -f $root/values$valuesDir/grafana.yaml
 
-printf "${COLOR_BLUE}[SYSTEM] Deploying Kube Lego${COLOR_GREEN}\n"
-hs kube-lego $root/charts/kube-lego -f $root/values$valuesDir/kube-lego.yaml
+if [ "$TLS_ENABLE" == "true" ]; then
+  printf "${COLOR_BLUE}[SYSTEM] Deploying Kube Lego${COLOR_GREEN}\n"
+  hs kube-lego $root/charts/kube-lego -f $root/values$valuesDir/kube-lego.yaml
+fi
 
 printf "${COLOR_BLUE}[SYSTEM] Deploying Docker Registry${COLOR_GREEN}\n"
 hs registry $root/charts/docker-registry -f $root/values$valuesDir/docker-registry.yaml
 
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}[LOGGING] Deploying ELK stack\n${COLOR_GREEN}"
-  hl elk $root/charts/elk
+  hl elk $root/charts/elk -f $root/values$valuesDir/elk.yaml
 fi
 
 printf "${COLOR_WHITE}Now deploying TEAM FRONTEND packages${COLOR_GREEN}\n"
@@ -138,8 +142,10 @@ htf drone $root/charts/drone -f $root/values$valuesDir/drone.yaml
 printf "${COLOR_BLUE}[TEAM-FRONTEND] Deploying Frontend API${COLOR_GREEN}\n"
 htf team-frontend-api $root/charts/api -f $root/values$valuesDir/api.yaml
 
-printf "${COLOR_PURPLE}[SYSTEM] Waiting for kube-lego to become available${COLOR_BROWN}\n"
-ks rollout status -w deploy/kube-lego-kube-lego
+if [ "$TLS_ENABLE" == "true" ]; then
+  printf "${COLOR_PURPLE}[SYSTEM] Waiting for kube-lego to become available${COLOR_BROWN}\n"
+  ks rollout status -w deploy/kube-lego-kube-lego
+fi
 
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}Starting tunnels${COLOR_NC}\n"

@@ -4,5 +4,5 @@ image:
   pullPolicy: Always
 ingress:
   enabled: true
-  tls: true
+  tls: {{TLS_ENABLE}}
   hostname: api.{{CLUSTER_HOST}}

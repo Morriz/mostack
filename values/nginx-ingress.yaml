@@ -1,6 +1,10 @@
 rbac:
   create: {{RBAC_ENABLE}}
 controller:
+  config:
+    ssl-redirect: "{{TLS_ENABLE}}"
+    hsts: "{{TLS_ENABLE || false}}"
+    disable-ipv6: "true"
   stats:
     enabled: true
   hostNetwork: true
