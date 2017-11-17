@@ -1,4 +1,4 @@
-kpk() { ps aux|grep "$@" | awk '{print $2}' | tail -1 | xargs kill; }
+kpk() { ps aux|grep "$@" | awk '{print $2}' | xargs kill; }
 
 #h() { helm template "$@" | k apply -f -; }
 #hsk() { helm template --namespace kube-system "$@" | ksk apply -f -; }

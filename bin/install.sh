@@ -8,6 +8,8 @@ shopt -s expand_aliases
 
 cd $root > /dev/null
 
+sh $root/bin/gen-values.sh
+
 printf "${COLOR_WHITE}RUNNING INSTALL:${COLOR_NC}\n"
 
 if [ -z "$1" ]; then
@@ -150,6 +152,10 @@ fi
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}Starting tunnels${COLOR_NC}\n"
   sh $root/bin/tunnel-to-minikube-ingress.sh
+  sh $root/bin/ngrok.sh
 fi
+
+printf "${COLOR_BLUE}Starting dashboard proxies${COLOR_GREEN}\n"
+sh $root/bin/dashboards.sh
 
 printf "${COLOR_WHITE}ALL DONE!${COLOR_NC}\n"

@@ -10,12 +10,12 @@ if [ $? -ne 0 ]; then
 fi
 
 parseFiles() {
-  folder=$1
-  cat $root/templates/service-index.html | mo > $root/docgen/${folder}-service-index.html
+  cluster=$1
+  cat $root/templates/service-index.html | mo > $root/docgen/${cluster}-service-index.html
   shift
   for f in "$@"; do
-    echo generating values/_gen/$folder/$f
-    cat "$f" | mo > $root/values/_gen/$folder/$f
+    echo generating values/_gen/$cluster/$f
+    cat "$f" | mo > $root/values/_gen/$cluster/$f
   done
 }
 

@@ -16,4 +16,4 @@ fi
 
 killall ngrok
 cat $root/templates/ngrok.yaml | mo >> /tmp/ngrok.yaml
-ngrok start -config=/tmp/ngrok.yaml dev dev-tls
+ngrok start -config=/tmp/ngrok.yaml dev dev-tls &
