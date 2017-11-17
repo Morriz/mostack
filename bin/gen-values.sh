@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
+. $root/bin/colors.sh
 
 # uses 'mo'
 which mo > /dev/null
@@ -18,6 +19,8 @@ parseFiles() {
     cat "$f" | mo > $root/values/_gen/$cluster/$f
   done
 }
+
+printf "${COLOR_WHITE}GENERATING VALUES:${COLOR_NC}\n"
 
 cd $root/values > /dev/null
 baseFiles=$(find . -name "*.yaml" -maxdepth 1 | cut -c 3-)
