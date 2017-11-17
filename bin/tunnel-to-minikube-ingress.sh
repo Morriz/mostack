@@ -8,8 +8,6 @@ shopt -s expand_aliases
 
 cluster_ip=$(minikube ip) # or another ip when not using minikube
 local_ip=127.0.0.1 # $(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | sed -n '1 p')
-#echo "local_ip: $local_ip"
-#echo "cluster_ip: $cluster_ip"
 
 kpk 8080 > /dev/null 2>&1
 sudo killall ssh > /dev/null 2>&1

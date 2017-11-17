@@ -5,6 +5,4 @@ proxy:
   enabled: true
 persistentVolume:
   existingClaim: slow-pvc
-  storageClass: slow
-  size: 10Gi
   subPath: registry-cache

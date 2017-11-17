@@ -42,7 +42,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: team-frontend
+  namespace: system
   name: fast-pvc
 spec:
   storageClassName: fast

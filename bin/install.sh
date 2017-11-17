@@ -110,6 +110,9 @@ ks rollout status -w deploy/registry-cache2-docker-registry
 printf "${COLOR_BLUE}[monitoring] Installing Prometheus Operator${COLOR_NC}\n"
 hm prometheus-operator $root/charts/prometheus-operator -f $root/values$valuesDir/prometheus-operator.yaml
 
+printf "${COLOR_BLUE}[system] Deploying Drone${COLOR_NC}\n"
+hs drone $root/charts/drone -f $root/values$valuesDir/drone.yaml
+
 printf "${COLOR_BLUE}[system] Deploying Nginx controller${COLOR_NC}\n"
 hs nginx $root/charts/nginx-ingress -f $root/values$valuesDir/nginx-ingress.yaml
 
@@ -138,8 +141,8 @@ fi
 
 printf "${COLOR_WHITE}Now deploying TEAM FRONTEND packages${COLOR_NC}\n"
 
-printf "${COLOR_BLUE}[team-frontend] Deploying Drone${COLOR_NC}\n"
-htf drone $root/charts/drone -f $root/values$valuesDir/drone.yaml
+printf "${COLOR_BLUE}[team-frontend] Deploying RBAC{COLOR_NC}\n"
+k apply -f $root/k8s/team-frontend/drone-rbac.yaml
 
 printf "${COLOR_BLUE}[team-frontend] Deploying Frontend API${COLOR_NC}\n"
 htf team-frontend-api $root/charts/api -f $root/values$valuesDir/api.yaml

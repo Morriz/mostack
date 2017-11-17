@@ -19,7 +19,5 @@ shared_secret: {{DRONE_SECRET}}
 persistentVolume:
   enabled: true
   existingClaim: fast-pvc
-  storageClass: fast
-  size: 1Gi
 rbac:
-  create: {{RBAC_ENABLE}}
+  create: false # we will give `drone-deploy' roles to the teams

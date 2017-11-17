@@ -20,8 +20,6 @@ To boot the following Kubernetes applications/tools:
 * [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
-    *
-
 * *DISABLED FOR NOW:* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements. (Waiting for SNI which enables path based vhost ingress routing).
 * *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 
@@ -54,7 +52,7 @@ PREREQUISITES:
 	    * biz account: see provided `templates/ngrok.yaml`
 * Create an app key & secret for our Drone app in GitHub/BitBucket so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
 
-#### 1 Configuration
+#### 1. Configuration
 
 Copy `secrets/*.sample.sh` to `secrets/*.sh`, and edit them.
 If needed you can also edit `values/*.yaml` (see all the options in `charts/*/values.yaml`), but for a first boot I would leave them as is.
@@ -73,13 +71,13 @@ To load the aliases and functions (used throughout the stack) source them in you
 
     . bin/aliases && . bin/functions.sh
 
-#### 2 Deploy the stack
+#### 2. Deployment
 
 Running the main installer with
 
     bin/install.sh
 
-will do a `kubectl use-context minikube` and install the stack with the values from `values/_gen/*.yaml`.
+will do a `kubectl use-context minikube` and install the helm charts (and a few kubernetes manifests) with the values from `values/_gen/*.yaml`.
 
 Running the main installer with
 
@@ -116,8 +114,8 @@ Let's configure Drone now:
 1. Go to your public drone url (https://drone.dev.yourdoma.in) and select the repo `nodejs-demo-api`.
 2. Go to the 'Secrets' menu and create the following entries (follow the comments to get the values):
 
-        KUBERNETES_CERT= # ktf get secret $(ktf get sa drone-drone -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
-        KUBERNETES_TOKEN= # ktf get secret $(ktf get sa drone-drone -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
+        KUBERNETES_CERT= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
+        KUBERNETES_TOKEN= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
         KUBERNETES_DNS=10.0.0.10 # if minikube
         REGISTRY=localhost:5000 # or public
 

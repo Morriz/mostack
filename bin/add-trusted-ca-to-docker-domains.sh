@@ -4,7 +4,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 [ -e $CLUSTER_HOST ] && printf "${COLOR_LIGHT_RED}CLUSTER_HOST not found in env! Please set as main domain for app subdomains.${COLOR_NC}" && exit 1
 
-apps=(api drone reg)
+apps=(api grafana logging drone reg)
 pem=`cat $root/fakelerootx1.pem`
 
 caExists=`minikube ssh "echo '$pem' | tail -n +2 | head -n -1 | grep -f /etc/ssl/certs/ca-certificates.crt"`
