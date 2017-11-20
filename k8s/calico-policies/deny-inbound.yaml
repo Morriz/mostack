@@ -1,0 +1,22 @@
+- apiVersion: v1
+  kind: policy
+  metadata:
+    name: deny-cluster-internal-ingress
+  spec:
+    order: 10
+    preDNAT: true
+    ingress:
+      - action: deny
+        source:
+          nets: [10.0.0.0/16, 192.168.0.0/16]
+    selector: has(host-endpoint)
+- apiVersion: v1
+  kind: policy
+  metadata:
+    name: drop-other-ingress
+  spec:
+    order: 20
+    preDNAT: true
+    ingress:
+      - action: deny
+    selector: has(host-endpoint)

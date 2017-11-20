@@ -17,6 +17,7 @@ To boot the following Kubernetes applications/tools:
 
 * Docker Registry for storing locally built images, and as a proxy + cache for external ones.
 * [Prometheus Operator](https://github.com/coreos/prometheus-operator) + [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com)
+* [Calico](https://github.com/projectcalico) for networking and policies k8s style.
 * [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
@@ -47,7 +48,7 @@ PREREQUISITES:
 * [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager temporarily if you'd like to bypass browser warnings about https)
 * In case you run minikube, for kube-lego to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are portforwarded to your local machine:
 	* by manipulating your firewall
-	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as $CLUSTER_HOST in the config below):
+	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
 	    * free account: only http works since we can't load multiple tunnels (80 & 443) for one domain
 	    * biz account: see provided `templates/ngrok.yaml`
 * Create an app key & secret for our Drone app in GitHub/BitBucket so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
@@ -57,7 +58,7 @@ PREREQUISITES:
 Copy `secrets/*.sample.sh` to `secrets/*.sh`, and edit them.
 If needed you can also edit `values/*.yaml` (see all the options in `charts/*/values.yaml`), but for a first boot I would leave them as is.
 
-IMPORTANT: The `CLUSTER_HOST` subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
+IMPORTANT: The `$CLUSTER_HOST` subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
 
 If you also want to deploy to a gce cluster, also edit these values: `values/gce/*.yaml`.
 
@@ -77,7 +78,7 @@ Running the main installer with
 
     bin/install.sh
 
-will do a `kubectl use-context minikube` and install the helm charts (and a few kubernetes manifests) with the values from `values/_gen/*.yaml`.
+will do a `kubectl use-context minikube` and install the helm charts (and essential kubernetes manifests) with the values from `values/_gen/*.yaml`.
 
 Running the main installer with
 
@@ -99,13 +100,11 @@ The `api` deployment can't start because it can't find it's local docker image, 
 Drone needs to build from a commit first, which we will get to later. After that the `api:latest` tag is permanently stored in the registry's file storage,
 which survives cluster deletion, and will thus be immediately used upon cluster re-creation.
 
-When all containers are ready we can start the local service proxies:
+When all deployments are ready the local service proxies are automatically started with:
 
 	bin/dashboards.js
 
-and look at [the service index](./docgen/minikube-service-index.html)
-
-Let's configure Drone now:
+and [the service index](./docgen/minikube-service-index.html) will open.
 
 #### 3.1 Drone CI/CD
 
@@ -133,7 +132,9 @@ Check output for the following url: https://api.dev.yourdoma.in/api/publicmethod
 
 It should already be running ok, or it is in the process of detecting the new image and rolling out the update.
 
-#### 3.3 Prometheus stats in Grafana
+#### 3.3 Prometheus monitoring
+
+##### 3.3.1 Grafana
 
 Look at a pre-installed [Grafana dashboard](https://grafana.dev.yourdoma.in) showing the system cluster metrics.
 Use the following default creds if not changed already in `values/grafana.yaml`:
@@ -141,11 +142,31 @@ Use the following default creds if not changed already in `values/grafana.yaml`:
 * username: admin
 * password: jaja
 
+##### 3.3.2 Prometheus
+
+Look at the Prometheus view to see all targets are scrapable. For now there is an issue with one endpoints cert. That will be fixed later. There will be prometheus alerts sent to the alertmanager:
+
+##### 3.3.3 Alertmanager
+
+The alertmanager view will show the alerts concerning the unreachable endpoints.
+
 #### 3.4 Kibana log view
 
 Look at a pre-installed [Kibana dashboard with Logtrail](https://kibana.dev.yourdoma.in/app/logtrail) showing the cluster logs.
 
 Creds: Same as Grafana.
+
+#### 3.5 Calico
+
+Now that we have all ups running and functional, we can start deploying network policies. Let's start with denying all inbound/outbound ingress and egress for all namespaces:
+
+	k apply -f k8s/policies/deny-all.yaml
+	
+Now we can revisit the apps and see most of them failing. Interesting observation on minikube: the main nginx-ingress is still functional. This is because current setup does not operate on the host network. To also control host networking we have to fix some things, but that will arrive in the next update of this stack (hopefully).
+
+Let's apply all the policies needed for every namespace to open up the needed connectivity, and watch the apps work again:
+
+	k apply -f k8s/policies
 
 ### 4. Deleting the cluster
 

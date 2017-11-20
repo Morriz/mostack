@@ -1,6 +1,12 @@
+# using hostNetwork hack until hostPort works with CNI
+# @todo: remove and enable localproxy when ready
+hostNetwork: true
 localproxy:
-  enabled: true
+  enabled: false
   port: 6000
+service:
+  http:
+    externalPort: 6000
 proxy:
   enabled: true
 persistentVolume:

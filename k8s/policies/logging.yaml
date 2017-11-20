@@ -1,0 +1,56 @@
+---
+# allow egress to kube-dns
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: logging
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    ports:
+    - protocol: UDP
+      port: 53
+---
+# allow nginx ingress > kibana egress > elasticsearch
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kibana-ingress
+  namespace: logging
+spec:
+  podSelector:
+    matchLabels:
+      app: kibana
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+    - namespaceSelector:
+        matchLabels:
+          purpose: public-ingress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: elasticsearch
+---
+# allow kibana ingress > elasticsearch
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-elasticsearch-ingress
+  namespace: logging
+spec:
+  podSelector:
+    matchLabels:
+      app: elasticsearch
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: kibana

@@ -16,4 +16,4 @@ spec:
   ports:
   - name: registry
     port: {{ .Values.service.http.externalPort }}
-    targetPort: 5000
+    targetPort: {{ .Values.service.http.externalPort }}

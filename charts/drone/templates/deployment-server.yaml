@@ -17,6 +17,7 @@ spec:
         app: {{ template "fullname" . }}-server
         chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         release: {{ .Release.Name }}
+        component: server
         heritage: {{ .Release.Service }}
     spec:
       serviceAccountName: {{ if .Values.rbac.create }}{{ template "fullname" . }}{{ else }}"{{ .Values.rbac.serviceAccountName }}"{{ end }}

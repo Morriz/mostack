@@ -794,7 +794,7 @@ metadata:
   labels:
     app: elasticsearch
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - port: 9200
     protocol: TCP

@@ -12,6 +12,7 @@ spec:
         app: {{ template "fullname" . }}-agent
         chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         release: {{ .Release.Name }}
+        component: agent
         heritage: {{ .Release.Service }}
     spec:
       containers:

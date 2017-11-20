@@ -1,0 +1,82 @@
+---
+# allow egress to kube-dns
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: monitoring
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    ports:
+    - protocol: UDP
+      port: 53
+---
+# allow nginx ingress > api
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-grafana-ingress
+  namespace: team-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: grafana
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+    - namespaceSelector:
+        matchLabels:
+          purpose: public-ingress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+---
+# allow scraping
+#
+# @todo: tighten this:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-targets
+  namespace: monitoring
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/8
+    - ipBlock:
+        cidr: 192.168.0.0/16
+    - ipBlock:
+        cidr: 172.17.17.100/32
+---
+# allow all for now
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels: {}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels: {}
+  egress:
+  - to:
+    - podSelector:
+        matchLabels: {}

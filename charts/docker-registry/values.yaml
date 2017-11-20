@@ -57,3 +57,4 @@ proxy:
 #  username: bla
 #  password: bla
 
+hostNetwork: false

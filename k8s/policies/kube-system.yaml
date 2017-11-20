@@ -1,0 +1,49 @@
+---
+# allow cluster ingress > kube-dns
+kind: NetworkPolicy
+apiVersion: extensions/v1beta1
+metadata:
+  name: allow-kube-system
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  ingress:
+  - from:
+    - namespaceSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53
+---
+# allow all ingress from prometheus
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kube-system-exporters
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels: {}
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: monitoring
+#    ports:
+#      - port: 10054
+#        protocol: TCP
+#      - port: 10055
+#        protocol: TCP
+#---
+## temporary:
+#kind: NetworkPolicy
+#apiVersion: extensions/v1beta1
+#metadata:
+#  name: allow-kube-system-all
+#  namespace: kube-system
+#spec:
+#  podSelector:
+#    matchLabels: {}
+#  ingress:
+#  - from: []

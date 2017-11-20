@@ -66,6 +66,9 @@ fi
 printf "${COLOR_PURPLE}Waiting for a node to talk to"
 until k get nodes > /dev/null 2>&1; do sleep 1; printf "."; done
 
+#printf "\n${COLOR_BLUE}[cluster] Patching node to set CIDR for Canal${COLOR_NC}\n"
+#kubectl patch node minikube -p '{"spec":{"podCIDR":"10.244.0.0/16"}}'
+
 printf "\n${COLOR_WHITE}Now deploying Kubernetes resources\n"
 
 printf "${COLOR_BLUE}[cluster] Setting up cluster resources like namespaces and RBAC${COLOR_NC}\n"
@@ -86,7 +89,18 @@ else
 fi
 
 # remove taint that is not removed by kubeadm because of some race condition:
-[ $haveMiniRunning -ne 1 ] && k taint node minikube node-role.kubernetes.io/master:NoSchedule-
+[ $haveMiniRunning -ne 1 ] && k taint node minikube node-role.kubernetes.io/master:NoSchedule- > /dev/null 2>&1
+# help calico: add extra namespace label for kube-system
+k label namespace kube-system name=kube-system
+
+printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"
+k apply -f $root/k8s/calico.yaml
+
+printf "${COLOR_PURPLE}[tiller]Waiting for Calico to become available${COLOR_BROWN}\n"
+ksk rollout status -w deploy/calico-kube-controllers
+
+#printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"
+#k apply -f $root/k8s/calico.yaml
 
 printf "${COLOR_BLUE}[tiller] Installing Tiller${COLOR_NC}\n"
 helm init --service-account tiller --tiller-namespace=tiller --history-max 1
@@ -96,22 +110,16 @@ k -n tiller rollout status -w deploy/tiller-deploy
 
 printf "${COLOR_BLUE}[system] Deploying Docker Registry cache first${COLOR_NC}\n"
 hs registry-cache $root/charts/docker-registry -f $root/values$valuesDir/docker-registry-cache.yaml
-hs registry-cache2 $root/charts/docker-registry -f $root/values$valuesDir/docker-registry-cache.yaml \
-  --set localproxy.port=6001 --set proxy.url=https://quay.io
+#hs registry-cache2 $root/charts/docker-registry -f $root/values$valuesDir/docker-registry-cache.yaml \
+#  --set localproxy.port=6001 --set proxy.url=https://quay.io
 [ $? -ne 0 ] && printf "${COLOR_LIGHT_RED}Something went wrong installing Docker Registry cache${COLOR_NC}\n" && exit 1
 
 printf "${COLOR_PURPLE}[system] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
 ks rollout status -w deploy/registry-cache-docker-registry
-ks rollout status -w deploy/registry-cache2-docker-registry
-
-#printf "${COLOR_BLUE}waiting for nginx controller to become available${COLOR_BROWN}\n"
-#ks rollout status -w deploy/nginx-nginx-ingress-controller
+#ks rollout status -w deploy/registry-cache2-docker-registry
 
 printf "${COLOR_BLUE}[monitoring] Installing Prometheus Operator${COLOR_NC}\n"
 hm prometheus-operator $root/charts/prometheus-operator -f $root/values$valuesDir/prometheus-operator.yaml
-
-printf "${COLOR_BLUE}[system] Deploying Drone${COLOR_NC}\n"
-hs drone $root/charts/drone -f $root/values$valuesDir/drone.yaml
 
 printf "${COLOR_BLUE}[system] Deploying Nginx controller${COLOR_NC}\n"
 hs nginx $root/charts/nginx-ingress -f $root/values$valuesDir/nginx-ingress.yaml
@@ -139,9 +147,12 @@ if [ $isMini -eq 1 ]; then
   hl elk $root/charts/elk -f $root/values$valuesDir/elk.yaml
 fi
 
+printf "${COLOR_BLUE}[system] Deploying Drone${COLOR_NC}\n"
+hs drone $root/charts/drone -f $root/values$valuesDir/drone.yaml
+
 printf "${COLOR_WHITE}Now deploying TEAM FRONTEND packages${COLOR_NC}\n"
 
-printf "${COLOR_BLUE}[team-frontend] Deploying RBAC{COLOR_NC}\n"
+printf "${COLOR_BLUE}[team-frontend] Deploying RBAC${COLOR_NC}\n"
 k apply -f $root/k8s/team-frontend/drone-rbac.yaml
 
 printf "${COLOR_BLUE}[team-frontend] Deploying Frontend API${COLOR_NC}\n"

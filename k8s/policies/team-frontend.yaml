@@ -1,0 +1,68 @@
+---
+# allow nginx + prometheus ingress > api
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api
+  namespace: team-frontend
+spec:
+  podSelector:
+    matchLabels:
+      release: api
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+    - namespaceSelector:
+        matchLabels:
+          purpose: public-ingress
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+---
+# allow prometheus ingress + egress
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus
+  namespace: team-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels: {}
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: alertmanager
+# @todo: somehow the next block is not working
+#  - to:
+#    - podSelector:
+#        matchLabels:
+#          release: api
+# so using this for now:
+  - to:
+    - ipBlock:
+        cidr: 192.168.0.0/16
+---
+# allow prometheus ingress > alertmanager
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-alertmanager
+  namespace: team-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: alertmanager
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus

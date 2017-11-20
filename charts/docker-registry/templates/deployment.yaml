@@ -17,6 +17,9 @@ spec:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
     spec:
+{{- if .Values.hostNetwork }}
+      hostNetwork: true # minikube hack because cni can't seem to handle hostport even now (19 nov 2017)
+{{- end }}
       containers:
       - name: registry
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -27,7 +30,7 @@ spec:
             memory: 256Mi
         env:
         - name: REGISTRY_HTTP_ADDR
-          value: ":5000"
+          value: ":{{ .Values.service.http.externalPort }}"
         - name: REGISTRY_LOG_LEVEL
           value: {{ .Values.logLevel | quote }}
         - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
@@ -55,7 +58,7 @@ spec:
           mountPath: /var/lib/registry
           subPath: "{{ .Values.persistentVolume.subPath }}"
         ports:
-        - containerPort: 5000
+        - containerPort: {{ .Values.service.http.externalPort }}
           name: registry
           protocol: TCP
       volumes:
