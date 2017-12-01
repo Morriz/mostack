@@ -3,7 +3,6 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
-. $root/bin/functions.sh
 . $root/secrets/minikube.sh
 
 # uses 'mo'
@@ -16,4 +15,4 @@ fi
 
 killall ngrok
 cat $root/templates/ngrok.yaml | mo > /tmp/ngrok.yaml
-ngrok start -config=/tmp/ngrok.yaml dev dev-tls &
+ngrok start --log-level "info" -config=/tmp/ngrok.yaml dev dev-tls &

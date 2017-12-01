@@ -14,10 +14,10 @@ spec:
         {{ $key }}: {{ $value }}
         {{- end }}
       labels:
-        app: {{ template "fullname" . }}-server
+        app: {{ .Chart.Name }}
+        component: server
         chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         release: {{ .Release.Name }}
-        component: server
         heritage: {{ .Release.Service }}
     spec:
       serviceAccountName: {{ if .Values.rbac.create }}{{ template "fullname" . }}{{ else }}"{{ .Values.rbac.serviceAccountName }}"{{ end }}

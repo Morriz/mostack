@@ -2,8 +2,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: {{ template "grafana.fullname" . }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{ .Chart.Name | quote }}
+    chart: {{.Chart.Name}}-{{.Chart.Version}}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
   name: {{ template "grafana.server.fullname" . }}
@@ -17,7 +17,7 @@ spec:
         {{ $key }}: {{ $value }}
       {{- end }}
       labels:
-        app: {{ template "grafana.fullname" . }}
+        app: {{ .Chart.Name | quote }}
         release: {{ .Release.Name }}
     spec:
       containers:

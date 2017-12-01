@@ -70,7 +70,7 @@ You may want to run the `bin/watch.sh` script to auto-generate these files when 
 
 To load the aliases and functions (used throughout the stack) source them in your shell:
 
-    . bin/aliases && . bin/functions.sh
+    . bin/aliases
 
 #### 2. Deployment
 
@@ -115,7 +115,7 @@ and [the service index](./docgen/minikube-service-index.html) will open.
 
         KUBERNETES_CERT= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
         KUBERNETES_TOKEN= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
-        KUBERNETES_DNS=10.0.0.10 # if minikube
+        KUBERNETES_DNS=10.96.0.10 # if minikube
         REGISTRY=localhost:5000 # or public
 
 ##### 3.1.2 Trigger the build pipeline
@@ -161,7 +161,7 @@ Creds: Same as Grafana.
 Now that we have all ups running and functional, we can start deploying network policies. Let's start with denying all inbound/outbound ingress and egress for all namespaces:
 
 	k apply -f k8s/policies/deny-all.yaml
-	
+
 Now we can revisit the apps and see most of them failing. Interesting observation on minikube: the main nginx-ingress is still functional. This is because current setup does not operate on the host network. To also control host networking we have to fix some things, but that will arrive in the next update of this stack (hopefully).
 
 Let's apply all the policies needed for every namespace to open up the needed connectivity, and watch the apps work again:

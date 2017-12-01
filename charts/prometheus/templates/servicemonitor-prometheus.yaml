@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
@@ -13,7 +13,7 @@ spec:
   jobLabel: {{ template "name" . }}
   selector:
     matchLabels:
-      app: {{ template "name" . }}
+      app: {{ .Chart.Name | quote }}
       prometheus: {{ .Values.prometheus }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version }}
   namespaceSelector:

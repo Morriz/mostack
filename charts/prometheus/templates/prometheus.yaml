@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     prometheus: {{ .Values.prometheus }}
@@ -69,7 +69,7 @@ spec:
 {{- else }}
   ruleSelector:
     matchLabels:
-      app: {{ template "name" . }}
+      app: {{ .Chart.Name | quote }}
       prometheus: {{ .Values.prometheus }}
 {{- end }}
 {{- if .Values.storageSpec }}

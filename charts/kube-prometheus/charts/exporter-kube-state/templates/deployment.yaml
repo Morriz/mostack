@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     component: kube-state
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
@@ -19,11 +19,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: {{ template "fullname" . }}
+      app: {{ .Chart.Name | quote }}
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ .Chart.Name | quote }}
         component: kube-state
         release: {{ .Release.Name }}
         version: "{{ .Values.kube_state_metrics.image.tag }}"

@@ -3,11 +3,11 @@ rbac:
 controller:
   config:
     ssl-redirect: "{{TLS_ENABLE}}"
-    hsts: "{{TLS_ENABLE || false}}"
+    hsts: "{{TLS_ENABLE}}"
     disable-ipv6: "true"
   stats:
     enabled: true
-  hostNetwork: true
+  hostNetwork: {{HAS_CNI}}
   resources:
      limits:
        cpu: 100m

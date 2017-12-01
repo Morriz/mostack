@@ -1,49 +1,77 @@
 ---
-# allow cluster ingress > kube-dns
+# cluster > dns
 kind: NetworkPolicy
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 metadata:
-  name: allow-kube-system
+  name: allow-cluster-ingress-dns
   namespace: kube-system
 spec:
   podSelector:
     matchLabels:
-      k8s-app: kube-dns
+      k8s-app: coredns
   ingress:
   - from:
-    - namespaceSelector: {}
+    - ipBlock:
+        cidr: 192.168.0.0/16
     ports:
     - protocol: UDP
       port: 53
 ---
-# allow all ingress from prometheus
-apiVersion: networking.k8s.io/v1
+# prometheus > dns monitoring
 kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
 metadata:
-  name: allow-kube-system-exporters
+  name: allow-prometheus-ingress-dns
   namespace: kube-system
 spec:
   podSelector:
-    matchLabels: {}
+    matchLabels:
+      k8s-app: coredns
   ingress:
   - from:
     - namespaceSelector:
         matchLabels:
           purpose: monitoring
+    ports:
+    - protocol: TCP
+      port: 9153
+---
+# - dns egress > kubernetes api
+# - dns udp egress
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-dns-egress-kubernetes
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: coredns
+  egress:
+  # had to open up to all, but wanted to use the part that is commented out below
+  - to: []
+#    - ipBlock:
+#        cidr: 10.96.0.0/8
 #    ports:
-#      - port: 10054
-#        protocol: TCP
-#      - port: 10055
-#        protocol: TCP
-#---
-## temporary:
-#kind: NetworkPolicy
-#apiVersion: extensions/v1beta1
-#metadata:
-#  name: allow-kube-system-all
-#  namespace: kube-system
-#spec:
-#  podSelector:
-#    matchLabels: {}
-#  ingress:
-#  - from: []
+#    - protocol: TCP
+#      port: 443
+#  - to:
+#    - namespaceSelector:
+#        matchLabels:
+#          name: kube-system
+#    ports:
+#    - protocol: UDP
+---
+# cluster ingress > kubernetes api
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-cluster-ingress-kubernetes
+  namespace: kube-system
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    ports:
+    - protocol: TCP
+      port: 443

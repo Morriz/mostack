@@ -8,21 +8,21 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      release: api
+      app: api
   ingress:
   - from:
-    - podSelector:
-        matchLabels:
-          app: nginx-ingress
     - namespaceSelector:
         matchLabels:
           purpose: public-ingress
+    ports:
+    - protocol: TCP
+      port: 80
   - from:
     - podSelector:
         matchLabels:
           app: prometheus
 ---
-# allow prometheus ingress + egress
+# allow all ingress > prometheus > alertmanager egress
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -33,23 +33,23 @@ spec:
     matchLabels:
       app: prometheus
   ingress:
-  - from:
-    - podSelector:
-        matchLabels: {}
+  - ports:
+    - protocol: TCP
+      port: 9090
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: alertmanager
 # @todo: somehow the next block is not working
-#  - to:
-#    - podSelector:
-#        matchLabels:
-#          release: api
-# so using this for now:
   - to:
-    - ipBlock:
-        cidr: 192.168.0.0/16
+    - podSelector:
+        matchLabels:
+          app: api
+# so using this for now:
+#  - to:
+#    - ipBlock:
+#        cidr: 192.168.0.0/16
 ---
 # allow prometheus ingress > alertmanager
 apiVersion: networking.k8s.io/v1

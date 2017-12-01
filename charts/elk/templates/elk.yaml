@@ -610,7 +610,7 @@ data:
         slack:
           active: true
           username: Sentinl
-    #      hook: '{{ .Values.slackUrl }}'
+          hook: '{{ .Values.slackUrl }}'
           channel: '#devops'
 
     server.host: '0.0.0.0'
@@ -762,7 +762,7 @@ spec:
             echo "starting with \$resource_version: $resource_version"
 
             curl --silent --fail --show-error --insecure --header "Authorization: Bearer $kube_token" \
-              --request GET "https://kubernetes.default.svc/api/v1/watch/events?resourceVersion=$resource_version" \
+              --request GET "https://kubernetes.default/api/v1/watch/events?resourceVersion=$resource_version" \
                 | while read -l event
 
               if test (echo $event | jq -r '.object.metadata.resourceVersion') = "null"
@@ -773,7 +773,7 @@ spec:
 
               set -l index "kube-events-"(date --utc -I)
               while not curl --silent --fail --show-error \
-                --request POST http://elasticsearch.logging.svc:9200/$index/event --data "$event" \
+                --request POST http://elasticsearch:9200/$index/event --data "$event" \
                   | read -l es_result
                 echo "\$status: $status"
                 sleep 10

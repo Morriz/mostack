@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     component: node-exporter
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
@@ -15,6 +15,6 @@ spec:
     port: {{ .Values.service.externalPort }}
     protocol: TCP
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ .Chart.Name | quote }}
     component: node-exporter
     release: {{ .Release.Name }}

@@ -3,7 +3,6 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
-. $root/bin/functions.sh
 . $root/secrets/minikube.sh
 
 cluster_ip=$(minikube ip) # or another ip when not using minikube
@@ -17,7 +16,7 @@ sudo ssh -N -p 22 -g $USER@$local_ip -L $local_ip:443:$cluster_ip:443 &
 
 if [ "$TLS_ENABLE" == "true" ]; then
   # make lego available on localhost:8080
-  kubectl -n system port-forward $(kubectl -n system get po -l app=kube-lego -o jsonpath='{.items[0].metadata.name}') 8080 &
+  ks port-forward $(ks get po -l app=kube-lego -o jsonpath='{.items[0].metadata.name}') 8080 &
   # port forward incoming port 80 to lego's node
   sudo ssh -N -p 22 -g $USER@$local_ip -L $local_ip:80:127.0.0.1:8080 &
 else

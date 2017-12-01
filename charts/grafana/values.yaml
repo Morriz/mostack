@@ -87,3 +87,5 @@ ingress:
 dataSource: {}
 
 serverDashboardFiles: {}
+
+slackUrl:

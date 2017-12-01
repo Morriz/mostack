@@ -243,5 +243,7 @@ tcp: {}
 ##
 udp: {}
   # 53: "kube-system/kube-dns:53"
+
+selfServiceMonitor: true
 prometheus: prometheus
 forceTls: true

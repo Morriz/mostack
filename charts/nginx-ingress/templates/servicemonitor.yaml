@@ -1,9 +1,10 @@
+{{- if .Values.selfServiceMonitor }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   namespace: monitoring
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
@@ -13,7 +14,7 @@ spec:
   jobLabel: {{ template "name" . }}
   selector:
     matchLabels:
-      app: {{ template "name" . }}
+      app: {{ .Chart.Name | quote }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version }}
       component: "{{ .Values.controller.name }}"
   namespaceSelector:
@@ -22,3 +23,4 @@ spec:
   endpoints:
   - port: metrics
     interval: 10s
+{{- end }}

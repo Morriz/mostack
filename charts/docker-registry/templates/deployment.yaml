@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -14,11 +14,15 @@ spec:
       annotations:
 {{ toYaml .Values.annotations | indent 8 }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ .Chart.Name | quote }}
         release: {{ .Release.Name }}
     spec:
+{{- if .Values.hostAliases }}
+      hostAliases:
+{{ toYaml .Values.hostAliases | indent 8 }}
+{{- end }}
 {{- if .Values.hostNetwork }}
-      hostNetwork: true # minikube hack because cni can't seem to handle hostport even now (19 nov 2017)
+      hostNetwork: {{ .Values.hostNetwork }} # minikube hack because cni can't seem to handle hostport even now (19 nov 2017)
 {{- end }}
       containers:
       - name: registry

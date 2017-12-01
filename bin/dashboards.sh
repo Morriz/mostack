@@ -3,11 +3,10 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
-. $root/bin/functions.sh
 
 printf "${COLOR_WHITE}Starting SYSTEM app proxies${COLOR_NC}\n"
 
-printf "${COLOR_PURPLE}[system] Waiting for nodes to become available${COLOR_BROWN}\n"
+printf "${COLOR_PURPLE}[system] Waiting for necessary pods to become available${COLOR_BROWN}\n"
 ks rollout status -w deploy/nginx-nginx-ingress-controller
 kl rollout status -w deploy/elasticsearch
 km rollout status -w statefulset/prometheus-prometheus
@@ -16,7 +15,7 @@ km rollout status -w statefulset/alertmanager-alertmanager
 ktf rollout status -w statefulset/prometheus-team-frontend-prometheus
 ktf rollout status -w statefulset/alertmanager-team-frontend-alertmanager
 
-printf "${COLOR_BLUE}Starting nginx proxy${COLOR_NC}\n"
+printf "${COLOR_BLUE}Starting nginx status proxy${COLOR_NC}\n"
 kpk 18080 > /dev/null 2>&1
 ks port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 18080 &
 

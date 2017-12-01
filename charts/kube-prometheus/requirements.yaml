@@ -7,9 +7,13 @@ dependencies:
     version: 0.1.0
     repository: file://./exporter-kube-controller-manager
 
-  - name: exporter-kube-dns
+  - name: exporter-coredns
     version: 0.1.0
     repository: file://./charts.cloudposse.com/incubator
+
+#  - name: exporter-kube-dns
+#    version: 0.1.0
+#    repository: file://./charts.cloudposse.com/incubator
 
   - name: exporter-kube-etcd
     version: 0.1.0

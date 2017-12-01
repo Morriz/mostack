@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
@@ -11,7 +11,7 @@ metadata:
 {{ toYaml .Values.service.annotations | indent 4 }}
 spec:
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ .Chart.Name | quote }}
     release: {{ .Release.Name }}
   ports:
   - name: registry

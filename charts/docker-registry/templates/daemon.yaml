@@ -4,7 +4,7 @@ kind: DaemonSet
 metadata:
   name: {{ template "fullname" . }}-proxy
   labels:
-    app: {{ template "fullname" . }}-proxy
+    app: {{ .Chart.Name | quote }}-proxy
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}

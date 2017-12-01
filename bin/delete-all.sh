@@ -3,7 +3,6 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
-. $root/bin/functions.sh
 
 k config use-context minikube
 

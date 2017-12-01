@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     component: alertmanager
     heritage: {{ .Release.Service }}
@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels:
       alertmanager: {{ .Release.Name }}
-      app: {{ template "name" . }}
+      app: {{ .Chart.Name | quote }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version }}
   namespaceSelector:
     matchNames:

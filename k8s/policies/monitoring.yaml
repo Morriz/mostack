@@ -1,82 +1,150 @@
 ---
-# allow egress to kube-dns
+# allow nginx > grafana > prometheus
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-dns-egress
+  name: allow-grafana
   namespace: monitoring
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    ports:
-    - protocol: UDP
-      port: 53
----
-# allow nginx ingress > api
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-grafana-ingress
-  namespace: team-frontend
 spec:
   podSelector:
     matchLabels:
       app: grafana
   ingress:
   - from:
-    - podSelector:
-        matchLabels:
-          app: nginx-ingress
+    # we have to open up access to grafana from any pod in the namespace that nginx is egressing from
+    # but we would like to have a mechanism to AND the podSelector below this one:
     - namespaceSelector:
         matchLabels:
           purpose: public-ingress
+    ports:
+    - port: 3000
+      protocol: TCP
+    # disabling the following section, as selectors are OR'd (no AND coming?):
+#    - podSelector:
+#        matchLabels:
+#          app: nginx-ingress
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: prometheus
 ---
-# allow scraping
-#
-# @todo: tighten this:
+# TCP 9090 > prometheus > endpoints
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-targets
-  namespace: monitoring
-spec:
-  podSelector: {}
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: prometheus
-  egress:
-  - to:
-    - ipBlock:
-        cidr: 10.0.0.0/8
-    - ipBlock:
-        cidr: 192.168.0.0/16
-    - ipBlock:
-        cidr: 172.17.17.100/32
----
-# allow all for now
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-all
+  name: allow-prometheus
   namespace: monitoring
 spec:
   podSelector:
-    matchLabels: {}
+    matchLabels:
+      app: prometheus
   ingress:
-  - from:
-    - podSelector:
-        matchLabels: {}
+  - ports:
+    - port: 9090
+      protocol: TCP
   egress:
   - to:
     - podSelector:
-        matchLabels: {}
+        matchLabels:
+          app: alertmanager
+    ports:
+    - protocol: TCP
+      port: 9093
+  - to:
+    - podSelector:
+        matchLabels:
+          app: exporter-node
+    ports:
+    - protocol: TCP
+      port: 9100
+  - to:
+    - podSelector:
+        matchLabels:
+          app: exporter-kube-state
+    ports:
+    - protocol: TCP
+      port: 8080
+  # nodePort services:
+  - to:
+    - ipBlock:
+        cidr: 172.17.17.100/32
+    ports:
+    # exporter-node
+    - protocol: TCP
+      port: 9100
+    # kubelet
+    - protocol: TCP
+      port: 10250
+    # nginx-controller
+    - protocol: TCP
+      port: 9913
+  # headless services:
+  - to:
+    - ipBlock:
+        cidr: 10.96.0.0/8
+  # coredns:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - port: 9153
+      protocol: TCP
+---
+# allow prometheus ingress > alertmanager
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-alertmanager
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: alertmanager
+  ingress:
+  # mesh communication
+  - from:
+    - podSelector:
+        matchLabels:
+          app: alertmanager
+    ports:
+    - port: 6783
+      protocol: TCP
+  # prometheus
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+---
+# allow prometheus ingress > exporter-kube-state
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-exporter-kube-state
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: exporter-kube-state
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+---
+# allow prometheus ingress > exporter-node
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-exporter-node
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: exporter-node
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus

@@ -1,5 +1,6 @@
 rbac:
   create: {{RBAC_ENABLE}}
+useHostPort: false
 controller:
   stats:
     enabled: true

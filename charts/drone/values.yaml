@@ -2,7 +2,7 @@ image:
   registry: docker.io
   org: drone
   name: drone
-  tag: 0.8-alpine
+  tag: 0.8.2
   pullPolicy: IfNotPresent
 
 service:

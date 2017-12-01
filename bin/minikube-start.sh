@@ -16,30 +16,23 @@ minikube start \
     --extra-config=controller-manager.ClusterCIDR=192.168.0.0/16 \
     --extra-config=controller-manager.CIDRAllocatorType=RangeAllocator \
     --extra-config=controller-manager.AllocateNodeCIDRs=true \
-    --registry-mirror=http://localhost:6000 \
-    --registry-mirror=http://localhost:6001
+    --registry-mirror=http://localhost:6000
 
 # with kubeadm bootstrapper:
 #minikube start \
 #    --bootstrapper kubeadm \
-#    --kubernetes-version v1.8.3 \
+#    --kubernetes-version v1.8.4 \
 #    --extra-config=apiserver.admission-control="NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,GenericAdmissionWebhook,PodPreset" \
 #    --network-plugin=cni \
 #    --host-only-cidr 172.17.17.1/24 \
 #    --extra-config=kubelet.pod-cidr=192.168.0.0/16 \
 #    --extra-config=proxy.cluster-cidr=192.168.0.0/16 \
 #    --extra-config=controller-manager.cluster-cidr=192.168.0.0/16 \
-#    --registry-mirror=http://localhost:6000 \
-#    --registry-mirror=http://localhost:6001
-
 #    --extra-config=controller-manager.cidr-allocator-type=RangeAllocator \
 #    --extra-config=controller-manager.allocate-node-cidrs=true \
-#    --v 10 \
+#    --registry-mirror=http://localhost:6000
 
-# timesync
-printf "${COLOR_BLUE}ON MINIKUBE: syncing clock${COLOR_NC}\n"
-minikube ssh -- sudo ln -sf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
-minikube ssh -- docker run -i --rm --privileged --pid=host debian nsenter -t 1 -m -u -n -i date -u $(date -u +%m%d%H%M%Y)
+#    --v 10 \
 
 # add to wakeup script after `brew install sleepwatcher && brew services start sleepwatcher`:
 # echo minikube ssh -- docker run -i --rm --privileged --pid=host debian nsenter -t 1 -m -u -n -i date -u $(date -u +%m%d%H%M%Y) > ~/.wakeup

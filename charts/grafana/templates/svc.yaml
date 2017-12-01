@@ -2,14 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: {{ template "grafana.fullname" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
   name: {{ template "grafana.server.fullname" . }}
 spec:
   ports:
-    - name: "http"
+    - name: http
       port: 80
       protocol: TCP
       targetPort: 3000
@@ -19,8 +19,9 @@ spec:
   {{- end }}
 {{- end }}
   selector:
-    app: {{ template "grafana.fullname" . }}
-  type: "{{ .Values.service.type }}"
+    app: {{ .Chart.Name | quote }}
+    release: {{ .Release.Name }}
+  type: {{ .Values.service.type }}
 {{- if contains "LoadBalancer" .Values.service.type }}
   {{- if .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}

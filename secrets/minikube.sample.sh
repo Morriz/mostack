@@ -24,3 +24,6 @@ export RBAC_ENABLE=true
 export TLS_ENABLE=true
 [ "$TLS_ENABLE" == "true" ] && TLSS=s
 export TLSS
+
+export HAS_CNI=false
+export NOT_HAS_CNI=true

@@ -3,12 +3,15 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: tiller
+  labels:
+    name: tiller
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: system
   labels:
+    name: system
     purpose: public-ingress
 ---
 apiVersion: v1
@@ -16,6 +19,7 @@ kind: Namespace
 metadata:
   name: monitoring
   labels:
+    name: monitoring
     purpose: monitoring
 ---
 apiVersion: v1
@@ -23,12 +27,15 @@ kind: Namespace
 metadata:
   name: logging
   labels:
+    name: logging
     purpose: logging
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: team-frontend
+  labels:
+    name: team-frontend
 ---
 apiVersion: v1
 kind: ServiceAccount

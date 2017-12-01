@@ -7,7 +7,7 @@ metadata:
 {{- end }}
   labels:
     alertmanager: {{ .Release.Name }}
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
@@ -38,5 +38,5 @@ spec:
       protocol: TCP
   selector:
     alertmanager: {{ .Release.Name }}
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
   type: "{{ .Values.service.type }}"

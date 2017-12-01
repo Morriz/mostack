@@ -9,10 +9,10 @@ spec:
       annotations:
 {{ toYaml .Values.agent.annotations | indent 8 }}
       labels:
-        app: {{ template "fullname" . }}-agent
+        app: {{ .Chart.Name }}
+        component: agent
         chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         release: {{ .Release.Name }}
-        component: agent
         heritage: {{ .Release.Service }}
     spec:
       containers:

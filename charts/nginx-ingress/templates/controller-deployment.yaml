@@ -3,7 +3,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: {{ template "name" . }}
+    app: {{ .Chart.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     component: "{{ .Values.controller.name }}"
     heritage: {{ .Release.Service }}
@@ -19,7 +19,7 @@ spec:
 {{ toYaml .Values.controller.podAnnotations | indent 8}}
       {{- end }}
       labels:
-        app: {{ template "name" . }}
+        app: {{ .Chart.Name | quote }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         component: "{{ .Values.controller.name }}"
         release: {{ .Release.Name }}
