@@ -1,5 +1,48 @@
-rbacEnable: {{RBAC_ENABLE}}
-resources:
+deployKubeDNS: false
+deployCoreDNS: true
+global:
+  rbacEnable: {{RBAC_ENABLE}}
+prometheus:
+  resources:
   requests:
     memory: 400Mi
-externalUrl: https://prometheus.{{CLUSTER_HOST}}
+  # externalUrl: https://prometheus.{{CLUSTER_HOST}}
+alertmanager:
+  config:
+    global:
+      slack_api_url: {{SLACK_API_URL}}
+    route:
+      receiver: default-receiver
+      repeat_interval: 3h
+      routes:
+      - match:
+          alertname: DeadMansSwitch
+        repeat_interval: 5m
+        receiver: deadmansswitch
+    receivers:
+    - name: deadmansswitch
+    - name: default-receiver
+      slack_configs:
+      - channel: '#devops'
+        send_resolved: true
+  # externalUrl: https://alertmanager.{{CLUSTER_HOST}}  
+grafana:
+  ingress:
+    enabled: 'true'
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: 'false'
+      ingress.kubernetes.io/rewrite-target: /
+      ingress.kubernetes.io/ssl-redirect: 'false'
+    hosts:
+    - grafana.{{CLUSTER_HOST}}
+    # tls:
+    # - secretName: grafana-tls
+    #   hosts:
+    #   - grafana.{{CLUSTER_HOST}}
+  adminPassword: 'jaja'
+  
+exporter-kube-controller-manager:
+  serviceSelectorLabelKey: component
+exporter-kube-scheduler:
+  serviceSelectorLabelKey: component

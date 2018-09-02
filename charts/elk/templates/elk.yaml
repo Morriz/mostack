@@ -38,15 +38,12 @@ metadata:
     kubernetes.io/cluster-service: "true"
 data:
   kubernetes.yml: |-
-    - type: log
-      paths:
-        - /var/lib/docker/containers/*/*.log
-      json.message_key: log
-      json.keys_under_root: true
+    - type: docker
+      containers.ids:
+      - "*"
       processors:
         - add_kubernetes_metadata:
             in_cluster: true
-            namespace: ${POD_NAMESPACE}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -69,7 +66,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:6.0.0-rc1
+        image: docker.elastic.co/beats/filebeat:6.3.2
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
@@ -83,10 +80,6 @@ spec:
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
           value: changeme
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
         securityContext:
           runAsUser: 0
         resources:
@@ -421,7 +414,7 @@ spec:
           privileged: true
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
         imagePullPolicy: IfNotPresent
         # workarounds until https://github.com/kubernetes/kubernetes/issues/30120
         env:
@@ -580,38 +573,38 @@ data:
       "index_patterns" : [
         {
           "es": {
-            "default_index": "filebeat-*",
-            "allow_url_parameter": false
+            "default_index": "filebeat-*"
           },
-          "tail_interval_in_seconds": 2,
+          "tail_interval_in_seconds": 10,
           "es_index_time_offset_in_seconds": 0,
-          "display_timezone": "Etc/UTC",
-          "display_timestamp_format": "YYYY MMM DD HH:mm:ss",
+          "display_timezone": "local",
+          "display_timestamp_format": "MMM DD HH:mm:ss",
           "max_buckets": 500,
           "default_time_range_in_days" : 0,
           "max_hosts": 100,
           "max_events_to_keep_in_viewer": 5000,
+          "default_search": "",
           "nested_objects" : true,
           "fields" : {
             "mapping" : {
                 "timestamp" : "@timestamp",
-                "display_timestamp" : "@timestamp",
                 "hostname" : "kubernetes.pod.name",
                 "program": "kubernetes.container.name",
-                "message": "log"
-            }
+                "message": "message"
+            },
+            "keyword_suffix" : ""
           }
         }
       ]
     }
   kibana.yml: |
-    sentinl:
-      settings:
-        slack:
-          active: true
-          username: Sentinl
-          hook: '{{ .Values.slackUrl }}'
-          channel: '#devops'
+    # sentinl:
+    #   settings:
+    #     slack:
+    #       active: true
+    #       username: Sentinl
+    #       hook: '{{ .Values.slackUrl }}'
+    #       channel: '#devops'
 
     server.host: '0.0.0.0'
     elasticsearch.url: 'http://elasticsearch:9200'
@@ -638,7 +631,8 @@ spec:
     spec:
       containers:
       - name: kibana
-        image: morriz/kibana-logtrail-sentinl:5.6.3
+        # image: morriz/kibana-logtrail-sentinl:5.6.3
+        image: tgbyte/kibana:6.3.2
         imagePullPolicy: IfNotPresent
         resources:
           # keep request = limit to keep this container in guaranteed class
@@ -650,7 +644,7 @@ spec:
         - name: ELASTICSEARCH_URL
           value: 'http://elasticsearch:9200'
         - name: KIBANA_INDEX
-          value: 'filebeat-*'
+        #   value: 'filebeat-*'
         ports:
         - containerPort: 5601
           name: ui

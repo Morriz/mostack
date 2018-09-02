@@ -1,15 +1,48 @@
 rbacEnable: {{RBAC_ENABLE}}
-resources:
-  requests:
-    memory: 400Mi
-rules:
-  specifiedInValues: true
-  value:
-    team-frontend-api.rules: |-
-      ALERT FrontendApiDown
-        IF absent(up{job="team-frontend-api-api"}) or (count(up{job="team-frontend-api-api"} == 1) BY (cluster) == 0)
-        FOR 5m
-        LABELS {service="team-frontend", severity="critical"}
-        ANNOTATIONS {description="There is no running frontend api. Deployments and replication controllers are not making progress.", summary="Frontend API is down"}
-prometheus: team-frontend-prometheus
-alertmanager: team-frontend-alertmanager-alertmanager
+# disable grafana until we have something to see:
+deployGrafana: false
+# disable because not needed in team-frontend namespace:
+deployExporterNode: false
+deployKubelets: false
+deployKubeScheduler: false
+deployKubeControllerManager: false
+deployKubeState: false
+deployCoreDNS: false
+deployKubeDNS: false
+deployKubeEtcd: false
+prometheus:
+  resources:
+    requests:
+      memory: 400Mi
+  rules:
+    value:
+      - name: team-frontend-rules
+        rules:
+        - alert: FrontendApiDown
+          expr: absent(up{job="team-frontend-api-api"}) or (count(up{job="team-frontend-api-api"} == 1) BY (cluster) == 0)
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            description: There is no running frontend api. Deployments and replication controllers are not making progress.
+            summary: Frontend API is down
+  # externalUrl: https://prometheus.{{CLUSTER_HOST}}
+alertmanager:
+  config:
+    global:
+      slack_api_url: '{{SLACK_API_URL}}'
+    route:
+      receiver: default-receiver
+      repeat_interval: 3h
+      routes:
+      - match:
+          alertname: DeadMansSwitch
+        repeat_interval: 5m
+        receiver: deadmansswitch
+    receivers:
+    - name: deadmansswitch
+    - name: default-receiver
+      slack_configs:
+      - channel: '#frontend'
+        send_resolved: true
+  # externalUrl: https://alertmanager.{{CLUSTER_HOST}}  

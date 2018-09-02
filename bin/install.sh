@@ -98,16 +98,17 @@ k label namespace kube-system name=kube-system
 k label namespace default name=default
 
 printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"
-k apply -f k8s/calico.yaml
+k apply -f k8s/calico-kdd/rbac.yaml
+k apply -f k8s/calico-kdd/calico.yaml
 
 printf "${COLOR_PURPLE}[tiller]Waiting for Calico to become available${COLOR_BROWN}\n"
-ksk rollout status -w deploy/calico-kube-controllers
+ksk rollout status -w daemonset.extensions/calico-node
 
 #printf "${COLOR_BLUE}[tiller] Installing Weave${COLOR_NC}\n"
 #k apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(k version | base64 | tr -d '\n')"
 
 printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"
-for ns in default kube-system system monitoring logging team-frontend; do k apply -n $ns -f k8s/policies/each-namespace; done
+for ns in default kube-system system monitoring logging team-frontend; do k apply -n $ns -f k8s/policies/each-namespace/defaults.yaml; done
 k apply -f k8s/policies
 
 printf "${COLOR_BLUE}[tiller] Installing Tiller${COLOR_NC}\n"
@@ -122,28 +123,17 @@ hs registry-cache charts/docker-registry -f values$valuesDir/docker-registry-cac
 printf "${COLOR_PURPLE}[system] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
 ks rollout status -w deploy/registry-cache-docker-registry
 
-printf "${COLOR_BLUE}[tiller] Installing CoreDNS${COLOR_NC}\n"
-ksk delete deploy/kube-dns svc/kube-dns > /dev/null 2>&1 # disable kube-dns if somehow it is still running
-hsk coredns charts/coredns -f values$valuesDir/coredns.yaml
-
-printf "${COLOR_PURPLE}[tiller]Waiting for CoreDNS to become available${COLOR_BROWN}\n"
-ksk rollout status -w deploy/coredns-coredns
-
 printf "${COLOR_BLUE}[monitoring] Installing Prometheus Operator${COLOR_NC}\n"
 hm prometheus-operator charts/prometheus-operator -f values$valuesDir/prometheus-operator.yaml
 
 printf "${COLOR_BLUE}[system] Deploying Nginx controller${COLOR_NC}\n"
 hs nginx charts/nginx-ingress -f values$valuesDir/nginx-ingress.yaml
 
-printf "${COLOR_BLUE}[system] Installing Kube exporters for Prometheus consumption${COLOR_NC}\n"
-hm kube-prometheus charts/kube-prometheus -f values$valuesDir/kube-prometheus.yaml
+printf "${COLOR_BLUE}[system] Installing Prometheus, Alertmanager and Grafana for SYSTEM monitoring${COLOR_NC}\n"
+hm prometheus charts/kube-prometheus -f values$valuesDir/prometheus.yaml
 
-printf "${COLOR_BLUE}[monitoring] Installing Prometheus, Alertmanager and Grafana${COLOR_NC}\n"
-hm prometheus charts/prometheus -f values$valuesDir/prometheus.yaml
-htf team-frontend-prometheus charts/prometheus -f values$valuesDir/prometheus-team-frontend.yaml
-hm alertmanager charts/alertmanager -f values$valuesDir/alertmanager.yaml
-htf team-frontend-alertmanager charts/alertmanager -f values$valuesDir/alertmanager-team-frontend.yaml
-hm grafana charts/grafana -f values$valuesDir/grafana.yaml
+printf "${COLOR_BLUE}[system] Installing Prometheus and Alertmanager for TEAM-FRONTEND monitoring${COLOR_NC}\n"
+htf team-frontend-prometheus charts/kube-prometheus -f values$valuesDir/prometheus-team-frontend.yaml
 
 if [ "$TLS_ENABLE" == "true" ]; then
   printf "${COLOR_BLUE}[system] Deploying Kube Lego${COLOR_NC}\n"
@@ -177,7 +167,7 @@ fi
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}Starting tunnels${COLOR_NC}\n"
   sh bin/tunnel-to-minikube-ingress.sh
-  sh bin/ngrok.sh
+  # sh bin/ngrok.sh
 fi
 
 printf "${COLOR_BLUE}Starting dashboard proxies${COLOR_NC}\n"

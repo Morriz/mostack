@@ -22,7 +22,10 @@ export REGISTRY_HOST="localhost:5000"
 
 export RBAC_ENABLE=true
 export TLS_ENABLE=true
-[ "$TLS_ENABLE" == "true" ] && TLSS=s
+if [ "$TLS_ENABLE" == "true" ]; then
+    TLSS=s
+    TLS_DISABLE=false
+fi
 export TLSS
 
 export HAS_CNI=false

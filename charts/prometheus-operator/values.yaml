@@ -1,15 +1,16 @@
-## Hyperkube image to use when getting ThirdPartyResources & cleaning up
-##
-hyperkube:
-  repository: quay.io/coreos/hyperkube
-  tag: v1.7.6_coreos.0
-  pullPolicy: IfNotPresent
+global:
+  ## Hyperkube image to use when getting ThirdPartyResources & cleaning up
+  ##
+  hyperkube:
+    repository: quay.io/coreos/hyperkube
+    tag: v1.7.6_coreos.0
+    pullPolicy: IfNotPresent
 
 ## Prometheus-config-reloader image to use for config and rule reloading
 ##
 prometheusConfigReloader:
   repository: quay.io/coreos/prometheus-config-reloader
-  tag: v0.0.2
+  tag: v0.23.2
 
 ## Configmap-reload image to use for reloading configmaps
 ##
@@ -21,7 +22,7 @@ configmapReload:
 ##
 image:
   repository: quay.io/coreos/prometheus-operator
-  tag: v0.14.1
+  tag: v0.23.2
   pullPolicy: IfNotPresent
 
 ## If enabled, prometheus-operator will create a service for scraping kubelets
@@ -35,9 +36,24 @@ kubeletService:
 ##
 nodeSelector: {}
 
+## Tolerations for use with node taints
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
 ## If true, create & use RBAC resources
 ##
 rbacEnable: true
+
+## If true, create Pod Security Policy resources
+pspEnable: true
+
+# Reference to one or more secrets to be used when pulling images
+imagePullSecrets: []
+#  - name: "image-pull-secret"
+
+# Use logfmt (default) or json-formatted logging
+# logFormat: logfmt
 
 ## Prometheus-operator resource limits & requests
 ## Ref: https://kubernetes.io/docs/user-guide/compute-resources/
@@ -51,5 +67,3 @@ resources: {}
   #   memory: 50Mi
 
 jobLabel: prometheus-operator
-
-prometheus: prometheus

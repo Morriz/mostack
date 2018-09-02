@@ -1,5 +1,0 @@
-rbacEnable: {{RBAC_ENABLE}}
-global:
-  prometheus: prometheus
-  isMini: true
-  minikubeIp: {{MINIKUBE_IP}}
