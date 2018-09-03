@@ -1,0 +1,2 @@
+email: {{LETSENCRYPT_EMAIL}}
+stage: staging # production

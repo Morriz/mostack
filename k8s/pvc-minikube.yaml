@@ -51,17 +51,3 @@ spec:
   resources:
     requests:
       storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: test-pv
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 10Gi
-  storageClassName: test
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /Users/Morriz/Documents/Workspace/playground/mostack/minidata/test

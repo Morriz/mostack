@@ -810,9 +810,9 @@ metadata:
     kubernetes.io/tls-acme: 'true'
     ingress.kubernetes.io/rewrite-target: /
     prometheus.io/scrape: 'true'
-{{- if not .Values.tls }}
+    {{- if not .Values.tls }}
     ingress.kubernetes.io/ssl-redirect: 'false'
-{{- end }}
+    {{- end }}
 spec:
   rules:
   - host: {{ .Values.hostname }}
@@ -821,10 +821,10 @@ spec:
       - backend:
           serviceName: kibana
           servicePort: 80
-        path: /*
+        path: /
 {{- if .Values.tls }}
   tls:
   - hosts:
     - {{ .Values.hostname }}
-    secretName: logging-tls
+    secretName: kibana-tls
 {{- end -}}

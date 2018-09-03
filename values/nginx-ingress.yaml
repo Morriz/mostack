@@ -8,10 +8,10 @@ controller:
   stats:
     enabled: true
   hostNetwork: {{HAS_CNI}}
-  resources:
-     limits:
-       cpu: 100m
-       memory: 64Mi
-     requests:
-       cpu: 100m
-       memory: 64Mi
+  # resources:
+  #    limits:
+  #      cpu: 100m
+  #      memory: 64Mi
+  #    requests:
+  #      cpu: 100m
+  #      memory: 64Mi

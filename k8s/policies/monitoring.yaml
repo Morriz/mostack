@@ -10,6 +10,7 @@ spec:
     matchLabels:
       app: prometheus-grafana
   ingress:
+  # grafana public incoming:
   - from:
     # we have to open up access to grafana from any pod in the namespace that nginx is egressing from
     # but we would like to have a mechanism to AND the podSelector below this one:
@@ -23,6 +24,14 @@ spec:
 #    - podSelector:
 #        matchLabels:
 #          app: nginx-ingress
+  # prometheus scraper incoming:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - port: 3000
+      protocol: TCP
   egress:
   - to:
     - podSelector:

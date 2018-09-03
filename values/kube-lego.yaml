@@ -1,5 +1,0 @@
-config:
-  LEGO_EMAIL: {{LEGO_EMAIL}}
-#  LEGO_URL: https://acme-v01.api.letsencrypt.org/directory
-rbac:
-  create: {{RBAC_ENABLE}}

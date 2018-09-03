@@ -28,20 +28,21 @@ alertmanager:
   # externalUrl: https://alertmanager.{{CLUSTER_HOST}}  
 grafana:
   ingress:
-    enabled: 'true'
+    enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
-      kubernetes.io/tls-acme: 'false'
+      kubernetes.io/tls-acme: '{{TLS_ENABLE}}'
       ingress.kubernetes.io/rewrite-target: /
-      ingress.kubernetes.io/ssl-redirect: 'false'
+      ingress.kubernetes.io/ssl-redirect: '{{TLS_ENABLE}}'
     hosts:
     - grafana.{{CLUSTER_HOST}}
-    # tls:
-    # - secretName: grafana-tls
-    #   hosts:
-    #   - grafana.{{CLUSTER_HOST}}
-  adminPassword: 'jaja'
+    tls:
+    - secretName: grafana-tls
+      hosts:
+      - grafana.{{CLUSTER_HOST}}
+  adminPassword: jaja
   
+# fix for wrong selector:  
 exporter-kube-controller-manager:
   serviceSelectorLabelKey: component
 exporter-kube-scheduler:

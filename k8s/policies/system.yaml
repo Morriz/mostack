@@ -3,12 +3,12 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-kube-lego
+  name: allow-cert-manager
   namespace: system
 spec:
   podSelector:
     matchLabels:
-      app: kube-lego
+      app: cert-manager
   ingress:
   - from: []
 #    - podSelector:
@@ -16,16 +16,11 @@ spec:
 #          app: nginx-ingress
 #          component: controller
     ports:
-    # lego needs port 8080 open to receive incoming from letsencrypt
-    - port: 8080
-      protocol: TCP
   egress:
   - to: []
     ports:
-    # lego tests the domains for reachability on port 80
     - port: 80
       protocol: TCP
-    # and asks letsencrypt for certs
     - port: 443
       protocol: TCP
 ---

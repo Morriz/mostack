@@ -22,6 +22,9 @@ parseFiles() {
 
 printf "${COLOR_WHITE}GENERATING VALUES:${COLOR_NC}\n"
 
+rm -rf $root/values/_gen/*
+mkdir $root/values/_gen/minikube
+mkdir $root/values/_gen/gce
 cd $root/values > /dev/null
 baseFiles=$(find . -name "*.yaml" -maxdepth 1 | cut -c 3-)
 cd gce
@@ -34,7 +37,5 @@ parseFiles minikube $baseFiles
 . $root/secrets/gce.sh
 parseFiles gce $baseFiles
 parseFiles gce $gceFiles
-
-cat $root/templates/dashboards.yaml >> $root/values/_gen/minikube/grafana.yaml
 
 cd $root > /dev/null

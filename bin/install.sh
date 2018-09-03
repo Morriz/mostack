@@ -120,6 +120,9 @@ k -n tiller rollout status -w deploy/tiller-deploy
 printf "${COLOR_BLUE}[system] Deploying Docker Registry cache first${COLOR_NC}\n"
 hs registry-cache charts/docker-registry -f values$valuesDir/docker-registry-cache.yaml
 
+printf "${COLOR_BLUE}[system] Deploying Kubernetes Dashboard${COLOR_NC}\n"
+hsk dashboard charts/kubernetes-dashboard -f values$valuesDir/dashboard.yaml
+
 printf "${COLOR_PURPLE}[system] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
 ks rollout status -w deploy/registry-cache-docker-registry
 
@@ -136,8 +139,8 @@ printf "${COLOR_BLUE}[system] Installing Prometheus and Alertmanager for TEAM-FR
 htf team-frontend-prometheus charts/kube-prometheus -f values$valuesDir/prometheus-team-frontend.yaml
 
 if [ "$TLS_ENABLE" == "true" ]; then
-  printf "${COLOR_BLUE}[system] Deploying Kube Lego${COLOR_NC}\n"
-  hs kube-lego charts/kube-lego -f values$valuesDir/kube-lego.yaml
+  printf "${COLOR_BLUE}[system] Deploying CertManager${COLOR_NC}\n"
+  hs cert-manager charts/cert-manager -f values$valuesDir/cert-manager.yaml
 fi
 
 printf "${COLOR_BLUE}[system] Deploying Docker Registry${COLOR_NC}\n"
@@ -160,15 +163,21 @@ printf "${COLOR_BLUE}[team-frontend] Deploying Frontend API${COLOR_NC}\n"
 htf team-frontend-api charts/api -f values$valuesDir/api.yaml
 
 if [ "$TLS_ENABLE" == "true" ]; then
-  printf "${COLOR_PURPLE}[system] Waiting for kube-lego to become available${COLOR_BROWN}\n"
-  ks rollout status -w deploy/kube-lego-kube-lego
+  printf "${COLOR_PURPLE}[system] Waiting for cert-manager to become available${COLOR_BROWN}\n"
+  ks rollout status -w deploy/cert-manager
 fi
 
 if [ $isMini -eq 1 ]; then
   printf "${COLOR_BLUE}Starting tunnels${COLOR_NC}\n"
   sh bin/tunnel-to-minikube-ingress.sh
-  # sh bin/ngrok.sh
+  sh bin/ngrok.sh
 fi
+
+if [ "$TLS_ENABLE" == "true" ]; then
+  printf "${COLOR_BLUE}[system] Deploying CertManager's ClusterIssuer (2-step deply for now)${COLOR_NC}\n"
+  hs cert-manager-cluster-issuer charts/cert-manager-cluster-issuer -f values$valuesDir/cert-manager-cluster-issuer.yaml
+fi
+
 
 printf "${COLOR_BLUE}Starting dashboard proxies${COLOR_NC}\n"
 sh bin/dashboards.sh
