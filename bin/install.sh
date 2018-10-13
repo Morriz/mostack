@@ -129,6 +129,9 @@ hs registry-cache charts/docker-registry -f values$valuesDir/docker-registry-cac
 printf "${COLOR_BLUE}[system] Deploying Kubernetes Dashboard${COLOR_NC}\n"
 hsk dashboard charts/kubernetes-dashboard -f values$valuesDir/dashboard.yaml
 
+printf "${COLOR_BLUE}[system] Deploying Metrics Server${COLOR_NC}\n"
+hsk metrics-server charts/metrics-server -f values$valuesDir/metrics-server.yaml
+
 printf "${COLOR_PURPLE}[system] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
 ks rollout status -w deploy/registry-cache-docker-registry
 
