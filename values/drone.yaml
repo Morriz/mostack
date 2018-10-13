@@ -12,6 +12,7 @@ server:
     DRONE_ADMIN: {{DRONE_ADMIN}}
     DRONE_GITHUB_CLIENT: {{DRONE_GITHUB_CLIENT}}
     DRONE_GITHUB_SECRET: {{DRONE_GITHUB_SECRET}}
+    DRONE_PROMETHEUS_AUTH_TOKEN: {{DRONE_AUTH_TOKEN}}
 agent:
   env:
     DRONE_DEBUG: false
@@ -21,3 +22,4 @@ persistentVolume:
   existingClaim: fast-pvc
 rbac:
   create: false # we will give `drone-deploy' roles to the teams
+prometheus: prometheus

@@ -6,9 +6,9 @@ dependencies:
     condition: deployAlertManager
 
   - name: prometheus
-    version: 0.0.51
+    version: 7.0.2
     #e2e-repository: file://../prometheus
-    repository: https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+    repository: stable/prometheus
 
   - name: exporter-coredns
     version: 0.0.3

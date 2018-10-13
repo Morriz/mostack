@@ -91,3 +91,4 @@ agent:
 rbac:
   create: true
   serviceAccountName: default
+prometheus: prometheus  

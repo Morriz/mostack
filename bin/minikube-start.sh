@@ -19,7 +19,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 #     --registry-mirror=http://localhost:6000
 
 # with kubeadm bootstrapper:
-minikube -v 10 start \
+minikube -v 7 start --memory 8000 \
    --bootstrapper kubeadm \
    --kubernetes-version v1.11.2 \
    --network-plugin=cni --extra-config=kubelet.network-plugin=cni \
@@ -30,8 +30,6 @@ minikube -v 10 start \
    --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0 \
    --extra-config=controller-manager.cluster-cidr=192.168.0.0/16 --extra-config=controller-manager.allocate-node-cidrs=true \
    --registry-mirror=http://localhost:6000
-#    --extra-config=controller-manager.pod-network-cidr=192.168.0.0/16 \
-#    --extra-config=proxy.cluster-cidr=192.168.0.0/16 \
 
 # add to wakeup script after `brew install sleepwatcher && brew services start sleepwatcher`:
 # echo minikube ssh -- docker run -i --rm --privileged --pid=host debian nsenter -t 1 -m -u -n -i date -u $(date -u +%m%d%H%M%Y) > ~/.wakeup

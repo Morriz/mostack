@@ -57,6 +57,37 @@ spec:
     - protocol: TCP
       port: 443
 ---
+# weave:
+#
+# - allow ingress from internal services and world on port 80, 443
+# - allow egress to internal services on port 80, 443
+#
+# @todo: narrow internal services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-access-weave
+  namespace: system
+spec:
+  podSelector:
+    matchLabels:
+      app: weave-scope
+      component: frontend
+  ingress:
+  - from:
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+  egress:
+  - to:
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+---
 # Drone server:
 #
 # - allow egress to github.com on port 443
@@ -82,18 +113,19 @@ spec:
         matchLabels:
           app: drone
           component: agent
-    ports:
-    - protocol: TCP
-      port: 9000
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus    
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: drone
           component: agent
-    ports:
-    - protocol: TCP
-      port: 9000
   # external traffic can't be limited to domains (yet), so rudimentary for now:
   - to:
     ports:
@@ -120,18 +152,18 @@ spec:
         matchLabels:
           app: drone
           component: server
-    ports:
-    - protocol: TCP
-      port: 9000
+    # ports:
+    # - protocol: TCP
+    #   port: 9000
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: drone
           component: server
-    ports:
-    - protocol: TCP
-      port: 9000
+    # ports:
+    # - protocol: TCP
+    #   port: 9000
   # external traffic can't be limited to domains (yet), so rudimentary for now:
   - to:
     ports:

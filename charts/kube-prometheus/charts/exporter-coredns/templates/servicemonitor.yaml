@@ -25,3 +25,4 @@ spec:
   - port: http-metrics-coredns
     interval: 15s
     bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    

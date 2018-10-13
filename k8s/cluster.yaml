@@ -12,7 +12,6 @@ metadata:
   name: system
   labels:
     name: system
-    purpose: public-ingress
 ---
 apiVersion: v1
 kind: Namespace

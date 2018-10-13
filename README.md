@@ -45,8 +45,9 @@ PREREQUISITES:
 
 * Helm (if on osx it will detect and autoinstall)
 * Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
-* [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your cert manager temporarily if you'd like to bypass browser warnings about https)
-* In case you run minikube, for kube-lego to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are portforwarded to your local machine:
+* [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your browser's cert manager temporarily if you'd like to bypass browser warnings about https)
+* ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
+* In case you run minikube, for `cert-manager` to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are portforwarded to your local machine:
 	* by manipulating your firewall
 	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
 	    * free account: only http works since we can't load multiple tunnels (80 & 443) for one domain
@@ -102,7 +103,7 @@ which survives cluster deletion, and will thus be immediately used upon cluster 
 
 When all deployments are ready the local service proxies are automatically started with:
 
-	bin/dashboards.js
+    bin/dashboards.js
 
 and [the service index](./docgen/minikube-service-index.html) will open.
 
@@ -144,7 +145,17 @@ Use the following default creds if not changed already in `values/grafana.yaml`:
 
 ##### 3.3.2 Prometheus
 
-Look at the Prometheus view to see all targets are scrapable. For now there is an issue with one endpoints cert. That will be fixed later. There will be prometheus alerts sent to the alertmanager:
+Look at the Prometheus view to see all targets are scrapable. Drone should not be able to be scraped and prometheus alerts will be sent to the alertmanager. (Chek next section now and come back.)
+
+We need to tell Prometheus to use an auth token for scraping: go to [Drone](https://drone.dev.yourdoma.in) and retrieve the token from the menu.
+Copy and paste that into the `secrets/minikube.sh` file `DRONE_AUTH_TOKEN` var.
+run the following to create the secret and reload the relevant pods:
+
+    bin/gen-values.sh
+    k apply -f values/_gen/minikube/secrets.yaml
+    km delete pod/prometheus-prometheus-0
+
+You should soon see scrape endpoint drone-drone reporting up.    
 
 ##### 3.3.3 Alertmanager
 
@@ -173,6 +184,8 @@ Let's apply all the policies needed for every namespace to open up the needed co
 On OSX you can delete the entire minikube cluster with
 
     mkd
+
+which will backup all the images locally for faster startup next time.
 
 On gcloud:
 

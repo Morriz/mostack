@@ -32,6 +32,9 @@ spec:
     - namespaceSelector:
         matchLabels:
           purpose: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus    
     ports:
     - protocol: TCP
       port: 9153
@@ -81,7 +84,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-dashboard
-  namespace: logging
+  namespace: kube-system
 spec:
   podSelector:
     matchLabels:
@@ -92,6 +95,6 @@ spec:
         matchLabels:
           app: nginx-ingress
           component: controller
-    - namespaceSelector:
+      namespaceSelector:
         matchLabels:
-          purpose: public-ingress
+          name: system

@@ -16,22 +16,22 @@ spec:
     # but we would like to have a mechanism to AND the podSelector below this one:
     - namespaceSelector:
         matchLabels:
-          purpose: public-ingress
-    ports:
-    - port: 80
-      protocol: TCP
-    # disabling the following section, as selectors are OR'd (no AND coming?):
-#    - podSelector:
-#        matchLabels:
-#          app: nginx-ingress
+          name: system
+      podSelector:
+        matchLabels:
+          app: nginx-ingress
+          component: controller    
+    # ports:
+    # - port: 80
+    #   protocol: TCP
   # prometheus scraper incoming:
   - from:
     - podSelector:
         matchLabels:
           app: prometheus
-    ports:
-    - port: 3000
-      protocol: TCP
+    # ports:
+    # - port: 3000
+    #   protocol: TCP
   egress:
   - to:
     - podSelector:
@@ -49,40 +49,48 @@ spec:
     matchLabels:
       app: prometheus
   ingress:
-  - ports:
-    - port: 9090
-      protocol: TCP
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    # ports:
+    # - port: 9090
+    #   protocol: TCP
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus-grafana
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: prometheus-grafana
-    ports:
-    - protocol: TCP
-      port: 3000
-    - protocol: TCP
-      port: 80
+    # ports:
+    # - protocol: TCP
+    #   port: 3000
+    # - protocol: TCP
+    #   port: 80
   - to:
     - podSelector:
         matchLabels:
           app: alertmanager
-    ports:
-    - protocol: TCP
-      port: 9093
+    # ports:
+    # - protocol: TCP
+    #   port: 9093
   - to:
     - podSelector:
         matchLabels:
           app: prometheus-exporter-node
-    ports:
-    - protocol: TCP
-      port: 9100
+    # ports:
+    # - protocol: TCP
+    #   port: 9100
   - to:
     - podSelector:
         matchLabels:
           app: prometheus-exporter-kube-state
-    ports:
-    - protocol: TCP
-      port: 8080
+    # ports:
+    # - protocol: TCP
+    #   port: 8080
   # nodePort services:
   - to:
     - ipBlock:
@@ -106,9 +114,24 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: kube-system
-    ports:
-    - port: 9153
-      protocol: TCP
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    # ports:
+    # - port: 9153
+    #   protocol: TCP
+  # drone
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: system
+      podSelector:
+        matchLabels:
+          app: drone
+          component: server
+    # ports:
+    # - protocol: TCP
+    #   port: 8000
 ---
 # allow prometheus ingress > alertmanager
 apiVersion: networking.k8s.io/v1
@@ -126,9 +149,9 @@ spec:
     - podSelector:
         matchLabels:
           app: alertmanager
-    ports:
-    - port: 6783
-      protocol: TCP
+    # ports:
+    # - port: 6783
+    #   protocol: TCP
   # prometheus
   - from:
     - podSelector:

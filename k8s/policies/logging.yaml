@@ -15,9 +15,9 @@ spec:
         matchLabels:
           app: nginx-ingress
           component: controller
-    - namespaceSelector:
+      namespaceSelector:
         matchLabels:
-          purpose: public-ingress
+          name: system
   egress:
   - to:
     - podSelector:

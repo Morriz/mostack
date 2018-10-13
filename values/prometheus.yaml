@@ -1,12 +1,16 @@
-deployKubeDNS: false
 deployCoreDNS: true
+deployKubeDNS: false
+deployKubeEtcd: false
 global:
   rbacEnable: {{RBAC_ENABLE}}
 prometheus:
   resources:
-  requests:
-    memory: 400Mi
+    requests:
+      memory: 400Mi
   # externalUrl: https://prometheus.{{CLUSTER_HOST}}
+  externalUrl: http://127.0.0.1:9090
+  secrets:
+    - drone-auth
 alertmanager:
   config:
     global:
@@ -15,35 +19,39 @@ alertmanager:
       receiver: default-receiver
       repeat_interval: 3h
       routes:
-      - match:
-          alertname: DeadMansSwitch
-        repeat_interval: 5m
-        receiver: deadmansswitch
+        - match:
+            alertname: DeadMansSwitch
+          repeat_interval: 5m
+          receiver: deadmansswitch
     receivers:
-    - name: deadmansswitch
-    - name: default-receiver
-      slack_configs:
-      - channel: '#devops'
-        send_resolved: true
-  # externalUrl: https://alertmanager.{{CLUSTER_HOST}}  
+      - name: deadmansswitch
+      - name: default-receiver
+        slack_configs:
+          - channel: "#devops"
+            send_resolved: true
+  # externalUrl: https://alertmanager.{{CLUSTER_HOST}}
+  externalUrl: http://127.0.0.1:9093
 grafana:
   ingress:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
-      kubernetes.io/tls-acme: '{{TLS_ENABLE}}'
+      kubernetes.io/tls-acme: "{{TLS_ENABLE}}"
       ingress.kubernetes.io/rewrite-target: /
-      ingress.kubernetes.io/ssl-redirect: '{{TLS_ENABLE}}'
+      ingress.kubernetes.io/ssl-redirect: "{{TLS_ENABLE}}"
     hosts:
-    - grafana.{{CLUSTER_HOST}}
-    tls:
-    - secretName: grafana-tls
-      hosts:
       - grafana.{{CLUSTER_HOST}}
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.{{CLUSTER_HOST}}
   adminPassword: jaja
-  
-# fix for wrong selector:  
+
+# fix for wrong selector:
 exporter-kube-controller-manager:
   serviceSelectorLabelKey: component
 exporter-kube-scheduler:
   serviceSelectorLabelKey: component
+exporter-kube-etcd:
+  serviceSelectorLabelKey: component
+  serviceSelectorLabelValue: etcd
