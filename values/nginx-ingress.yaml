@@ -7,7 +7,13 @@ controller:
     disable-ipv6: "true"
   stats:
     enabled: true
-  hostNetwork: {{HAS_CNI}}
+  hostNetwork: {{ISMINIKUBE}}
+  service:
+    type: ClusterIP
+    # nodePorts:
+    #   http: 32080
+    #   https: 32443
+
   # resources:
   #    limits:
   #      cpu: 100m

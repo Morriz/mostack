@@ -1,9 +1,10 @@
-deployCoreDNS: true
-deployKubeDNS: false
+deployCoreDNS: {{HAS_COREDNS}}
+deployKubeDNS: {{HAS_KUBE_DNS}}
 deployKubeEtcd: false
 global:
   rbacEnable: {{RBAC_ENABLE}}
 prometheus:
+  # prometheusLabelValue: prometheus
   resources:
     requests:
       memory: 400Mi
@@ -12,6 +13,7 @@ prometheus:
   secrets:
     - drone-auth
 alertmanager:
+  # prometheusLabelValue: prometheus
   config:
     global:
       slack_api_url: {{SLACK_API_URL}}
@@ -29,6 +31,7 @@ alertmanager:
         slack_configs:
           - channel: "#devops"
             send_resolved: true
+  # to have clickable links in the gui:          
   # externalUrl: https://alertmanager.{{CLUSTER_HOST}}
   externalUrl: http://127.0.0.1:9093
 grafana:
@@ -50,8 +53,10 @@ grafana:
 # fix for wrong selector:
 exporter-kube-controller-manager:
   serviceSelectorLabelKey: component
+  k8sCoreComponentsNamespace: {{K8SCORECOMPONENTS_NAMESPACE}}
 exporter-kube-scheduler:
   serviceSelectorLabelKey: component
+  k8sCoreComponentsNamespace: {{K8SCORECOMPONENTS_NAMESPACE}}
 exporter-kube-etcd:
   serviceSelectorLabelKey: component
   serviceSelectorLabelValue: etcd

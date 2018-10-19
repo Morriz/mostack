@@ -14,3 +14,4 @@ additionalServiceMonitorLabels: {}
 ##Custom Labels to be added to Prometheus Rules CRD
 ##
 additionalRulesLabels: {}
+k8sCoreComponentsNamespace: kube-system

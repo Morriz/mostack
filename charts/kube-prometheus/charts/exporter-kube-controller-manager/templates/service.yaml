@@ -8,7 +8,7 @@ metadata:
     release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
   name: {{ template "exporter-kube-controller-manager.fullname" . }}
-  namespace: kube-system
+  namespace: {{ .Values.k8sCoreComponentsNamespace }}
 spec:
   clusterIP: None
   ports:

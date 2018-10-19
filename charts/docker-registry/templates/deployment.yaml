@@ -34,7 +34,7 @@ spec:
             memory: 256Mi
         env:
         - name: REGISTRY_HTTP_ADDR
-          value: ":{{ .Values.service.http.externalPort }}"
+          value: ":{{ .Values.service.externalPort }}"
         - name: REGISTRY_LOG_LEVEL
           value: {{ .Values.logLevel | quote }}
         - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
@@ -62,7 +62,7 @@ spec:
           mountPath: /var/lib/registry
           subPath: "{{ .Values.persistentVolume.subPath }}"
         ports:
-        - containerPort: {{ .Values.service.http.externalPort }}
+        - containerPort: 5000
           name: registry
           protocol: TCP
       volumes:

@@ -8,7 +8,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      k8s-app: coredns
+      k8s-app: kube-dns
   ingress:
   - from:
     - ipBlock:
@@ -16,63 +16,27 @@ spec:
     ports:
     - protocol: UDP
       port: 53
----
-# prometheus > dns monitoring
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: allow-prometheus-ingress-dns
-  namespace: kube-system
-spec:
-  podSelector:
-    matchLabels:
-      k8s-app: coredns
-  ingress:
   - from:
+    # and allow scraping
     - namespaceSelector:
         matchLabels:
           purpose: monitoring
       podSelector:
         matchLabels:
           app: prometheus    
-    ports:
-    - protocol: TCP
-      port: 9153
----
-# - dns egress > kubernetes api
-# - dns udp egress
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: allow-dns-egress-kubernetes
-  namespace: kube-system
-spec:
-  podSelector:
-    matchLabels:
-      k8s-app: coredns
   egress:
-  # had to open up to all, but wanted to use the part that is commented out below
   - to: []
-#    - ipBlock:
-#        cidr: 10.96.0.0/8
-#    ports:
-#    - protocol: TCP
-#      port: 443
-#  - to:
-#    - namespaceSelector:
-#        matchLabels:
-#          name: kube-system
-#    ports:
-#    - protocol: UDP
 ---
 # cluster ingress > kubernetes api
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-cluster-ingress-kubernetes
+  name: allow-cluster-ingress-apiserver
   namespace: kube-system
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      component: kube-apiserver
   ingress:
   - from:
     ports:
@@ -98,3 +62,43 @@ spec:
       namespaceSelector:
         matchLabels:
           name: system
+---
+# allow prometheus ingress > exporter-node
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-exporter-kube-controller-manager
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      component: kube-scheduler
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus
+
+---
+# allow prometheus ingress > exporter-node
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-exporter-kube-controller-manager
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      component: kube-controller-manager
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus
+

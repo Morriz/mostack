@@ -14,9 +14,10 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: system
-    ports:
-    - protocol: TCP
-      port: 80
+      podSelector:
+        matchLabels:
+          app: nginx-ingress
+          component: controller
   - from:
     - podSelector:
         matchLabels:
@@ -33,23 +34,21 @@ spec:
     matchLabels:
       app: prometheus
   ingress:
-  - ports:
-    - protocol: TCP
-      port: 9090
+  - from:
+    # loopback
+    - podSelector:
+        matchLabels:
+          app: prometheus
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: alertmanager
-# @todo: somehow the next block is not working
+          alertmanager: team-frontend-prometheus
   - to:
     - podSelector:
         matchLabels:
           app: api
-# so using this for now:
-#  - to:
-#    - ipBlock:
-#        cidr: 192.168.0.0/16
 ---
 # allow prometheus ingress > alertmanager
 apiVersion: networking.k8s.io/v1

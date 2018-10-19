@@ -7,13 +7,15 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
+{{- if .Values.service.annotations }}
   annotations:
 {{ toYaml .Values.service.annotations | indent 4 }}
+{{- end }}
 spec:
   selector:
     app: {{ .Chart.Name | quote }}
     release: {{ .Release.Name }}
   ports:
   - name: registry
-    port: {{ .Values.service.http.externalPort }}
-    targetPort: {{ .Values.service.http.externalPort }}
+    port: {{ .Values.service.externalPort }}
+    targetPort: 5000

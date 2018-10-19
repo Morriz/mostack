@@ -20,7 +20,7 @@ spec:
       component: kube-scheduler
   namespaceSelector:
     matchNames:
-      - "kube-system"
+      - {{ .Values.k8sCoreComponentsNamespace }}
   endpoints:
   - port: http-metrics
     interval: 15s

@@ -33,12 +33,11 @@ localproxy:
   enabled: false
   port: 5000
   image:
-    repository: gcr.io/google_containers/kube-registry-proxy
+    repository: k8s.gcr.io/kube-registry-proxy
     tag: 0.4
     pullPolicy: IfNotPresent
 service:
-  http:
-    externalPort: 80
+  externalPort: 5000
   annotations: {}
 ingress:
   enabled: false

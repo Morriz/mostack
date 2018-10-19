@@ -1,33 +1,65 @@
 ---
-# allow cluster > kubernetes api
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-kubernetes-api
   namespace: default
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      component: kube-apiserver
   ingress:
+  # allow cluster > kubernetes api
   - from:
     - ipBlock:
         cidr: 192.168.0.0/16
     ports:
     - port: 443
       protocol: TCP
----
-# prometheus > kubernetes 8443
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-prometheus-kubernetes
-  namespace: default
-spec:
-  podSelector: {}
-  ingress:
   - from:
     - namespaceSelector:
         matchLabels:
           purpose: monitoring
-    ports:
-    - protocol: TCP
-      port: 8443
+      podSelector:
+        matchLabels:
+          app: prometheus
+---
+# allow prometheus ingress > exporter-node
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-exporter-kube-controller-manager
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      component: kube-scheduler
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus
+
+---
+# allow prometheus ingress > exporter-node
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-exporter-kube-controller-manager
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      component: kube-controller-manager
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus
+

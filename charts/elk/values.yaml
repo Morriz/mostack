@@ -2,3 +2,4 @@ slackUrl:
 kibanaPassword:
 hostname:
 tls:
+containersLocation:

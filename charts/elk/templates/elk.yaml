@@ -108,7 +108,7 @@ spec:
           name: filebeat-config
       - name: varlibdockercontainers
         hostPath:
-          path: /var/lib/docker/containers
+          path: {{ .Values.containersLocation }}
       - name: prospectors
         configMap:
           defaultMode: 0600
@@ -578,13 +578,12 @@ data:
           "tail_interval_in_seconds": 10,
           "es_index_time_offset_in_seconds": 0,
           "display_timezone": "local",
-          "display_timestamp_format": "MMM DD HH:mm:ss",
+          "display_timestamp_format": "MMM DD HH:mm:ss.mmm",
           "max_buckets": 500,
           "default_time_range_in_days" : 0,
           "max_hosts": 100,
           "max_events_to_keep_in_viewer": 5000,
           "default_search": "",
-          "nested_objects" : true,
           "fields" : {
             "mapping" : {
                 "timestamp" : "@timestamp",
@@ -643,7 +642,7 @@ spec:
         env:
         - name: ELASTICSEARCH_URL
           value: 'http://elasticsearch:9200'
-        - name: KIBANA_INDEX
+        # - name: KIBANA_INDEX
         #   value: 'filebeat-*'
         ports:
         - containerPort: 5601
@@ -766,7 +765,7 @@ spec:
               end
 
               set -l index "kube-events-"(date --utc -I)
-              while not curl --silent --fail --show-error \
+              while not curl --silent --fail --show-error -H "Content-Type: application/json" \
                 --request POST http://elasticsearch:9200/$index/event --data "$event" \
                   | read -l es_result
                 echo "\$status: $status"

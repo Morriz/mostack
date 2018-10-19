@@ -3,7 +3,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
-. $root/secrets/minikube.sh
+. $root/secrets/local.sh
 
 # uses 'mo'
 which mo > /dev/null

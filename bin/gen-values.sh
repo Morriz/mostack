@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
+. $root/.env.sh
 
 # uses 'mo'
 which mo > /dev/null
@@ -23,7 +24,7 @@ parseFiles() {
 printf "${COLOR_WHITE}GENERATING VALUES:${COLOR_NC}\n"
 
 rm -rf $root/values/_gen/*
-mkdir $root/values/_gen/minikube
+mkdir $root/values/_gen/local
 mkdir $root/values/_gen/gce
 cd $root/values > /dev/null
 baseFiles=$(find . -name "*.yaml" -maxdepth 1 | cut -c 3-)
@@ -31,8 +32,8 @@ cd gce
 gceFiles=$(find . -name "*.yaml" -maxdepth 1 | cut -c 3-)
 cd -
 
-. $root/secrets/minikube.sh
-parseFiles minikube $baseFiles
+. $root/secrets/local.sh
+parseFiles local $baseFiles
 
 . $root/secrets/gce.sh
 parseFiles gce $baseFiles

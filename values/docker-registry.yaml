@@ -1,14 +1,12 @@
-# using hostNetwork hack until hostPort works with CNI
+# Only minikube: using hostNetwork hack until hostPort works with CNI
 # @todo: remove and enable localproxy when ready
-hostNetwork: {{HAS_CNI}}
+hostNetwork: {{ISMINIKUBE}}
 localproxy:
-  enabled: {{NOT_HAS_CNI}}
-service:
-  http:
-    externalPort: 5000
-#ingress:
-#  enabled: true
-#  tls: false
-#  hostname: reg.{{CLUSTER_HOST}}
+  enabled: {{NOTISMINIKUBE}}
+# service:
+# ingress:
+#   enabled: true
+#   tls: true
+#   hostname: reg.{{CLUSTER_HOST}}
 persistentVolume:
   existingClaim: slow-pvc

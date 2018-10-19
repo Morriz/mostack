@@ -4,7 +4,7 @@ kind: DaemonSet
 metadata:
   name: {{ template "fullname" . }}-proxy
   labels:
-    app: {{ .Chart.Name | quote }}-proxy
+    app: {{ .Chart.Name }}-proxy
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
@@ -23,9 +23,9 @@ spec:
         - name: REGISTRY_HOST
           value: {{ template "fullname" . }}
         - name: REGISTRY_PORT
-          value: {{ .Values.service.http.externalPort | quote }}
+          value: {{ .Values.service.externalPort | quote }}
         ports:
-        - name: registry
-          containerPort: {{ .Values.service.http.externalPort }}
+        - containerPort: 80
           hostPort: {{ .Values.localproxy.port }}
+          hostIP: {{ default "127.0.0.1" .Values.hostIP }}
 {{- end }}

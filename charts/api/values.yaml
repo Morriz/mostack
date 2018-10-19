@@ -31,4 +31,3 @@ resources:
   limits:
     memory: 100M
     cpu: 1
-prometheus: team-frontend-prometheus

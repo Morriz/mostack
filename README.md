@@ -8,21 +8,26 @@ So I set out to create a stack that declares our entire kubernetes platform, all
 
 So far I am using the following (mostly open source) technologies:
 
-* [Kubernetes](https://github.com/Kubernetes/Kubernetes) for describing our container infrastructure.
-* [Minikube](https://github.com/Kubernetes/minikube) for running a local k8s cluster
-* [Helm](https://github.com/Kubernetes/helm) for packaging and deploying of Kubernetes apps and subapps.
-* A bash install script to boot everything in the right order.
+To boot up a cluster (see `bin/install*.sh` scripts) you can choose one of the following setups before running the package installer:
+
+* [Minikube](https://github.com/Kubernetes/minikube) for running a local k8s cluster.
+* [kubeadm-cluster-dind](https://github.com/kubernetes-sigs/kubeadm-dind-cluster) for running a local multinode k8s cluster as an alternative that is more close to the real deal.
+* [Vagrant](https://www.vagrantup.com) for running a local multinode cluster that even more closely mimics a currently available cloud cluster.
+* A bash install script to boot everything in the right order. Could use more fancy stuff, but I will leave that to you.
 
 To boot the following Kubernetes applications/tools:
 
+* [Kubernetes](https://github.com/Kubernetes/Kubernetes) for describing our container infrastructure.
+* [Helm](https://github.com/Kubernetes/helm) for packaging and deploying of Kubernetes apps and subapps.
 * Docker Registry for storing locally built images, and as a proxy + cache for external ones.
-* [Prometheus Operator](https://github.com/coreos/prometheus-operator) + [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com)
+* [Prometheus Operator](https://github.com/coreos/prometheus-operator) + [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com) for monitoring.
 * [Calico](https://github.com/projectcalico) for networking and policies k8s style.
-* [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing
+* [Cert Manager](https://github.com/jetstack/cert-manager) for automatic https certificate creation for public endpoints.
+* [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing.
+* [Weave Scope](https://www.weave.works/oss/scope/) for a graphic overview of the network topology and services.
 * [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
     * [drone-kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
 * *DISABLED FOR NOW:* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements. (Waiting for SNI which enables path based vhost ingress routing).
-* *COMING SOON:* [ExternalDNS](https://github.com/Kubernetes-incubator/external-dns) for making our services accesible at our FQDN
 
 We will be going through the following workflow:
 
@@ -33,41 +38,42 @@ We will be going through the following workflow:
 
 At any point can any step be re-run to result in the same (idempotent) state.
 After destroying the cluster, and then running install again, all storage endpoints will still contain the previously built/cached artifacts and configuration.
-The next boot should thus be much faster :)
+The next boot should thus be faster :)
 
 PREREQUISITES:
 
 * A running Kubernetes cluster with RBAC enabled and `kubectl` installed on your local machine:
-	* On OSX `bin/install.sh` will also start a minikube cluster for you.
-	* If you wish to also deploy to GCE (Google Compute Engine), please create a cluster there:
+	* On OSX you may install one of 3 types of clusters:
+        * `bin/install-minikube.sh` will start a single node. minikube cluster for you, and try to restore docker images.
+        * `bin/install-dind.sh` will start a multi node dind cluster. Slower initial startup than miinikube, but much faster on 'up'. My preferred setup :)
+        * `bin/install-vagrant.sh` will start a multi node vagrant cluster.
+	* If you wish to deploy to GCE (Google Compute Engine), please create a cluster there:
 
 		    bin/gce-create.sh
 
-* Helm (if on osx it will detect and autoinstall)
+* [Helm](https://helm.sh) (`brew install helm`?)
 * Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
 * [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your browser's cert manager temporarily if you'd like to bypass browser warnings about https)
 * ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
 * In case you run minikube, for `cert-manager` to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are portforwarded to your local machine:
 	* by manipulating your firewall
 	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
-	    * free account: only http works since we can't load multiple tunnels (80 & 443) for one domain
+	    * free account: only http works (set `TLS_ENABLE=false` in `secrets/local.sh`) since we can't load multiple tunnels (80 & 443) for one domain
 	    * biz account: see provided `templates/ngrok.yaml`
 * Create an app key & secret for our Drone app in GitHub/BitBucket so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
 
 #### 1. Configuration
 
-Copy `secrets/*.sample.sh` to `secrets/*.sh`, and edit them.
+Copy `secrets/*.sample.sh` to `secrets/local.sh` (and `secrets/gce.sh` for deploying to gce), and edit them.
 If needed you can also edit `values/*.yaml` (see all the options in `charts/*/values.yaml`), but for a first boot I would leave them as is.
 
-IMPORTANT: The `$CLUSTER_HOST` subdomains must all point to the main public nginx controller, which will serve all our public ingresses.
+IMPORTANT: The `$CLUSTER_HOST` subdomains must all point to your laptop ip (I use ngrok for that, see `bin/ngrok.sh`). Then the `bin/tunnel-to-ingress.sh` script can forward incoming port 443 and 80 to the nginx controller, which will serve all our public ingresses.
 
-If you also want to deploy to a gce cluster, also edit these values: `values/gce/*.yaml`.
-
-Now generate the final value files into `values/_gen` by running:
+Now you may generate the final value files into `values/_gen` by running:
 
     bin/gen-values.sh
 
-You may want to run the `bin/watch.sh` script to auto-generate these files when secrets or values are modified.
+This is for your inspection only. It gets run every time you run the package installer.
 
 To load the aliases and functions (used throughout the stack) source them in your shell:
 
@@ -77,17 +83,9 @@ To load the aliases and functions (used throughout the stack) source them in you
 
 Running the main installer with
 
-    bin/install.sh
+    bin/install-packages.sh
 
-will do a `kubectl use-context minikube` and install the helm charts (and essential kubernetes manifests) with the values from `values/_gen/*.yaml`.
-
-Running the main installer with
-
-    bin/install.sh gce
-
-will do a `kubectl use-context $KUBE_CONTEXT` and install the stack with the values from `values/_gen/gce/*.yaml`.
-
-If on minikube, the script will also set up port forwarding to the lego node, and an ssh tunnel for the incoming traffic on your local machine.
+will install a lot of necessary `k8s/*` manifests and the helm charts with the values from `values/_gen/*.yaml`.
 
 ### 3. Testing the apps
 

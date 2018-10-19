@@ -10,12 +10,18 @@ spec:
     matchLabels:
       app: cert-manager
   ingress:
-  - from: []
-#    - podSelector:
-#        matchLabels:
-#          app: nginx-ingress
-#          component: controller
-    ports:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+          component: controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus    
   egress:
   - to: []
     ports:
@@ -47,15 +53,22 @@ spec:
       port: 80
     - protocol: TCP
       port: 443
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus    
   egress:
-  - to:
+  - to: 
     - ipBlock:
         cidr: 192.168.0.0/16
-    ports:
-    - protocol: TCP
-      port: 80
-    - protocol: TCP
-      port: 443
+    # ports:
+    # - protocol: TCP
+    #   port: 80
+    # - protocol: TCP
+    #   port: 443
 ---
 # weave:
 #
@@ -75,16 +88,21 @@ spec:
       component: frontend
   ingress:
   - from:
-    ports:
-    - protocol: TCP
-      port: 80
-    - protocol: TCP
-      port: 443
+    - podSelector:
+        matchLabels:
+          app: weave-scope
+          component: agent
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus    
   egress:
+  # allow license lookup:
   - to:
     ports:
-    - protocol: TCP
-      port: 80
     - protocol: TCP
       port: 443
 ---
@@ -152,18 +170,12 @@ spec:
         matchLabels:
           app: drone
           component: server
-    # ports:
-    # - protocol: TCP
-    #   port: 9000
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: drone
           component: server
-    # ports:
-    # - protocol: TCP
-    #   port: 9000
   # external traffic can't be limited to domains (yet), so rudimentary for now:
   - to:
     ports:

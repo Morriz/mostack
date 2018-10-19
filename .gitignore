@@ -2,5 +2,9 @@
 .vscode
 .idea
 .history
+.vagrant
 secrets/*.sh
-!secrets/*.sample.sh
+!secrets/*.sample.sharts
+charts/efk
+charts/elasticsearch-operator
+values/efk.yaml

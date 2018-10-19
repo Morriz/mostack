@@ -11,6 +11,11 @@ deployCoreDNS: false
 deployKubeDNS: false
 deployKubeEtcd: false
 prometheus:
+  # prometheusLabelValue: prometheus-team-frontend
+  # # alertingEndpoints:
+  # # - name: prometheus-team-frontend-alertmanager
+  # #   namespace: team-frontend
+  # #   port: http
   resources:
     requests:
       memory: 400Mi
@@ -29,6 +34,7 @@ prometheus:
   # externalUrl: https://prometheus.{{CLUSTER_HOST}}
   externalUrl: http://127.0.0.1:9190
 alertmanager:
+  # prometheusLabelValue: prometheus-team-frontend
   config:
     global:
       slack_api_url: "{{SLACK_API_URL}}"
@@ -46,5 +52,7 @@ alertmanager:
         slack_configs:
           - channel: "#frontend"
             send_resolved: true
+  # to have clickable links in the gui:          
   # externalUrl: https://alertmanager.{{CLUSTER_HOST}}
   externalUrl: http://127.0.0.1:9193
+

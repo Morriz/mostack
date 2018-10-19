@@ -1,12 +1,11 @@
 # using hostNetwork hack until hostPort works with CNI
 # @todo: remove and enable localproxy when ready
-hostNetwork: {{HAS_CNI}}
+hostNetwork: {{ISMINIKUBE}}
 localproxy:
-  enabled: {{NOT_HAS_CNI}}
+  enabled: {{NOTISMINIKUBE}}
   port: 6000
 service:
-  http:
-    externalPort: 6000
+  externalPort: 6000
 proxy:
   enabled: true
 persistentVolume:
