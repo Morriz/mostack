@@ -1,13 +1,8 @@
 #!/usr/bin/env sh
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 shopt -s expand_aliases
-. ./.env.sh
 
-if [ "$CLUSTERTYPE" == "minikube" ]; then
-	eval $(minikube docker-env);
-else
-	eval "$(docker-machine env kube-node-1)"
-fi	
+eval $(minikube docker-env);
 
 location=$root/minidata/images
 

@@ -18,13 +18,6 @@ spec:
   podSelector: {}
   egress:
   - to:
-    # Next part would be nice if dns could do internal forwarding to external servers
-    # - namespaceSelector:
-    #     matchLabels:
-    #       name: kube-system
-    #   podSelector:
-    #     matchLabels:
-    #       k8s-app: kube-dns    
     ports:
     - protocol: UDP
       port: 53
