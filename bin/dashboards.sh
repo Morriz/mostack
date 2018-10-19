@@ -6,8 +6,22 @@ shopt -s expand_aliases
 
 printf "${COLOR_WHITE}Starting SYSTEM app proxies${COLOR_NC}\n"
 
+killall kubectl > /dev/null 2>&1
+k proxy &
+
+ks rollout status -w deploy/nginx-nginx-ingress-controller
+printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}\n"
+kpk 32080 > /dev/null 2>&1
+kubectl -n system port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
+
+if [ -e $ISLOCAL ]; then
+	printf "${COLOR_BLUE}Starting tunnels to allow cert manager ingress${COLOR_NC}\n"
+	sh bin/tunnel-to-ingress.sh
+	sh bin/ngrok.sh
+fi
+
 printf "${COLOR_PURPLE}[system] Waiting for necessary pods to become available${COLOR_BROWN}\n"
-ksk rollout status -w deploy/dashboard-kubernetes-dashboard
+ksk rollout status -w deploy/dashboard-kubernetes
 ks rollout status -w deploy/nginx-nginx-ingress-controller
 ks rollout status -w deploy/weave-scope-frontend-weave-scope
 kl rollout status -w deploy/elasticsearch
@@ -15,10 +29,6 @@ km rollout status -w statefulset.apps/prometheus-prometheus
 km rollout status -w statefulset.apps/alertmanager-prometheus
 ktf rollout status -w statefulset.apps/prometheus-team-frontend-prometheus
 ktf rollout status -w statefulset.apps/alertmanager-team-frontend-prometheus
-
-printf "${COLOR_BLUE}Starting Kubernetes Dashboard${COLOR_NC}\n"
-kpk 8443 > /dev/null 2>&1
-ksk port-forward $(ksk get po --selector=app=kubernetes-dashboard --output=jsonpath={.items..metadata.name}) 8443 &
 
 printf "${COLOR_BLUE}Starting Weave Scope${COLOR_NC}\n"
 kpk 4041 > /dev/null 2>&1
@@ -50,4 +60,4 @@ printf "${COLOR_BLUE}Starting alertmanager proxy${COLOR_NC}\n"
 kpk 9193 > /dev/null 2>&1
 ktf port-forward $(ktf get po --selector=app=alertmanager --output=jsonpath={.items..metadata.name}) 9193:9093 &
 
-open $root/docgen/minikube-service-index.html
+open $root/docgen/local-service-index.html

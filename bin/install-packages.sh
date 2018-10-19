@@ -175,18 +175,7 @@ if [ "$TLS_ENABLE" == "true" ]; then
 	hs cert-manager-cluster-issuer charts/cert-manager-cluster-issuer -f $valuesDir/cert-manager-cluster-issuer.yaml
 fi
 
-ks rollout status -w deploy/nginx-nginx-ingress-controller
-printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}\n"
-kpk 32080 > /dev/null 2>&1
-kubectl -n system port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
-
-if [ $ISLOCAL -eq 1 ]; then
-	printf "${COLOR_BLUE}Starting tunnels to allow cert manager ingress${COLOR_NC}\n"
-	sh bin/tunnel-to-ingress.sh
-	sh bin/ngrok.sh
-fi
-
-printf "${COLOR_BLUE}Opening dashboard${COLOR_NC}\n"
+printf "${COLOR_BLUE}Opening dashboards${COLOR_NC}\n"
 sh bin/dashboards.sh
 
 printf "${COLOR_WHITE}ALL DONE!${COLOR_NC}\n"

@@ -12,12 +12,12 @@ if [ $? -ne 0 ]; then
 fi
 
 parseFiles() {
-  cluster=$1
-  cat $root/templates/service-index.html | mo > $root/docgen/${cluster}-service-index.html
+  provider=$1
+  cat $root/templates/service-index.html | mo > $root/docgen/${provider}-service-index.html
   shift
   for f in "$@"; do
-    echo generating values/_gen/$cluster/$f
-    cat "$f" | mo > $root/values/_gen/$cluster/$f
+    echo generating values/_gen/$provider/$f
+    cat "$f" | mo > $root/values/_gen/$provider/$f
   done
 }
 
@@ -34,9 +34,11 @@ cd -
 
 . $root/secrets/local.sh
 parseFiles local $baseFiles
+cat $root/templates/README.md | mo > $root/README.md
 
 . $root/secrets/gce.sh
 parseFiles gce $baseFiles
 parseFiles gce $gceFiles
+cat $root/README.md | mo > $root/docgen/README-gce.md
 
 cd $root > /dev/null

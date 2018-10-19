@@ -1,3 +1,4 @@
+fullnameOverride: kubernetes-dashboard
 rbac:
   clusterAdminRole: true
 # ingress:
