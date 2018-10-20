@@ -47,9 +47,9 @@ fi
 
 # @todo: add dind parts to policies and re-enable
 # if [ "$CLUSTERTYPE" != "multinode" ]; then
-	# printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"
-	# for ns in default kube-system system monitoring logging team-frontend; do k apply -n $ns -f k8s/policies/each-namespace/defaults.yaml; done
-	# k apply -f k8s/policies
+# printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"
+# for ns in default kube-system system monitoring logging team-frontend; do k apply -n $ns -f k8s/policies/each-namespace/defaults.yaml; done
+# k apply -f k8s/policies
 # fi
 # for ns in tiller default kube-system system monitoring logging team-frontend; do k apply -n $ns -f k8s/policies/each-namespace/allow-all.yaml; done
 
@@ -73,13 +73,11 @@ else
 	k apply -f k8s/pvc-gce.yaml
 fi
 
-if [ "$KUBECONTEXT" == "minikube" ]; then
-	# registry cache only for minikube, for simplicity as it has only one node to restore to, and docker env is already pointing to it
-	printf "${COLOR_BLUE}[system] Deploying Docker Registry cache${COLOR_NC}\n"
-	hs registry-cache charts/docker-registry -f $valuesDir/docker-registry-cache.yaml
-	printf "${COLOR_PURPLE}[system] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
-	ks rollout status -w deploy/registry-cache-docker-registry
-fi
+# registry cache as mirror, which speeds up downloads images stored on docker hub
+printf "${COLOR_BLUE}[system] Deploying Docker Registry cache${COLOR_NC}\n"
+hs registry-cache charts/docker-registry -f $valuesDir/docker-registry-cache.yaml
+printf "${COLOR_PURPLE}[system] Waiting for Docker Registry caches to become available${COLOR_BROWN}\n"
+ks rollout status -w deploy/registry-cache-docker-registry
 
 ###
 ### Registry available, go ahead with the rest !!
@@ -134,7 +132,7 @@ if [ $ISLOCAL -eq 1 ]; then
 	# hl elasticsearch-operator charts/elasticsearch-operator # -f $valuesDir/efk.yaml
 	# hl efk charts/efk -f $valuesDir/efk.yaml
 	hl elk charts/elk -f $valuesDir/elk.yaml
-	
+
 	# for google fluentd-elasticsearch addon:
 	# k label nodes kube-node-1 kube-node-2 beta.kubernetes.io/fluentd-ds-ready=true
 	# k create -f $root/k8s/fluentd-elasticsearch/es-statefulset.yaml

@@ -16,6 +16,13 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: istio-system
+  labels:
+    name: istio-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: monitoring
   labels:
     name: monitoring

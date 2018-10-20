@@ -3,6 +3,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 shopt -s expand_aliases
 . $root/bin/aliases
+. $root/.env.sh
 
 printf "${COLOR_WHITE}Starting SYSTEM app proxies${COLOR_NC}\n"
 
@@ -14,14 +15,14 @@ printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}
 kpk 32080 > /dev/null 2>&1
 kubectl -n system port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
 
-if [ -e $ISLOCAL ]; then
+echo "ISLOCAL ${ISLOCAL}"
+if [ -v ISLOCAL ]; then
 	printf "${COLOR_BLUE}Starting tunnels to allow cert manager ingress${COLOR_NC}\n"
 	sh bin/tunnel-to-ingress.sh
 	sh bin/ngrok.sh
 fi
 
 printf "${COLOR_PURPLE}[system] Waiting for necessary pods to become available${COLOR_BROWN}\n"
-ksk rollout status -w deploy/dashboard-kubernetes
 ks rollout status -w deploy/nginx-nginx-ingress-controller
 ks rollout status -w deploy/weave-scope-frontend-weave-scope
 kl rollout status -w deploy/elasticsearch

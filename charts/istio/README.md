@@ -1,152 +1,117 @@
 # Istio
 
-[Istio](https://istio.io/), Istio is an open platform that provides a uniform way to connect, manage, and secure microservices. Istio supports managing traffic flows between microservices, enforcing access policies, and aggregating telemetry data, all without requiring changes to the microservice code.
-
-## TL;DR;
-
-```console
-$ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
-$ helm install incubator/istio
-```
+[Istio](https://istio.io/) is an open platform for providing a uniform way to integrate microservices, manage traffic flow across microservices, enforce policies and aggregate telemetry data.
 
 ## Introduction
 
-This chart bootstraps a [Istio](https://istio.io/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps all istio [components](https://istio.io/docs/concepts/what-is-istio/overview.html) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+
+## Chart Details
+
+This chart can install multiple istio components as subcharts:
+- ingress
+- ingressgateway
+- egressgateway
+- sidecarInjectorWebhook
+- galley
+- mixer
+- pilot
+- security(citadel)
+- grafana
+- prometheus
+- servicegraph
+- tracing(jaeger)
+- kiali
+
+To enable or disable each component, change the corresponding `enabled` flag.
 
 ## Prerequisites
 
-- Kubernetes 1.6+
-- Kubernetes 1.7+ if you would like to use the Initializer (auto-inject)
-- istioctl
+- Kubernetes 1.9 or newer cluster with RBAC (Role-Based Access Control) enabled is required
+- Helm 2.7.2 or newer or alternately the ability to modify RBAC rules is also required
+- If you want to enable automatic sidecar injection, Kubernetes 1.9+ with `admissionregistration` API is required, and `kube-apiserver` process must have the `admission-control` flag set with the `MutatingAdmissionWebhook` and `ValidatingAdmissionWebhook` admission controllers added and listed in the correct order.
 
-### istioctl installation steps
+## Resources Required
 
-Run
-```console
-curl -L https://git.io/getIstio | sh -
-```
-to download and extract the latest release automatically (on MacOS and Ubuntu), the `istioctl` client will be added to your PATH by the above shell command.
-
-## RBAC
-By default the chart is installed without associated RBAC roles and rolebindings. If you would like to install the provided roles and rolebindings please do the following:
-
-```
-$ helm install incubator/istio --set rbac.install=true
-```
-
-This will install the associated RBAC roles and rolebindings using beta annotations.
-
-To determine if your cluster supports this running the following:
-
-```console
-$ kubectl api-versions | grep rbac
-```
-
-You also need to have the following parameter on the api server. See the following document for how to enable [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/)
-
-```
---authorization-mode=RBAC
-```
-
-If the output contains "beta" or both "alpha" and "beta" you can proceed with normal installation.
-
-### Changing RBAC manifest apiVersion
-
-By default the RBAC resources are generated with the "v1beta1" apiVersion. To use "v1alpha1" do the following:
-
-```console
-$ helm install --name my-release incubator/istio --set rbac.install=true,rbac.apiVersion=v1alpha1
-```
-
-If it does not. Follow the steps below to disable.
-
-### Disable RBAC role/rolebinding creation
-
-If you don't want the RBAC roles and bindings to be created by the installation of this chart simply install the default chart.
-
-```console
-$ helm install --name my-release incubator/istio
-```
+The chart deploys pods that consume minimum resources as specified in the resources configuration parameter.
 
 ## Installing the Chart
 
-It is recommended that you install Istio into the istio-system namespace.
-
-Full installation requires two steps.
-
-The first step will install the prerequisite CRDs.
-
-To install the chart with the release name `istio` into the namespace istio-system:
-
-```console
-$ helm install --name istio incubator/istio --namespace istio-system
+1. If a service account has not already been installed for Tiller, install one:
+```
+$ kubectl apply -f install/kubernetes/helm/helm-service-account.yaml
 ```
 
-The second step will install the Istio components
-
-```console
-helm upgrade istio incubator/istio --reuse-values --set istio.install=true
+2. Install Tiller on your cluster with the service account:
+```
+$ helm init --service-account tiller
 ```
 
-The command deploys Istio on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+3. Install Istio’s [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#customresourcedefinitions) via `kubectl apply`, and wait a few seconds for the CRDs to be committed in the kube-apiserver:
+   ```
+   $ kubectl apply -f install/kubernetes/helm/istio/templates/crds.yaml
+   ```
+   **Note**: If you are enabling `certmanager`, you also need to install its CRDs and wait a few seconds for the CRDs to be committed in the kube-apiserver:
+   ```
+   $ kubectl apply -f install/kubernetes/helm/istio/charts/certmanager/templates/crds.yaml
+   ```
 
-> **Tip**: List all releases using `helm list`
+4. To install the chart with the release name `istio` in namespace `istio-system`:
+    - With [automatic sidecar injection](https://istio.io/docs/setup/kubernetes/sidecar-injection/#automatic-sidecar-injection) (requires Kubernetes >=1.9.0):
+    ```
+    $ helm install install/kubernetes/helm/istio --name istio --namespace istio-system
+    ```
 
-## Uninstalling the Chart
-
-To uninstall/delete the `istio` deployment:
-
-```console
-$ helm delete istio
-```
-
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+    - Without the sidecar injection webhook:
+    ```
+    $ helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set sidecarInjectorWebhook.enabled=false
+    ```
 
 ## Configuration
 
-The following tables lists the configurable parameters of the Istio chart and their default values.
+The Helm chart ships with reasonable defaults.  There may be circumstances in which defaults require overrides.
+To override Helm values, use `--set key=value` argument during the `helm install` command.  Multiple `--set` operations may be used in the same Helm operation.
 
-> **Tip**: You can use the default [values.yaml](values.yaml)
+Helm charts expose configuration options which are currently in alpha.  The currently exposed options are explained in the following table:
 
-Parameter | Description | Default
---------- | ----------- | -------
- |  |  |
+| Parameter | Description | Values | Default |
+| --- | --- | --- | --- |
+| `global.hub` | Specifies the HUB for most images used by Istio | registry/namespace | `docker.io/istio` |
+| `global.tag` | Specifies the TAG for most images used by Istio | valid image tag | `0.8.latest` |
+| `global.proxy.image` | Specifies the proxy image name | valid proxy name | `proxyv2` |
+| `global.proxy.concurrency` | Specifies the number of proxy worker threads | number, 0 = auto | `0` |
+| `global.imagePullPolicy` | Specifies the image pull policy | valid image pull policy | `IfNotPresent` |
+| `global.controlPlaneSecurityEnabled` | Specifies whether control plane mTLS is enabled | true/false | `false` |
+| `global.mtls.enabled` | Specifies whether mTLS is enabled by default between services | true/false | `false` |
+| `global.rbacEnabled` | Specifies whether to create Istio RBAC rules or not | true/false | `true` |
+| `global.refreshInterval` | Specifies the mesh discovery refresh interval | integer followed by s | `10s` |
+| `global.arch.amd64` | Specifies the scheduling policy for `amd64` architectures | 0 = never, 1 = least preferred, 2 = no preference, 3 = most preferred | `2` |
+| `global.arch.s390x` | Specifies the scheduling policy for `s390x` architectures | 0 = never, 1 = least preferred, 2 = no preference, 3 = most preferred | `2` |
+| `global.arch.ppc64le` | Specifies the scheduling policy for `ppc64le` architectures | 0 = never, 1 = least preferred, 2 = no preference, 3 = most preferred | `2` |
+| `ingress.enabled` | Specifies whether Ingress should be installed | true/false | `true` |
+| `gateways.istio-ingressgateway.enabled` | Specifies whether Ingress gateway should be installed | true/false | `true` |
+| `gateways.istio-egressgateway.enabled` | Specifies whether Egress gateway should be installed | true/false | `true` |
+| `sidecarInjectorWebhook.enabled` | Specifies whether automatic sidecar-injector should be installed | `true` |
+| `galley.enabled` | Specifies whether Galley should be installed for server-side config validation | true/false | `true` |
+| `mixer.enabled` | Specifies whether Mixer should be installed | true/false | `true` |
+| `pilot.enabled` | Specifies whether Pilot should be installed | true/false | `true` |
+| `grafana.enabled` | Specifies whether Grafana addon should be installed | true/false | `false` |
+| `grafana.persist` | Specifies whether Grafana addon should persist config data | true/false | `false` |
+| `grafana.storageClassName` | If `grafana.persist` is true, specifies the [`StorageClass`](https://kubernetes.io/docs/concepts/storage/storage-classes/) to use for the `PersistentVolumeClaim` | `StorageClass` | "" |
+| `prometheus.enabled` | Specifies whether Prometheus addon should be installed | true/false | `true` |
+| `servicegraph.enabled` | Specifies whether Servicegraph addon should be installed | true/false | `false` |
+| `tracing.enabled` | Specifies whether Tracing(jaeger) addon should be installed | true/false | `false` |
+| `kiali.enabled` | Specifies whether Kiali addon should be installed | true/false | `false` |
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+## Uninstalling the Chart
 
-```console
-$ helm install incubator/istio --name my-release \
-    --set auth.enabled=false
+To uninstall/delete the `istio` release:
 ```
-
-Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
-
-```console
-$ helm install incubator/istio --name my-release -f values.yaml
+$ helm delete istio
 ```
+The command removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Custom ConfigMaps
-
-When creating a new chart with this chart as a dependency, customConfigMap can be used to override the default config map provided. To use, set the value to true and provide the file `templates/configmap.yaml` for your use case. If you start by copying `configmap.yaml` from this chart and want to access values from this chart you must change all references from `.Values` to `.Values.istio`.
-
+To uninstall/delete the `istio` release completely and make its name free for later use:
 ```
-pilot:
-  customConfigMap: true
-```
-
-### Addons
-Istio ships with several preconfigured addons
-* Grafana
-* Prometheus
-* ServiceGraph
-* Zipkin
-
-These addons can be selectively installed by setting `addons.<addon-name>.enabled=false` in values.yaml or by using the `--set` command
-
-
-### Auto-inject
-If you are running a Kubernetes 1.7+ and have the Initializers api enabled you may choose to enable the Initializer to be installed. See the [docs](https://kubernetes.io/docs/admin/extensible-admission-controllers/) on how to enable.
-
-```console
-helm install --name my-release --devel incubator/istio --namespace istio-system --set istio.install=true,initializer.enabled=true
+$ helm delete istio --purge
 ```

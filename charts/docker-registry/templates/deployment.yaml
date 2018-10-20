@@ -62,7 +62,7 @@ spec:
           mountPath: /var/lib/registry
           subPath: "{{ .Values.persistentVolume.subPath }}"
         ports:
-        - containerPort: 5000
+        - containerPort: {{ .Values.service.externalPort }}
           name: registry
           protocol: TCP
       volumes:
