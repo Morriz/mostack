@@ -30,6 +30,7 @@ until k get namespace tiller system monitoring logging team-frontend >/dev/null 
 done
 
 printf "\n${COLOR_BLUE}[cluster] Creating secrets${COLOR_NC}\n"
+k create -f k8s/sealed-secrets/sealedsecret-crd.yaml
 k apply -f $valuesDir/secrets.yaml
 
 # help calico: add extra namespace label for kube-system
@@ -59,7 +60,8 @@ if [ "$KUBECONTEXT" == "dind" ]; then
 fi
 
 printf "${COLOR_BLUE}[tiller] Installing Tiller${COLOR_NC}\n"
-helm init --service-account tiller --tiller-namespace=tiller --history-max 1
+# helm init --service-account tiller --tiller-namespace=tiller --history-max 1
+helm init --service-account tiller --history-max 1
 
 printf "${COLOR_PURPLE}[tiller]Waiting for Tiller to become available${COLOR_BROWN}\n"
 k -n tiller rollout status -w deploy/tiller-deploy
@@ -91,7 +93,7 @@ hm prometheus-operator charts/prometheus-operator -f $valuesDir/prometheus-opera
 printf "${COLOR_BLUE}[system] Deploying Nginx controller${COLOR_NC}\n"
 hs nginx charts/nginx-ingress -f $valuesDir/nginx-ingress.yaml
 printf "${COLOR_PURPLE}[system] Waiting for nginx to come online${COLOR_BROWN}\n"
-ks rollout status -w deploy/nginx-ingress-nginx
+ks rollout status -w deploy/nginx-nginx-ingress-controller
 
 if [ "$TLS_ENABLE" == "true" ]; then
 	printf "${COLOR_BLUE}[system] Deploying CertManager${COLOR_NC}\n"
@@ -159,6 +161,9 @@ printf "${COLOR_WHITE}Now deploying TEAM FRONTEND packages${COLOR_NC}\n"
 
 printf "${COLOR_BLUE}[team-frontend] Deploying RBAC${COLOR_NC}\n"
 k apply -f k8s/rbac/team-frontend/drone-rbac.yaml
+
+printf "${COLOR_BLUE}[team-frontend] Deploying Flux Operator${COLOR_NC}\n"
+htf team-frontend-flux charts/flux -f $valuesDir/flux-team-frontend.yaml
 
 printf "${COLOR_BLUE}[team-frontend] Deploying Frontend API${COLOR_NC}\n"
 htf team-frontend-api charts/api -f $valuesDir/api.yaml

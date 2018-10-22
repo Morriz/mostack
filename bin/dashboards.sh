@@ -15,8 +15,7 @@ printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}
 kpk 32080 > /dev/null 2>&1
 kubectl -n system port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
 
-echo "ISLOCAL ${ISLOCAL}"
-if [ -v ISLOCAL ]; then
+if [ "$ISLOCAL" ]; then
 	printf "${COLOR_BLUE}Starting tunnels to allow cert manager ingress${COLOR_NC}\n"
 	sh bin/tunnel-to-ingress.sh
 	sh bin/ngrok.sh

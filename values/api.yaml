@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
-  # repository: {{REGISTRY_HOST}}/api
-  repository: localhost:5000/api
+  repository: {{REGISTRY_HOST}}/api
+  # repository: localhost:5000/api
   tag: latest
   pullPolicy: Always
 ingress:

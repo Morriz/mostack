@@ -212,7 +212,7 @@ gateways:
       targetAverageUtilization: 80
     loadBalancerIP: ""
     serviceAnnotations: {}
-    type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
+    type: NodePort #change to NodePort, ClusterIP or LoadBalancer if need be
 
     ports:
       ## You can add custom gateway ports
@@ -405,7 +405,7 @@ telemetry-gateway:
   prometheusEnabled: false
 
 grafana:
-  enabled: false
+  enabled: true
   replicaCount: 1
   image: grafana
   persist: false
