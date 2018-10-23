@@ -1,4 +1,5 @@
 helmOperator:
   create: true
-  git:
-    url: "https://github.com/Morriz/nodejs-demo-api"
+git:
+  url: "git@github.com:Morriz/nodejs-demo-api"
+  ciSkip: true

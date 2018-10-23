@@ -23,12 +23,12 @@ To boot the following Kubernetes applications/tools:
 * [Calico](https://github.com/projectcalico) for networking and policies k8s style.
 * [Cert Manager](https://github.com/jetstack/cert-manager) for automatic https certificate creation for public endpoints.
 * [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing.
+* [Drone](https://github.com/drone/drone) for building, testing and and pushing images to our private registry.
+* [Weave Flux operator]() implementing [GitOps](https://www.weave.works/technologies/gitops/) automated deployment workflow, listening to newly pushed images.
 * [Weave Scope](https://www.weave.works/oss/scope/) for a graphic overview of the network topology and services.
-* [Drone](https://github.com/drone/drone) for Ci/CD, using these plugins:
-    * [drone-kubernetes](https://github.com/honestbee/drone-Kubernetes) to deploy
 
 Wishlist for the next version:
-* [GitOps](https://www.weave.works/technologies/gitops/) implementation (with either Vault or SealedSecrets), as I think it is a good workflow easily adopted, and makes Kubernetes operate itself inceptionally well.
+* Better Secret handling either with Sealed Secrets or Vault
 * [Istio](https://github.com/istio/istio) for service mesh security, traceability and other enhancements.
 * [Ambassador](https://www.getambassador.io): the new kubernetes native api gateway.
 
@@ -127,14 +127,14 @@ and [the service index](./docgen/local-service-index.html) will open.
 ### 3.1.2 Trigger the build pipeline
 
 1. Now commit to the forked `Morriz/nodejs-api-demo` repo and trigger a build in our Drone.
-2. Drone builds and does tests
-3. Drone pushes docker image artifact to our private docker registry
-4. Drone updates our running k8s deployment to use the new version
-5. Kubernetes detects config change and does an automated rolling update.
+2. Drone builds and does tests, pushes docker image artifact to our private docker registry.
+3. Weave Flux sees the image, updates the deployment, and commits the updated config to git.
 
 ### 3.2 API
 
-Check output for the following url: https://api.{{CLUSTER_HOST}}/api/publicmethod
+* https://api.{{CLUSTER_HOST}}/api/publicmethod
+* https://api-stg.{{CLUSTER_HOST}}/api/publicmethod
+* https://api.{{CLUSTER_HOST}}/api/publicmethod
 
 It should already be running ok, or it is in the process of detecting the new image and rolling out the update.
 
