@@ -6,25 +6,15 @@ Using Kubernetes because...reasons (go [Google](https://www.google.com/search?q=
 In my opinion we always want a single store of truth (Git) that houses all we do as code.
 So I set out to create a stack that declares our entire kubernetes platform, allowing to idempotently apply changes towards our desired end state without side effects.
 
-So far I am using the following (mostly open source) technologies:
+So far I am using the following Kubernetes applications/tools:
 
-To boot up a cluster (see `bin/install*.sh` scripts) you can choose one of the following setups before running the package installer:
-
-* [Minikube](https://github.com/Kubernetes/minikube) for running a local k8s cluster.
-* [kubeadm-cluster-dind](https://github.com/kubernetes-sigs/kubeadm-dind-cluster) for running a local multinode k8s cluster as an alternative that is more close to the real deal. My favorite, as it is fast.
-* [Vagrant](https://www.vagrantup.com) for running a local multinode cluster that even more closely mimics a currently available cloud cluster.
-  
-To boot the following Kubernetes applications/tools:
-
-* [Kubernetes](https://github.com/Kubernetes/Kubernetes) for describing our container infrastructure.
 * [Helm](https://github.com/Kubernetes/helm) for packaging and deploying of Kubernetes apps and subapps.
+* [Weave Flux](https://github.com/weaveworks/flux) operator implementing [GitOps](https://www.weave.works/technologies/gitops/) automated deployment workflow, listening to newly pushed images as well as changes to config repo itself (this one).
 * Docker Registry for storing locally built images, and as a proxy + cache for external ones.
 * [Prometheus Operator](https://github.com/coreos/prometheus-operator) + [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com) for monitoring.
-* [Calico](https://github.com/projectcalico) for networking and policies k8s style.
 * [Cert Manager](https://github.com/jetstack/cert-manager) for automatic https certificate creation for public endpoints.
 * [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing.
 * [Drone](https://github.com/drone/drone) for building, testing and and pushing images to our private registry.
-* [Weave Flux operator]() implementing [GitOps](https://www.weave.works/technologies/gitops/) automated deployment workflow, listening to newly pushed images.
 * [Weave Scope](https://www.weave.works/oss/scope/) for a graphic overview of the network topology and services.
 
 Wishlist for the next version:
@@ -45,19 +35,10 @@ After destroying the cluster, and then running install again, all storage endpoi
 
 ## PREREQUISITES:
 
-* A running Kubernetes 1.11+ cluster with RBAC enabled, Calico 3.2+ CNI plugin, and `kubectl` installed on your local machine:
-	* On OSX you may install one of 3 types of clusters:
-        * `bin/install-minikube.sh` will start a single node. minikube cluster for you, and try to restore docker images.
-        * `bin/install-dind.sh` will start a multi node dind cluster. Slower initial startup than miinikube, but much faster on 'up'. My preferred setup.
-        * `bin/install-vagrant.sh` will start a multi node vagrant cluster.
-	* If you wish to deploy to GCE (Google Compute Engine), please create a cluster there:
-
-		    bin/gce-create.sh
-
+* A running Kubernetes 1.11+ cluster with RBAC enabled, Calico 3.2+ CNI plugin, and `kubectl` installed on your local machine. See [morriz/k8s-devcluster](https://github.com/morriz/k8s-devcluster) for booting a quick dev cluster.
+* ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
 * [Helm](https://helm.sh) (`brew install helm`?)
 * Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
-* [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your browser's cert manager temporarily if you'd like to bypass browser warnings about https)
-* ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
 * For `cert-manager` to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are forwarded to your local machine:
 	* by manipulating your firewall
 	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):

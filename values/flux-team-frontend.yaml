@@ -1,5 +1,0 @@
-helmOperator:
-  create: true
-git:
-  url: "git@github.com:Morriz/nodejs-demo-api"
-  ciSkip: true

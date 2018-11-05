@@ -1,4 +1,4 @@
 description: Temp chart for ClusterIssuer
 engine: gotpl
 name: ClusterIssuer
-version: 0.0.1
+version: 0.1.0

@@ -1,8 +1,0 @@
-localproxy:
-  enabled: true
-  port: 6000
-proxy:
-  enabled: true
-persistentVolume:
-#  existingClaim: slow-pvc
-  size: 10Gi

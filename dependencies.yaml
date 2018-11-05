@@ -1,0 +1,65 @@
+dependencies:
+  - name: ambassador
+    version: 0.40.0
+    condition: ambassador.enabled
+    repository: file:///charts/ambassador
+  - name: api
+    version: 0.2.0
+    condition: api.enabled
+    repository: file:///charts/api
+  - name: cert-manager
+    version: v0.4.1
+    condition: security.enabled
+    repository: file:///charts/cert-manager
+  - name: cert-manager-cluster-issuer
+    version: 0.1.0
+    condition: cert-manager.enabled
+    repository: file:///charts/cert-manager-cluster-issuer
+  - name: docker-registry
+    version: 0.2.2
+    condition: docker-registry.enabled
+    repository: file:///charts/docker-registry
+  - name: drone
+    version: 0.1.0
+    condition: drone.enabled
+    repository: file:///charts/drone
+  - name: elk
+    version: 0.1.0
+    condition: elk.enabled
+    repository: file:///charts/elk
+  - name: flux
+    version: 1.7.1
+    condition: flux.enabled
+    repository: file:///charts/flux
+  - name: istio
+    version: 1.0.1
+    condition: istio.enabled
+    repository: file:///charts/istio
+  - name: kube-prometheus
+    version: 0.0.105
+    condition: kube-prometheus.enabled
+    repository: file:///charts/kube-prometheus
+  - name: kubernetes-dashboard
+    version: 0.7.2
+    condition: kubernetes-dashboard.enabled
+    repository: file:///charts/kubernetes-dashboard
+  - name: metrics-server
+    version: 1.1.0
+    condition: metrics-server.enabled
+    repository: file:///charts/metrics-server
+  - name: nginx-ingress
+    version: 0.8.6
+    condition: nginx-ingress.enabled
+    repository: file:///charts/nginx-ingress
+  - name: prometheus-operator
+    version: 0.0.29
+    condition: prometheus-operator.enabled
+    repository: file:///charts/prometheus-operator
+  - name: rook
+    version: v0.8.3
+    condition: rook.enabled
+    repository: file:///charts/rook
+  - name: weave-scope
+    version: 0.9.3
+    condition: weave-scope.enabled
+    repository: file:///charts/weave-scope

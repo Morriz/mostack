@@ -1,5 +1,0 @@
-slackUrl: {{SLACK_API_URL}}
-kibanaPassword: {{KIBANA_PASSWORD}}
-hostname: logging.{{CLUSTER_HOST}}
-tls: {{TLS_ENABLE}}
-containersLocation: {{CONTAINERS_LOCATION}}

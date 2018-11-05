@@ -1,0 +1,18 @@
+apiVersion: helm.integrations.flux.weave.works/v1alpha2
+kind: FluxHelmRelease
+metadata:
+  name: cert-manager
+  namespace: system
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.chart-image: semver:~0.1
+spec:
+  namespace: system
+  chartGitPath: cert-manager
+  releaseName: cert-manager
+  values:
+    slackUrl: https://hooks.slack.com/services/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
+    kibanaPassword: YWRtaW46JGFwcjEkVEZIUi8xcHckbjNXWlJKRGt4YmtCcWZTb0I0RW1TMAo=
+    hostname: logging.dev.idiotz.nl
+    tls: true
+    containersLocation: /var/lib/docker/containers

@@ -1,0 +1,28 @@
+api:
+    enabled: true
+cert-manager:
+    enabled: true
+docker-registry:
+    enabled: true
+docker-registry:
+    enabled: true
+drone:
+    enabled: true
+elk:
+    enabled: true
+flux:
+    enabled: true
+kube-prometheus:
+    enabled: true
+kubernetes-dashboard:
+    enabled: true
+metrics-server:
+    enabled: true
+nginx-ingress:
+    enabled: true
+prometheus-operator:
+    enabled: true
+rook:
+    enabled: true
+weave-scope:
+    enabled: true

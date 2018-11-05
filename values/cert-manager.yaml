@@ -1,3 +1,0 @@
-ingressShim:
-  defaultIssuerName: letsencrypt-{{LETSENCRYPT_STAGE}}
-  defaultIssuerKind: ClusterIssuer
