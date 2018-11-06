@@ -11,4 +11,4 @@ spec:
   chartGitPath: prometheus-operator
   releaseName: prometheus-operator
   values:
-    rbacEnable: true
+    rbacEnable: 

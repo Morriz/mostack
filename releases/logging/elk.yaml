@@ -11,8 +11,8 @@ spec:
   chartGitPath: cert-manager
   releaseName: cert-manager
   values:
-    slackUrl: https://hooks.slack.com/services/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
-    kibanaPassword: YWRtaW46JGFwcjEkVEZIUi8xcHckbjNXWlJKRGt4YmtCcWZTb0I0RW1TMAo=
-    hostname: logging.dev.idiotz.nl
-    tls: true
+    slackUrl: 
+    kibanaPassword: 
+    hostname: logging.
+    tls: 
     containersLocation: /var/lib/docker/containers

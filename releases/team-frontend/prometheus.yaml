@@ -11,7 +11,7 @@ spec:
   chartGitPath: prometheus
   releaseName: prometheus-team-frontend
   values:
-    rbacEnable: true
+    rbacEnable: 
     # disable grafana until we have something to see:
     deployGrafana: false
     # disable because not needed in team-frontend namespace:
@@ -44,13 +44,13 @@ spec:
                 annotations:
                   description: There is no running frontend api. Deployments and replication controllers are not making progress.
                   summary: Frontend API is down
-      # externalUrl: https://prometheus.dev.idiotz.nl
+      # externalUrl: https://prometheus.
       externalUrl: http://127.0.0.1:9190
     alertmanager:
       # prometheusLabelValue: prometheus-team-frontend
       config:
         global:
-          slack_api_url: "https://hooks.slack.com/services/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"
+          slack_api_url: ""
         route:
           receiver: default-receiver
           repeat_interval: 3h
@@ -66,6 +66,6 @@ spec:
               - channel: "#frontend"
                 send_resolved: true
       # to have clickable links in the gui:          
-      # externalUrl: https://alertmanager.dev.idiotz.nl
+      # externalUrl: https://alertmanager.
       externalUrl: http://127.0.0.1:9193
 

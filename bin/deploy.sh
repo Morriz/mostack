@@ -6,6 +6,7 @@ shopt -s expand_aliases
 
 # helm --tiller-namespace=kube-system --namespace=system install --name flux \ 
 hs flux \
+--set image.tag=1.8.0 \
 --set rbac.create=true \
 --set helmOperator.create=true \
 --set git.url=ssh://git@github.com/morriz/mostack \

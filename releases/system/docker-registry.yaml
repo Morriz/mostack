@@ -19,6 +19,6 @@ spec:
     ingress:
       enabled: true
       tls: true
-      hostname: reg.dev.idiotz.nl
+      hostname: reg.
     persistentVolume:
       existingClaim: slow-pvc

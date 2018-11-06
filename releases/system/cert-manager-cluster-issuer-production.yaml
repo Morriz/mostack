@@ -1,7 +1,7 @@
 apiVersion: helm.integrations.flux.weave.works/v1alpha2
 kind: FluxHelmRelease
 metadata:
-  name: cert-manager-cluster-issuer
+  name: cert-manager-cluster-issuer-production
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
@@ -9,7 +9,7 @@ metadata:
 spec:
   namespace: system
   chartGitPath: cert-manager-cluster-issuer
-  releaseName: cert-manager-cluster-issuer
+  releaseName: cert-manager-cluster-issuer-production
   values:
-    email: morriz@idiotz.nl
+    email: 
     stage: production # production

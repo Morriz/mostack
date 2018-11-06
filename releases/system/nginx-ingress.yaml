@@ -12,11 +12,11 @@ spec:
   releaseName: nginx-ingress
   values:
     rbac:
-      create: true
+      create: 
     controller:
       config:
-        ssl-redirect: "true"
-        hsts: "true"
+        ssl-redirect: ""
+        hsts: ""
         disable-ipv6: "true"
       stats:
         enabled: true
