@@ -8,4 +8,5 @@ secrets/*.sh
 charts/efk
 charts/efk-stack-helm
 charts/elasticsearch-operator
+minidata
 values/efk.yaml
