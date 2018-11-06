@@ -11,8 +11,8 @@ spec:
   chartGitPath: elk
   releaseName: elk
   values:
-    slackUrl: 
-    kibanaPassword: 
-    hostname: logging.
-    tls: 
+    slackUrl: https://hooks.slack.com/services/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
+    kibanaPassword: YWRtaW46JGFwcjEkVEZIUi8xcHckbjNXWlJKRGt4YmtCcWZTb0I0RW1TMAo=
+    hostname: logging.dev.idiotz.nl
+    tls: true
     containersLocation: /var/lib/docker/containers

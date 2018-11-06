@@ -3,7 +3,7 @@ root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 . $root/bin/colors.sh
 . $root/.env.sh
 
-provider=$1
+provider=${1:-'local'}
 
 # uses 'mo'
 which mo > /dev/null
@@ -18,8 +18,8 @@ parseFiles() {
   shift
   for f in "$@"; do
     echo generating releases/$f
-    mkdir -p "$(dirname "$root/releases/$f")"
-    cat "$f" | mo > $root/releases/$f
+    mkdir -p "$(dirname "$root/releases/$f.yaml")"
+    cat "$f.tpl" | mo > $root/releases/$f.yaml
   done
 }
 
@@ -27,7 +27,7 @@ printf "${COLOR_WHITE}GENERATING VALUES:${COLOR_NC}\n"
 
 rm -rf $root/releases/*
 cd $root/releases.tpl > /dev/null
-baseFiles=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
+baseFiles=$(find . -name "*.tpl" -maxdepth 2 | rev | cut -c 5- | rev)
 # echo $baseFiles
 # exit
 

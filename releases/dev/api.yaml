@@ -14,10 +14,10 @@ spec:
   values:
     replicaCount: 1
     image:
-      repository: /api
+      repository: reg.dev.idiotz.nl/api
       # repository: localhost:5000/api
     ingress:
-      tls: 
-      hostname: api.
+      tls: true
+      hostname: api.dev.idiotz.nl
       certmanager.k8s.io/cluster-issuer: letsencrypt-staging
     prometheus: team-frontend-prometheus

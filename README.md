@@ -97,7 +97,7 @@ and [the service index](./docgen/local-service-index.html) will open.
 
 ### 3.1.1 Configure Drone
 
-1. Go to your public drone url (https://drone.) and select the repo `nodejs-demo-api`.
+1. Go to your public drone url (https://drone.dev.idiotz.nl) and select the repo `nodejs-demo-api`.
 2. Go to the 'Secrets' menu and create the following entries (follow the comments to get the values):
 
         kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
@@ -113,9 +113,9 @@ and [the service index](./docgen/local-service-index.html) will open.
 
 ### 3.2 API
 
-* https://api./api/publicmethod
-* https://api-stg./api/publicmethod
-* https://api./api/publicmethod
+* https://api.dev.idiotz.nl/api/publicmethod
+* https://api-stg.dev.idiotz.nl/api/publicmethod
+* https://api.dev.idiotz.nl/api/publicmethod
 
 It should already be running ok, or it is in the process of detecting the new image and rolling out the update.
 
@@ -123,7 +123,7 @@ It should already be running ok, or it is in the process of detecting the new im
 
 #### 3.3.1 Grafana
 
-Look at a pre-installed [Grafana dashboard](https://grafana.) showing the system cluster metrics.
+Look at a pre-installed [Grafana dashboard](https://grafana.dev.idiotz.nl) showing the system cluster metrics.
 Use the following default creds if not changed already in `values/grafana.yaml`:
 
 * username: admin
@@ -133,7 +133,7 @@ Use the following default creds if not changed already in `values/grafana.yaml`:
 
 Look at the Prometheus view to see all targets are scrapable. Drone should not be able to be scraped and prometheus alerts will be sent to the alertmanager. (Chek next section now and come back.)
 
-We need to tell Prometheus to use an auth token for scraping: go to [Drone](https://drone.) and retrieve the token from the menu.
+We need to tell Prometheus to use an auth token for scraping: go to [Drone](https://drone.dev.idiotz.nl) and retrieve the token from the menu.
 Copy and paste that into the `secrets/minikube.sh` file `DRONE_AUTH_TOKEN` var.
 run the following to create the secret and reload the relevant pods:
 
@@ -149,7 +149,7 @@ The alertmanager view will show the alerts concerning the unreachable endpoints.
 
 ### 3.4 Kibana log view
 
-Look at a pre-installed [Kibana dashboard with Logtrail](https://logging./app/logtrail) showing the cluster logs.
+Look at a pre-installed [Kibana dashboard with Logtrail](https://logging.dev.idiotz.nl/app/logtrail) showing the cluster logs.
 
 Creds: Same as Grafana.
 

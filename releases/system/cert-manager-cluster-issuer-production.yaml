@@ -11,5 +11,5 @@ spec:
   chartGitPath: cert-manager-cluster-issuer
   releaseName: cert-manager-cluster-issuer-production
   values:
-    email: 
+    email: morriz@idiotz.nl
     stage: production # production

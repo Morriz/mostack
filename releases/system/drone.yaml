@@ -12,8 +12,8 @@ spec:
   releaseName: drone
   values:
     ingress:
-      hostname: drone.
-      tls: 
+      hostname: drone.dev.idiotz.nl
+      tls: true
     server:
       env:
         DRONE_DEBUG: false
@@ -22,14 +22,14 @@ spec:
         DRONE_DATABASE_DATASOURCE: /var/lib/drone/drone.sqlite
         DRONE_GITHUB_SKIP_VERIFY: true
         DRONE_GITHUB: true
-        DRONE_ADMIN: 
-        DRONE_GITHUB_CLIENT: 
-        DRONE_GITHUB_SECRET: 
-        DRONE_PROMETHEUS_AUTH_TOKEN: 
+        DRONE_ADMIN: Morriz
+        DRONE_GITHUB_CLIENT: 79eda338159cb083cf47
+        DRONE_GITHUB_SECRET: 121f234dd04cfdcf1c5764e55aa77c7a2ce1e73e
+        DRONE_PROMETHEUS_AUTH_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZXh0IjoiTW9ycml6IiwidHlwZSI6InVzZXIifQ.5V-2g1AzTgIRvFOEf9wQK1Tn1P4K4xv-sfkoCkWOXjM
     agent:
       env:
         DRONE_DEBUG: false
-    shared_secret: 
+    shared_secret: adsfasdfasdfasd123
     persistentVolume:
       enabled: true
       existingClaim: fast-pvc
