@@ -120,7 +120,7 @@ and [the service index](./docgen/local-service-index.html) will open.
 2. Go to the 'Secrets' menu and create the following entries (follow the comments to get the values):
 
         kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
-        kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
+        kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -d
         kubernetes_dns= # ksk get po --selector=k8s-app=kube-dns --output=jsonpath={.items..status.hostIP}
         registry=localhost:5000 # or the public version if you made the registry accessible as a service
 

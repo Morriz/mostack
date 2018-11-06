@@ -6,5 +6,6 @@
 secrets/*.sh
 !secrets/*.sample.sharts
 charts/efk
+charts/efk-stack-helm
 charts/elasticsearch-operator
 values/efk.yaml
