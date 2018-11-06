@@ -105,8 +105,16 @@ and [the service index](./docgen/service-index.html) will open.
 1. Go to your public drone url (https://drone.dev.idiotz.nl) and select the repo `nodejs-demo-api`.
 2. Go to the 'Secrets' menu and create the following entries (follow the comments to get the values):
 
+<<<<<<< HEAD
         kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}" | pbcopy
         kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -d | pbcopy
+||||||| merged common ancestors
+        kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
+        kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
+=======
+        kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
+        kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -d
+>>>>>>> 8a6ffa96f46464185ace26a56c50d89ec99d427a
         kubernetes_dns= # ksk get po --selector=k8s-app=kube-dns --output=jsonpath={.items..status.hostIP}
         registry=localhost:5000 # or the public version if you made the registry accessible as a service
 

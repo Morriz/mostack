@@ -8,3 +8,10 @@ secrets/*.sh
 charts/efk
 charts/efk-stack-helm
 charts/elasticsearch-operator
+<<<<<<< HEAD
+||||||| merged common ancestors
+values/efk.yaml
+=======
+minidata
+values/efk.yaml
+>>>>>>> 8a6ffa96f46464185ace26a56c50d89ec99d427a
