@@ -3,23 +3,27 @@
 
 Using Kubernetes because...reasons (go [Google](https://www.google.com/search?q=kubernetes)).
 
+This repo requires a running k8s cluster. In case you want to run one locally I suggest you check out [morriz/k8s-dev/cluster](https://github.com/Morriz/k8s-dev-cluster) for some flavors and insights.
+
+
 In my opinion we always want a single store of truth (Git) that houses all we do as code.
 So I set out to create a stack that declares our entire kubernetes platform, allowing to idempotently apply changes towards our desired end state without side effects.
 
 So far I am using the following Kubernetes applications/tools:
 
+* [Kubernetes](https://github.com/Kubernetes/Kubernetes) for describing our container infrastructure.
 * [Helm](https://github.com/Kubernetes/helm) for packaging and deploying of Kubernetes apps and subapps.
-* [Weave Flux](https://github.com/weaveworks/flux) operator implementing [GitOps](https://www.weave.works/technologies/gitops/) automated deployment workflow, listening to newly pushed images as well as changes to config repo itself (this one).
-* Docker Registry for storing locally built images, and as a proxy + cache for external ones.
+* [Weave Flux](https://github.com/weaveworks/flux) operator, which monitors this repo and reconciles the cluster state with the declarations found in this repo.
+* Docker Registry for storing locally built images, and as a proxy + cache for public docker hub images (disabled for now).
 * [Prometheus Operator](https://github.com/coreos/prometheus-operator) + [Prometheus](https://prometheus.io) + [Grafana](https://grafana.com) for monitoring.
+* [Calico](https://github.com/projectcalico) for networking and policies k8s style.
 * [Cert Manager](https://github.com/jetstack/cert-manager) for automatic https certificate creation for public endpoints.
 * [ElasticSearch](www.elastic.co) + [Kibana](www.elastic.co/products/kibana) for log indexing & viewing.
-* [Drone](https://github.com/drone/drone) for building, testing and and pushing images to our private registry.
 * [Weave Scope](https://www.weave.works/oss/scope/) for a graphic overview of the network topology and services.
-
+* [Drone](https://github.com/drone/drone) for Ci/CD.
+* 
 Wishlist for the next version:
-* Better Secret handling either with Sealed Secrets or Vault
-* [Istio](https://github.com/istio/istio) for service mesh security, traceability and other enhancements.
+* [Istio](https://github.com/istio/istio) for service mesh security, insights and other enhancements.
 * [Ambassador](https://www.getambassador.io): the new kubernetes native api gateway.
 
 Alright, let's get to it. Follow me please!
@@ -28,53 +32,50 @@ We will be going through the following workflow:
 1. Configuration
 2. Deploying the stack
 3. Testing the apps
-4. Destroying the cluster
 
 At any point can any step be re-run to result in the same (idempotent) state.
-After destroying the cluster, and then running install again, all storage endpoints will still contain the previously built/cached artifacts and configuration. The next boot should thus be faster.
+After destroying the cluster, and then running install again, all storage endpoints will still contain the previously built/cached artifacts and configuration.
+The next boot should thus be faster :)
 
 ## PREREQUISITES:
 
-* A running Kubernetes 1.11+ cluster with RBAC enabled, Calico 3.2+ CNI plugin, and `kubectl` installed on your local machine. See [morriz/k8s-devcluster](https://github.com/morriz/k8s-devcluster) for booting a quick dev cluster.
-* ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
-* [Helm](https://helm.sh) (`brew install helm`?)
+* A running Kubernetes cluster with RBAC enabled and `kubectl` installed on your local machine.
+* [Helm](https://helm.sh) client (`brew install helm`?).
 * Forked [Morriz/nodejs-demo-api](https://github.com/Morriz/nodejs-demo-api)
+* [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your browser's cert manager temporarily if you'd like to bypass browser warnings about https)
+* ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
 * For `cert-manager` to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are forwarded to your local machine:
 	* by manipulating your firewall
 	* or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
 	    * free account: only http works (set `TLS_ENABLE=false` in `secrets/local.sh`) since we can't load multiple tunnels (80 & 443) for one domain
 	    * biz account: see provided `templates/ngrok.yaml`
+* When using letsencrypt staging certs: For (Github) repo webhooks to be able to talk to drone in our cluster it needs to trust it's staging certs. So the previous Letsencrypt staging CA should be added to the cluster node list of trusted CA's. See `morriz/k8s-dev-cluster/bin/add-trusted-ca-to-docker-domains.sh` how I do it for minikube.
 * Create an oAuth app for our Drone and copy the key & secret in [GitHub](https://github.com/settings/developers) so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
 
 ## 1. Configuration
 
-Copy `secrets/sample.sh` to `secrets/local.sh` (and `secrets/gce.sh` for deploying to gce), and edit them.
+Copy `secrets/*.sample.sh` to `secrets/local.sh` (and `secrets/gce.sh` for deploying to gce), and edit them.
 If needed you can also edit `values/*.yaml` (see all the options in `charts/*/values.yaml`), but for a first boot I would leave them as is.
 
 IMPORTANT: The `$CLUSTER_HOST` subdomains must all point to your laptop ip (I use ngrok for that, see `bin/ngrok.sh`). Then the `bin/tunnel-to-ingress.sh` script can forward incoming port 443 and 80 to the nginx controller, which will serve all our public ingresses.
 
-Now you may generate the final value files (and docs with live) links into `values/_gen` by running:
+Now you may generate the final GitOps release files into `releases/` by running:
 
-    . bin/gen-values.sh
+    sh bin/gen-releases.sh
 
-This step will always execute in the package installer, so no need to do it before a `bin/install-packages.sh`.
-And, as you might have noticed, this README got overwritten so links are pointing to your CLUSTER_HOST domain for working clickable links :)
-
-To load the env vars, aliases and functions (used throughout the stack) source them in your shell:
-
-    . ./.env.sh
-    . bin/aliases
+The main `README.md` will also be overrwritten, reflecting the live service links.
 
 ## 2. Deployment
 
-A dirty bash script boots everything in the right order. Could use more fancy stuff like Ansible (check out Kubespray), but I will leave that to you.
-Running the main installer with
+A dirty bash script deploys the prerequisites like PVs, some RBAC and Tiller:
 
-    bin/install-packages.sh
+    sh bin/install-prerequisites.sh
 
-will install a lot of necessary `k8s/*` manifests and the helm charts with the values from `values/_gen/*.yaml`.
+Wait for it to complete, and then deploy the motherload:
 
-That's it. You can run this every time you make a change and it will idempotently apply the desired state.
+    sh bin/deploy.sh
+
+This will install the main GitOps operator that will reconcile the state of the cluster with this GitOps repo. That may take a long time as it needs to pull in the docker images on all the nodes.
 
 ## 3. Testing the apps
 
@@ -82,16 +83,20 @@ Please check if all apps are running:
 
     kaa
 
+Or set up a live watch that updates every second:
+
+    watch -n1 -x kubectl --all-namespaces=true get po,deploy
+
 and wait...
 
 The `api` deployment can't start because it can't find it's local docker image, which is not yet in the registry.
 Drone needs to build from a commit first, which we will get to later. After that the `api:latest` tag is permanently stored in the registry's file storage, which survives cluster deletion, and will thus be immediately used upon cluster re-creation.
 
-When all deployments are ready the local service proxies are automatically started with:
+When all deployments are ready the local service proxies can be started with:
 
     bin/dashboards.js
 
-and [the service index](./docgen/local-service-index.html) will open.
+and [the service index](./docgen/service-index.html) will open.
 
 ### 3.1 Drone CI/CD
 
@@ -100,8 +105,8 @@ and [the service index](./docgen/local-service-index.html) will open.
 1. Go to your public drone url (https://drone.{{CLUSTER_HOST}}) and select the repo `nodejs-demo-api`.
 2. Go to the 'Secrets' menu and create the following entries (follow the comments to get the values):
 
-        kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}"
-        kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -D
+        kubernetes_cert= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data['ca\.crt']}" | pbcopy
+        kubernetes_token= # ktf get secret $(ktf get sa drone-deploy -o jsonpath='{.secrets[].name}{"\n"}') -o jsonpath="{.data.token}" | base64 -d | pbcopy
         kubernetes_dns= # ksk get po --selector=k8s-app=kube-dns --output=jsonpath={.items..status.hostIP}
         registry=localhost:5000 # or the public version if you made the registry accessible as a service
 

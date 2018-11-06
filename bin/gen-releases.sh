@@ -14,7 +14,7 @@ if [ $? -ne 0 ]; then
 fi
 
 parseFiles() {
-  cat $root/templates/service-index.html | mo > $root/docgen/${provider}-service-index.html
+  cat $root/templates/service-index.html | mo > $root/docgen/service-index.html
   shift
   for f in "$@"; do
     echo generating releases/$f

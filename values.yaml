@@ -4,14 +4,16 @@ cert-manager:
     enabled: true
 docker-registry:
     enabled: true
-docker-registry:
-    enabled: true
+docker-registry-cache:
+    enabled: false
 drone:
     enabled: true
 elk:
     enabled: true
 flux:
     enabled: true
+istio:
+    enabled: false
 kube-prometheus:
     enabled: true
 kubernetes-dashboard:
@@ -23,6 +25,6 @@ nginx-ingress:
 prometheus-operator:
     enabled: true
 rook:
-    enabled: true
+    enabled: false
 weave-scope:
     enabled: true

@@ -9,7 +9,6 @@ metadata:
 spec:
   namespace: system
   chartGitPath: weave-scope
-  releaseName: weave-scope
   values:
     global:
       image:
