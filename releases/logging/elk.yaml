@@ -2,12 +2,12 @@ apiVersion: helm.integrations.flux.weave.works/v1alpha2
 kind: FluxHelmRelease
 metadata:
   name: elk
-  namespace: system
+  namespace: logging
   annotations:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.1
 spec:
-  namespace: system
+  namespace: logging
   chartGitPath: elk
   releaseName: elk
   values:

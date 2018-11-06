@@ -10,7 +10,7 @@ printf "${COLOR_WHITE}Starting SYSTEM app proxies${COLOR_NC}\n"
 killall kubectl > /dev/null 2>&1
 k proxy &
 
-ks rollout status -w deploy/nginx-nginx-ingress-controller
+ks rollout status -w deploy/nginx-ingress-nginx-ingress-controller
 printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}\n"
 kpk 32080 > /dev/null 2>&1
 ks port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
@@ -23,7 +23,7 @@ if [ "$ISLOCAL" ]; then
 fi
 
 printf "${COLOR_PURPLE}[system] Waiting for necessary pods to become available${COLOR_BROWN}\n"
-ks rollout status -w deploy/nginx-nginx-ingress-controller
+ks rollout status -w deploy/nginx-ingress-nginx-ingress-controller
 ks rollout status -w deploy/weave-scope-frontend-weave-scope
 kl rollout status -w deploy/elasticsearch
 km rollout status -w statefulset.apps/prometheus-prometheus
@@ -37,7 +37,7 @@ ks port-forward deploy/weave-scope-frontend-weave-scope 4041:4040 &
 
 printf "${COLOR_BLUE}Starting nginx status proxy${COLOR_NC}\n"
 kpk 18080 > /dev/null 2>&1
-ks port-forward deploy/nginx-nginx-ingress-controller 18080 &
+ks port-forward deploy/nginx-ingress-nginx-ingress-controller 18080 &
 
 printf "${COLOR_BLUE}Starting elasticsearch proxy${COLOR_NC}\n"
 kpk 9200 > /dev/null 2>&1
