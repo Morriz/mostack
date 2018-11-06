@@ -1,6 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  namespace: prod
   labels:
     app: api
     release: team-frontend-api-prod
@@ -8,6 +9,7 @@ metadata:
   name: team-frontend-api
 spec:
   jobLabel: team-frontend-api-prod
+  namespace: prod
   selector:
     matchLabels:
       app: api

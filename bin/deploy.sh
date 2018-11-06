@@ -8,6 +8,7 @@ shopt -s expand_aliases
 hs flux \
 --set rbac.create=true \
 --set helmOperator.create=true \
---set git.url=ssh://git@github.com:Morriz/mostack \
+--set git.url=ssh://git@github.com/morriz/mostack \
 --set git.branch=gitops \
+--set git.ciSkip=true \
 charts/flux
