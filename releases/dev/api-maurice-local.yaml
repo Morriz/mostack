@@ -1,0 +1,17 @@
+apiVersion: helm.integrations.flux.weave.works/v1alpha2
+kind: FluxHelmRelease
+metadata:
+  name: team-backend-api-maurice-local
+  namespace: dev
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.chart-image: glob:maurice-local-*
+spec:
+  namespace: dev
+  chartGitPath: api
+  releaseName: team-backend-api-maurice-local
+  valueFileSecrets:
+  - name: api.maurice-local-secrets
+  values:
+    image:
+      tag: maurice-local-ac88264dcef92a59e1a0cd8538a918012802fbdf

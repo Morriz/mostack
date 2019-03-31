@@ -1,0 +1,107 @@
+prometheusOperator:
+  createCustomResource: false
+defaultRules:
+  create: false
+kubeApiServer:
+  enabled: false
+kubelet:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+coreDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+nodeExporter:
+  enabled: false
+prometheus:
+  rules:
+    value:
+      - name: team-backend-rules
+        rules:
+          - alert: BackendApiStgDown
+            expr: absent(up{job="team-backend-api-stg-api"}) or (count(up{job="team-backend-api-stg-api"} == 1) BY (cluster) == 0)
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              description: There is no running backend api in staging. Deployments and replication controllers are not making progress.
+              summary: Staging backend API is down
+          - alert: BackendApiProdDown
+            expr: absent(up{job="team-backend-api-prod-api"}) or (count(up{job="team-backend-api-prod-api"} == 1) BY (cluster) == 0)
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              description: There is no running backend api in production. Deployments and replication controllers are not making progress.
+              summary: Production backend API is down
+  externalUrl: http://127.0.0.1:9190
+  additionalServiceMonitors:
+    - name: api-prod
+      additionalLabels:
+        prometheus: prometheus-operator-team-b-prometheus
+      selector:
+        matchLabels:
+          app: api
+          release: team-backend-api-prod
+      endpoints:
+        - port: http
+          interval: 30s
+          path: /metrics
+      namespaceSelector:
+        matchNames:
+        - team-backend
+    - name: api-stg
+      additionalLabels:
+        prometheus: prometheus-operator-team-b-prometheus
+      selector:
+        matchLabels:
+          app: api
+          release: team-backend-api-stg
+      endpoints:
+        - port: http
+          interval: 30s
+          path: /metrics
+      namespaceSelector:
+        matchNames:
+        - team-backend
+alertmanager:
+  config:
+    global:
+      slack_api_url: https://hooks.slack.com/services/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
+    route:
+      receiver: default-receiver
+      repeat_interval: 3h
+      routes:
+        - match:
+            alertname: DeadMansSwitch
+          repeat_interval: 5m
+          receiver: deadmansswitch
+    receivers:
+      - name: deadmansswitch
+      - name: default-receiver
+        slack_configs:
+          - channel: "#monitoring-backend"
+            send_resolved: true
+  externalUrl: http://127.0.0.1:9193
+grafana:
+  enabled: false
+  adminPassword: {{TB_GRAFANA_PASSWORD}}
+  defaultDashboardsEnabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      ingress.kubernetes.io/rewrite-target: /
+      ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - grafana.tb.{{CLUSTER_HOST}}
+    tls:
+      - secretName: grafana-tb-tls
+        hosts:
+          - grafana.tb.{{CLUSTER_HOST}}

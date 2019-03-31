@@ -1,0 +1,15 @@
+apiVersion: helm.integrations.flux.weave.works/v1alpha2
+kind: FluxHelmRelease
+metadata:
+  name: prometheus-operator-team-backend
+  namespace: team-backend
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.chart-image: semver:~0.1
+spec:
+  namespace: team-backend
+  chartGitPath: prometheus-operator
+  releaseName: prometheus-operator-team-backend
+  valueFileSecrets:
+  - name: prometheus-operator-secrets
+  values: {}

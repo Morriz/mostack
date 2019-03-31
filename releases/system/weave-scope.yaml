@@ -9,7 +9,4 @@ metadata:
 spec:
   namespace: system
   chartGitPath: weave-scope
-  values:
-    global:
-      image:
-        tag: "1.9.1"
+  values: {}

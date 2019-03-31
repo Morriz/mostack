@@ -10,4 +10,4 @@ spec:
   namespace: system
   chartGitPath: rook
   releaseName: rook
-  values:
+  values: {}

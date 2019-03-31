@@ -10,5 +10,6 @@ spec:
   namespace: monitoring
   chartGitPath: prometheus-operator
   releaseName: prometheus-operator
-  values:
-    rbacEnable: true
+  valueFileSecrets:
+  - name: prometheus-operator-secrets
+  values: {}

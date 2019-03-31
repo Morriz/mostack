@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-root=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
-. $root/bin/colors.sh
-shopt -s expand_aliases
-. $root/bin/aliases
-. $root/secrets/local.sh
-. $root/.env.sh
-
 local_ip=127.0.0.1
 
 sudo killall ssh > /dev/null 2>&1

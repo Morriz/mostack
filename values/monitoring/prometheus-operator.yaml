@@ -1,0 +1,76 @@
+kubeControllerManager:
+  service:
+    selector: 
+      component: kube-controller-manager
+coreDns:
+  service:
+    selector: 
+      component: kube-dns
+kubeEtcd:
+  service:
+    selector: 
+      component: etcd-server
+kubeScheduler:
+  service:
+    selector: 
+      component: kube-scheduler
+prometheus:
+  externalUrl: http://127.0.0.1:9090
+  additionalServiceMonitors:
+    - name: prometheus-operator-grafana
+      additionalLabels:
+        prometheus: prometheus-operator-prometheus
+      selector:
+        matchLabels:
+          app: grafana
+      endpoints:
+        - port: service
+          interval: 30s
+          path: /metrics
+    - name: nginx-ingress
+      additionalLabels:
+        prometheus: prometheus-operator-prometheus
+      selector:
+        matchLabels:
+          app: nginx-ingress
+      endpoints:
+        - port: stats
+          interval: 30s
+          path: /metrics
+      namespaceSelector:
+        matchNames:
+        - system
+alertmanager:
+  config:
+    global:
+      slack_api_url: https://hooks.slack.com/services/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
+    route:
+      receiver: default-receiver
+      repeat_interval: 3h
+      routes:
+        - match:
+            alertname: DeadMansSwitch
+          repeat_interval: 5m
+          receiver: deadmansswitch
+    receivers:
+      - name: deadmansswitch
+      - name: default-receiver
+        slack_configs:
+          - channel: "#monitoring-platform"
+            send_resolved: true
+  externalUrl: http://127.0.0.1:9093
+grafana:
+  adminPassword: {{GRAFANA_PASSWORD}}
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      ingress.kubernetes.io/rewrite-target: /
+      ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - grafana.{{CLUSTER_HOST}}
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.{{CLUSTER_HOST}}

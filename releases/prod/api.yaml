@@ -1,21 +1,17 @@
 apiVersion: helm.integrations.flux.weave.works/v1alpha2
 kind: FluxHelmRelease
 metadata:
-  name: team-frontend-api-prod
+  name: team-backend-api-prod
   namespace: prod
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1
+    flux.weave.works/tag.chart-image: glob:prod-*
 spec:
   namespace: prod
   chartGitPath: api
-  releaseName: team-frontend-api-prod
+  releaseName: team-backend-api-prod
+  valueFileSecrets:
+  - name: api-secrets
   values:
-    image: reg.dev.idiotz.nl/api:latest
-    ingress:
-      tls: true
-      hostname: api.dev.idiotz.nl
-      certmanager.k8s.io/cluster-issuer: letsencrypt-production
-    autoscaler:
-      maxReplicas: 10
-      targetCPUUtilizationPercentage: 50
+    image:
+      tag: prod-e50be0170a6b8caa35a1229f9fcaf232b60220b3

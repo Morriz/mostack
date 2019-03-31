@@ -1,3 +1,5 @@
+ambassador:
+    enabled: true
 api:
     enabled: true
 cert-manager:
@@ -21,7 +23,7 @@ kubernetes-dashboard:
 metrics-server:
     enabled: true
 nginx-ingress:
-    enabled: true
+    enabled: false
 prometheus-operator:
     enabled: true
 rook:

@@ -1,0 +1,17 @@
+apiVersion: helm.integrations.flux.weave.works/v1alpha2
+kind: FluxHelmRelease
+metadata:
+  name: team-backend-api-stg
+  namespace: stg
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.chart-image: glob:stg-*
+spec:
+  namespace: stg
+  chartGitPath: api
+  releaseName: team-backend-api-stg
+  valueFileSecrets:
+  - name: api-secrets
+  values:
+    image:
+      tag: stg-e50be0170a6b8caa35a1229f9fcaf232b60220b3

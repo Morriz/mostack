@@ -17,6 +17,8 @@ spec:
         app: {{ .Chart.Name | quote }}
         release: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecrets }}
       containers:
         - name: {{ .Chart.Name }}
           image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'

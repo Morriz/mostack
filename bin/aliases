@@ -5,7 +5,7 @@ alias km="k -n monitoring"
 alias kis="k -n istio-system"
 alias kl="k -n logging"
 alias kt="k -n tiller"
-alias ktf="k -n team-frontend"
+alias ktb="k -n team-backend"
 alias ka="kubectl --all-namespaces=true"
 alias kaa="ka get po,rs,job,deploy,ds,statefulset,svc"
 alias kap="ka get po"
@@ -14,8 +14,12 @@ alias kcv="k config view"
 alias kcg="k config view | grep 'current-context:' | sed -n -e 's/^.*current-context: //p'"
 alias kcu="k config use-context"
 alias kp="k proxy &"
-alias h="helm --tiller-namespace=kube-system"
-alias hi="h upgrade --install --force"
+alias h="helm --tls --tls-verify \
+  --tls-ca-cert ./tls/ca.pem \
+  --tls-cert ./tls/flux-helm-operator.pem \
+  --tls-key ./tls/flux-helm-operator-key.pem \
+  --tls-hostname tiller-deploy.kube-system"
+alias hi="h upgrade --install"
 alias hk="h delete --purge"
 alias kk="killall kubectl"
 alias mkk="killall ngrok; kk; killall fswatch; sudo killall ssh"
@@ -24,7 +28,7 @@ alias mkd="bin/backup-images.sh; mkk; minikube delete"
 function kpk() { ps aux|grep "$@" | awk '{print $2}' | xargs kill; }
 function kad() { k delete "$@" --all; }
 function kadnp() {
-  for ns in default kube-system system monitoring logging team-frontend; do
+  for ns in default kube-system system monitoring logging team-backend; do
     kad networkpolicy -n $ns
   done
 }
@@ -40,6 +44,6 @@ function hs() { hi --namespace=system "$@"; }
 function hm() { hi --namespace=monitoring "$@"; }
 function his() { hi --namespace=istio-system "$@"; }
 function hl() { hi --namespace=logging "$@"; }
-function htf() { hi --namespace=team-frontend "$@"; }
+function htb() { hi --namespace=team-backend "$@"; }
 
 function ifTls() { [ "$TLS_ENABLE" == "true" ] && print s; }

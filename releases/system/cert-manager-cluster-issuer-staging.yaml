@@ -10,6 +10,6 @@ spec:
   namespace: system
   chartGitPath: cert-manager-cluster-issuer
   releaseName: cert-manager-cluster-issuer-staging
-  values:
-    email: morriz@idiotz.nl
-    stage: staging # production
+  valueFileSecrets:
+  - name: cert-manager-cluster-issuer-staging-secrets
+  values: {}

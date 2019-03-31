@@ -1,0 +1,3 @@
+global:
+  image:
+    tag: "1.9.1"

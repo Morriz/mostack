@@ -10,27 +10,6 @@ spec:
   namespace: system
   chartGitPath: nginx-ingress
   releaseName: nginx-ingress
-  values:
-    rbac:
-      create: true
-    controller:
-      config:
-        ssl-redirect: "true"
-        hsts: "true"
-        disable-ipv6: "true"
-      stats:
-        enabled: true
-      hostNetwork: true
-      service:
-        type: ClusterIP
-        # nodePorts:
-        #   http: 32080
-        #   https: 32443
-
-      # resources:
-      #    limits:
-      #      cpu: 100m
-      #      memory: 64Mi
-      #    requests:
-      #      cpu: 100m
-      #      memory: 64Mi
+  valueFileSecrets:
+  - name: nginx-ingress-secrets
+  values: {}

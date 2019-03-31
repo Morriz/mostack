@@ -1,0 +1,10 @@
+apiVersion: v1
+description: All of the kubernetes services in one GitOps repo
+engine: gotpl
+maintainers:
+- email: morriz@idiotz.nl
+  name: Maurice Faber
+name: mostack
+sources:
+- https://github.com/morriz/mostack
+version: 0.1.0

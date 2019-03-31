@@ -1,0 +1,11 @@
+replicaCount: 1
+autoscaler:
+  maxReplicas: 2
+image:
+  repository: {{REGISTRY_HOST}}/api
+  pullSecrets: regcred-api
+  pullPolicy: IfNotPresent
+ingress:
+  tls: true
+  hostname: api.stg.{{CLUSTER_HOST}}
+  certmanager.k8s.io/cluster-issuer: letsencrypt-staging
