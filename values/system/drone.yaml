@@ -1,6 +1,19 @@
 ingress:
-  hostname: drone.{{CLUSTER_HOST}}
-  tls: {{TLS_ENABLE}}
+  enabled: true
+  hosts:
+    - drone.{{CLUSTER_HOST}}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  tls:
+    - secretName: drone-tls
+      hosts:
+        - reg.{{CLUSTER_HOST}}
+sourceControl:
+  github:
+      clientID: {{DRONE_GITHUB_CLIENT}}
+      clientSecretKey: {{DRONE_GITHUB_SECRET}}
+      server: https://github.com        
 server:
   env:
     DRONE_DEBUG: false
@@ -8,10 +21,9 @@ server:
     DRONE_DATABASE_DRIVER: sqlite3
     DRONE_DATABASE_DATASOURCE: /var/lib/drone/drone.sqlite
     DRONE_GITHUB_SKIP_VERIFY: true
+    DRONE_PROVIDER: github
     DRONE_GITHUB: true
     DRONE_ADMIN: {{DRONE_ADMIN}}
-    DRONE_GITHUB_CLIENT: {{DRONE_GITHUB_CLIENT}}
-    DRONE_GITHUB_SECRET: {{DRONE_GITHUB_SECRET}}
     DRONE_PROMETHEUS_AUTH_TOKEN: {{DRONE_AUTH_TOKEN}}
 agent:
   env:
@@ -22,4 +34,6 @@ persistentVolume:
   existingClaim: fast-pvc
 rbac:
   create: false # we will give `drone-deploy' roles to the teams
-prometheus: prometheus
+metrics:
+  prometheus:
+    enabled: true

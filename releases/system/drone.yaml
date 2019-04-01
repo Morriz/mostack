@@ -5,7 +5,8 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~2.0.0
+    flux.weave.works/tag.server: semver:~1.0.0
+    flux.weave.works/tag.agent: semver:~1.0.0
 spec:
   releaseName: drone
   chart:

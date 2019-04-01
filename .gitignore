@@ -5,4 +5,4 @@
 .vagrant
 secrets/*.sh
 !secrets/sample.sh
-minidata
+values.tmp

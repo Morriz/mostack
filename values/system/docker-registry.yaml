@@ -5,7 +5,14 @@ localproxy:
   enabled: false # {{NOTISMINIKUBE}}
 ingress:
   enabled: true
-  tls: true
-  hostname: reg.{{CLUSTER_HOST}}
+  hosts:
+    - reg.{{CLUSTER_HOST}}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  tls:
+    - secretName: docker-registry-tls
+      hosts:
+        - reg.{{CLUSTER_HOST}}
 persistentVolume:
   existingClaim: slow-pvc
