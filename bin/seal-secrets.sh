@@ -2,7 +2,7 @@
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)
 . bin/colors.sh
 . ./.env.sh
-provider=${1:-'gce'}
+provider=${1:-'local'}
 . secrets/${provider}.sh
 
 kubeseal --fetch-cert \
