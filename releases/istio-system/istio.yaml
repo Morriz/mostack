@@ -13,5 +13,5 @@ spec:
     name: istio
     version: 1.1.0
   valueFileSecrets:
-  - name: istio-secrets
+  - name: istio-values
   values: {}

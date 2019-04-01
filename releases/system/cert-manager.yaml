@@ -13,5 +13,5 @@ spec:
     name: cert-manager
     version: v0.6.6
   valueFileSecrets:
-  - name: cert-manager-secrets
+  - name: cert-manager-values
   values: {}

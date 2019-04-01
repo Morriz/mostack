@@ -5,7 +5,7 @@
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)
 . $root/bin/colors.sh
 . ./.env.sh
-provider=${1:-'gce'}
+provider=${1:-'local'}
 . $root/secrets/${provider}.sh
 
 rm -rf $root/values/_tmp >/dev/null 2>&1

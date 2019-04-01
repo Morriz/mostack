@@ -14,5 +14,5 @@ spec:
     ref: master
   chartFitPTH: elk
   valueFileSecrets:
-  - name: elk-secrets
+  - name: elk-values
   values: {}

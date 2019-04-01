@@ -13,5 +13,5 @@ spec:
     name: docker-registry
     version: 1.7.0
   valueFileSecrets:
-  - name: docker-registry-secrets
+  - name: docker-registry-values
   values: {}

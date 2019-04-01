@@ -8,27 +8,23 @@ ingress:
   tls:
     - secretName: drone-tls
       hosts:
-        - reg.{{CLUSTER_HOST}}
+        - drone.{{CLUSTER_HOST}}
 sourceControl:
+  provider: github
+  secret: drone-server-secret
   github:
-      clientID: {{DRONE_GITHUB_CLIENT}}
-      clientSecretKey: {{DRONE_GITHUB_SECRET}}
-      server: https://github.com        
+    clientID: {{DRONE_GITHUB_CLIENT}}
+    server: https://github.com        
 server:
+  host: drone.{{CLUSTER_HOST}}  
+  adminUser: {{DRONE_ADMIN}}
   env:
+    DRONE_RPC_SECRET: {{DRONE_SECRET}}
     DRONE_DEBUG: false
-    DRONE_OPEN: true
     DRONE_DATABASE_DRIVER: sqlite3
     DRONE_DATABASE_DATASOURCE: /var/lib/drone/drone.sqlite
     DRONE_GITHUB_SKIP_VERIFY: true
-    DRONE_PROVIDER: github
-    DRONE_GITHUB: true
-    DRONE_ADMIN: {{DRONE_ADMIN}}
     DRONE_PROMETHEUS_AUTH_TOKEN: {{DRONE_AUTH_TOKEN}}
-agent:
-  env:
-    DRONE_DEBUG: false
-shared_secret: {{DRONE_SECRET}}
 persistentVolume:
   enabled: true
   existingClaim: fast-pvc

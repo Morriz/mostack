@@ -14,5 +14,5 @@ spec:
     name: prometheus-operator
     version: 5.0.3
   valueFileSecrets:
-  - name: prometheus-operator-secrets
+  - name: prometheus-operator-values
   values: {}
