@@ -10,12 +10,12 @@ metadata:
 spec:
   releaseName: drone
   chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/api
-    ref: master
-    # repository: https://kubernetes-charts.storage.googleapis.com
-    # name: drone
-    # version: 2.0.0-rc.8
+    # git: git@github.com:Morriz/mostack
+    # path: charts/api
+    # ref: master
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: drone
+    version: 2.0.0-rc.8
   valueFileSecrets:
     - name: drone-values
   values: {}
