@@ -11,7 +11,7 @@ ingress:
         - drone.{{CLUSTER_HOST}}
 sourceControl:
   provider: github
-  secret: drone-server-secret
+  secret: drone-server-secrets
   github:
     clientID: {{DRONE_GITHUB_CLIENT}}
     server: https://github.com        
