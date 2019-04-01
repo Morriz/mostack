@@ -1,0 +1,10 @@
+replicaCount: 1
+autoscaler:
+  maxReplicas: 1
+image:
+  repository: {{REGISTRY_HOST}}/api
+  # pullSecrets: regcred-api
+ingress:
+  tls: true
+  hostname: api.morriz-local.{{CLUSTER_HOST}}
+  certmanager.k8s.io/cluster-issuer: letsencrypt-staging
