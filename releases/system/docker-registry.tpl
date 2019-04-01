@@ -1,5 +1,5 @@
-apiVersion: helm.integrations.flux.weave.works/v1alpha2
-kind: FluxHelmRelease
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
 metadata:
   name: docker-registry
   namespace: system
@@ -7,9 +7,11 @@ metadata:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.2.2
 spec:
-  namespace: system
-  chartGitPath: docker-registry
   releaseName: docker-registry
+  chart:
+    git: git@github.com:Morriz/mostack
+    path: charts/docker-registry
+    ref: master
   valueFileSecrets:
-  - name: drone-secrets
+  - name: docker-registry-secrets
   values: {}

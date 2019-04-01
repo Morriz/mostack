@@ -1,2 +1,2 @@
-email: devops@yourdoma.in
+email: {{LETSENCRYPT_EMAIL}}
 stage: staging # production

@@ -1,5 +1,5 @@
-apiVersion: helm.integrations.flux.weave.works/v1alpha2
-kind: FluxHelmRelease
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
 metadata:
   name: metrics-server
   namespace: kube-system
@@ -7,9 +7,11 @@ metadata:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.1
 spec:
-  namespace: kube-system
-  chartGitPath: metrics-server
   releaseName: metrics-server
+  chart:
+    git: git@github.com:Morriz/mostack
+    path: charts/metrics-server
+    ref: master
   values:
     args:
       - --source=kubernetes.summary_api:''

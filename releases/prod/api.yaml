@@ -1,5 +1,5 @@
-apiVersion: helm.integrations.flux.weave.works/v1alpha2
-kind: FluxHelmRelease
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
 metadata:
   name: team-backend-api-prod
   namespace: prod
@@ -7,9 +7,11 @@ metadata:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: glob:prod-*
 spec:
-  namespace: prod
-  chartGitPath: api
   releaseName: team-backend-api-prod
+  chart:
+    git: git@github.com:Morriz/mostack
+    path: charts/api
+    ref: master
   valueFileSecrets:
   - name: api-secrets
   values:

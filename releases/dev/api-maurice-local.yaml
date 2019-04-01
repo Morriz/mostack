@@ -1,5 +1,5 @@
-apiVersion: helm.integrations.flux.weave.works/v1alpha2
-kind: FluxHelmRelease
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
 metadata:
   name: team-backend-api-maurice-local
   namespace: dev
@@ -8,8 +8,11 @@ metadata:
     flux.weave.works/tag.chart-image: glob:maurice-local-*
 spec:
   namespace: dev
-  chartGitPath: api
   releaseName: team-backend-api-maurice-local
+  chart:
+    git: git@github.com:Morriz/mostack
+    path: charts/api
+    ref: master
   valueFileSecrets:
   - name: api.maurice-local-secrets
   values:

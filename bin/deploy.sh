@@ -8,17 +8,17 @@ helm --namespace=system upgrade --install --force flux \
     --tls-cert ./tls/flux-helm-operator.pem \
     --tls-key ././tls/flux-helm-operator-key.pem \
     --tls-hostname tiller-deploy.kube-system \
-    --set image.tag=1.8.1 \
     --set rbac.create=true \
     --set helmOperator.create=true \
     --set helmOperator.tls.enable=true \
     --set helmOperator.tls.verify=true \
     --set helmOperator.tls.secretName=helm-client \
     --set helmOperator.tls.caContent="$(cat ./tls/ca.pem)" \
-    --set git.url=ssh://git@github.com/morriz/mostack.git \
+    --set git.url=git@github.com:Morriz/mostack \
     --set git.branch=${GIT_BRANCH:-master} \
     --set git.path=releases \
     --set git.ciSkip=true \
+    --set git.pollInterval=15s \
     weaveworks/flux
 
 export FLUX_POD=$(kubectl get pods --namespace system -l "app=flux,release=flux" -o jsonpath="{.items[0].metadata.name}")
@@ -41,7 +41,7 @@ When the pod/sealed-secrets-* in namespace adm is ready, we can seal our secrets
 
 sh bin/seal-secrets.sh
 
-Finally commit the changes in this repo and let The FluxHelmRelease operator do it's work.
+Finally commit the changes in this repo and let The HelmRelease operator do it's work.
 
 To prepare for disaster recovery you should backup the sealed-secrets controller private key with:
 

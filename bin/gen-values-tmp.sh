@@ -8,23 +8,23 @@ root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)
 provider=${1:-'gce'}
 . $root/secrets/${provider}.sh
 
-rm -rf v$root/alues/_tmp > /dev/null 2>&1
-mkdir $root/values/_tmp > /dev/null
+rm -rf $root/values/_tmp >/dev/null 2>&1
+mkdir $root/values/_tmp >/dev/null
 
 parseFiles() {
   for f in "$@"; do
     ns=$(dirname $f)
     echo generating values.tmp/$f
-    mkdir _tmp/$ns > /dev/null 2>&1
-    cat $f | mo > _tmp/$f
+    mkdir _tmp/$ns >/dev/null 2>&1
+    cat $f | mo >_tmp/$f
   done
 }
 
 printf "${COLOR_WHITE}GENERATING TMP VALUE FILES:${COLOR_NC}\n"
 
-cd $root/values > /dev/null
+cd $root/values >/dev/null
 baseFiles=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
 parseFiles $baseFiles
-cd - > /dev/null
+cd - >/dev/null
 rm -rf values.tmp
 mv $root/values/_tmp $root/values.tmp

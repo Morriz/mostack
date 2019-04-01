@@ -11,9 +11,9 @@ controller:
   service:
     type: {{NGINX_SERVICE_TYPE}}
     loadBalancerIP: {{LOAD_BALANCER_IP}}
-    # nodePorts:
-    #   http: 32080
-    #   https: 32443
+    nodePorts:
+      http: 32080
+      https: 32443
 
   # resources:
   #    limits:

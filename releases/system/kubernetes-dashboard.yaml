@@ -1,5 +1,5 @@
-apiVersion: helm.integrations.flux.weave.works/v1alpha2
-kind: FluxHelmRelease
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
 metadata:
   name: kubernetes-dashboard
   namespace: system
@@ -7,9 +7,11 @@ metadata:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.7.2
 spec:
-  namespace: system
-  chartGitPath: kubernetes-dashboard
   releaseName: kubernetes-dashboard
+  chart:
+    git: git@github.com:Morriz/mostack
+    path: charts/kubernetes-dashboard
+    ref: master
   valueFileSecrets:
   - name: kubernetes-dashboard-secrets
   values: {}

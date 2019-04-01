@@ -1,5 +1,5 @@
-apiVersion: helm.integrations.flux.weave.works/v1alpha2
-kind: FluxHelmRelease
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
 metadata:
   name: weave-scope
   namespace: system
@@ -7,6 +7,9 @@ metadata:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.9.3
 spec:
-  namespace: system
-  chartGitPath: weave-scope
+  releaseName: weave-scope
+  chart:
+    git: git@github.com:Morriz/mostack
+    path: charts/weave-scope
+    ref: master
   values: {}
