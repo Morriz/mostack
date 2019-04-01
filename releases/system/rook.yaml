@@ -5,11 +5,11 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1
+    flux.weave.works/tag.chart-image: glob:v0.9.*
 spec:
   releaseName: rook
   chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/rook
-    ref: master
+    repository: https://charts.rook.io/stable
+    name: rook-stable/rook-ceph
+    version: v0.9.3
   values: {}

@@ -20,6 +20,7 @@ k apply -f k8s/rbac/tiller.yaml
 # help calico: add extra namespace label for kube-system
 k label namespace kube-system name=kube-system
 k label namespace default name=default
+k create ns system
 
 if [ "$CLUSTERTYPE" == "minikube" ]; then
 	printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"

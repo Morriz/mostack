@@ -12,6 +12,7 @@ spec:
     git: git@github.com:Morriz/mostack
     path: charts/elk
     ref: master
+  chartFitPTH: elk
   valueFileSecrets:
   - name: elk-secrets
   values: {}

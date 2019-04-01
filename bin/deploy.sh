@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 helm repo add weaveworks https://weaveworks.github.io/flux
+helm repo add rook-stable https://charts.rook.io/stable
+helm repo add istio.io https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
 helm repo update
 helm --namespace=system upgrade --install --force flux \
     --tls --tls-verify \

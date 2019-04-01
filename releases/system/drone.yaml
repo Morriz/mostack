@@ -5,13 +5,13 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1
+    flux.weave.works/tag.chart-image: semver:~2.0.0
 spec:
   releaseName: drone
   chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/drone
-    ref: master
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: drone
+    version: 2.0.0-rc.8
   valueFileSecrets:
-  - name: drone
+  - name: drone-secrets
   values: {}

@@ -5,13 +5,13 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.7.2
+    flux.weave.works/tag.chart-image: glob:v1.10.*
 spec:
   releaseName: kubernetes-dashboard
   chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/kubernetes-dashboard
-    ref: master
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: kubernetes-dashboard
+    version: 1.4.0
   valueFileSecrets:
   - name: kubernetes-dashboard-secrets
   values: {}

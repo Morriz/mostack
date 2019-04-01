@@ -3,7 +3,8 @@ autoscaler:
   maxReplicas: 20
 image:
   repository: {{REGISTRY_HOST}}/api
-  pullSecrets: regcred-api
+  # pullSecrets: regcred-api
+  pullPolicy: IfNotPresent
 ingress:
   tls: true
   hostname: api.prod.{{CLUSTER_HOST}}

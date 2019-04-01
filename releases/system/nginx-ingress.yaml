@@ -5,13 +5,13 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1
+    flux.weave.works/tag.chart-image: semver:~0.23.0
 spec:
   releaseName: nginx-ingress
   chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/nginx-ingress
-    ref: master
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: nginx-ingress
+    version: 1.4.0
   valueFileSecrets:
   - name: nginx-ingress-secrets
   values: {}

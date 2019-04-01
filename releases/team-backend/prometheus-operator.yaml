@@ -5,13 +5,14 @@ metadata:
   namespace: team-backend
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1
+    flux.weave.works/tag.prometheus-operator: glob:0.29.*
+    flux.weave.works/tag.alertmanager: glob:v0.15.*
 spec:
   releaseName: prometheus-operator-team-backend
   chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/prometheus-operator
-    ref: master
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: prometheus-operator
+    version: 5.0.3
   valueFileSecrets:
   - name: prometheus-operator-secrets
   values: {}
