@@ -18,9 +18,8 @@ kpk 32080 >/dev/null 2>&1
 ks port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
 # ks port-forward $(ks get po --selector=app=ambassador --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
 
-if [ "$ISLOCAL" ]; then
+if [ "$provider" = "local" ]; then
 	printf "${COLOR_BLUE}Starting tunnels to allow cert manager ingress${COLOR_NC}\n"
-	sh $root/bin/tunnel-to-ingress.sh
 	sh $root/bin/ngrok.sh
 fi
 

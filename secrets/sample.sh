@@ -23,7 +23,7 @@ export REGISTRY_HOST="localhost:5000"
 
 export RBAC_ENABLE=true
 export TLS_ENABLE=true
-if [ "$TLS_ENABLE" == "true" ]; then
+if [ "$TLS_ENABLE" = "true" ]; then
     TLSS=s
     export TLS_DISABLE=false
     export DRONE_GITHUB_CLIENT_ID=''     # your.doma.in secure

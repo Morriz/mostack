@@ -23,7 +23,7 @@ k label namespace default name=default
 k create ns adm
 k create ns system
 
-if [ "$CLUSTERTYPE" == "minikube" ]; then
+if [ "$CLUSTERTYPE" = "minikube" ]; then
 	printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"
 	k apply -f k8s/calico-kdd/rbac.yaml
 	k apply -f k8s/calico-kdd/calico.yaml

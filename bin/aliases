@@ -46,4 +46,4 @@ function his() { hi --namespace=istio-system "$@"; }
 function hl() { hi --namespace=logging "$@"; }
 function htb() { hi --namespace=team-backend "$@"; }
 
-function ifTls() { [ "$TLS_ENABLE" == "true" ] && print s; }
+function ifTls() { [ "$TLS_ENABLE" = "true" ] && print s; }

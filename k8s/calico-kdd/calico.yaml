@@ -717,14 +717,14 @@ spec:
       labels:
         k8s-app: calico-kube-controllers
     spec:
-      nodeSelector:
-        beta.kubernetes.io/os: linux
+      # nodeSelector:
+      #   beta.kubernetes.io/os: linux
       tolerations:
         # Mark the pod as a critical add-on for rescheduling.
         - key: CriticalAddonsOnly
           operator: Exists
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
+        # - key: node-role.kubernetes.io/master
+        #   effect: NoSchedule
       serviceAccountName: calico-kube-controllers 
       containers:
         - name: calico-kube-controllers
