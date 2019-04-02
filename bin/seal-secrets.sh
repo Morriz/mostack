@@ -17,11 +17,10 @@ parseFiles() {
     ns=$(dirname $f)
     package=$(basename $f | rev | cut -c 6- | rev)
     echo sealing $type/$f
-    mkdir -p /tmp/$ns
     if [ "$type" = "values" ]; then
-      cat $f | mo >/tmp/$ns/$package-$type.yaml
-      kubectl -n $ns create secret generic $package-$type --from-file=/tmp/$ns/$package-$type.yaml --dry-run -o yaml | kubeseal --format=yaml --cert=$root/pub-cert.pem - >$root/releases/$ns/$package-$type.yaml
-      rm /tmp/$ns/$package-$type.yaml
+      cat $f | mo >/tmp/values.yaml
+      kubectl -n $ns create secret generic $package-$type --from-file=/tmp/values.yaml --dry-run -o yaml | kubeseal --format=yaml --cert=$root/pub-cert.pem - >$root/releases/$ns/$package-$type.yaml
+      rm /tmp/values.yaml
     else
       cat $f | mo | kubeseal --format=yaml --cert=$root/pub-cert.pem - >$root/releases/$ns/$package-$type.yaml
     fi

@@ -1,3 +1,5 @@
+prometheusOperator:
+  createCustomResource: false
 kubeControllerManager:
   service:
     selector: 
@@ -17,16 +19,16 @@ kubeScheduler:
 prometheus:
   externalUrl: http://127.0.0.1:9090
   additionalServiceMonitors:
-    - name: prometheus-operator-grafana
-      additionalLabels:
-        prometheus: prometheus-operator-prometheus
-      selector:
-        matchLabels:
-          app: grafana
-      endpoints:
-        - port: service
-          interval: 30s
-          path: /metrics
+    # - name: prometheus-operator-grafana
+    #   additionalLabels:
+    #     prometheus: prometheus-operator-prometheus
+    #   selector:
+    #     matchLabels:
+    #       app: grafana
+    #   endpoints:
+    #     - port: service
+    #       interval: 30s
+    #       path: /metrics
     - name: nginx-ingress
       additionalLabels:
         prometheus: prometheus-operator-prometheus

@@ -16,8 +16,8 @@ sourceControl:
     clientID: {{DRONE_GITHUB_CLIENT}}
     server: https://github.com        
 server:
-  host: drone.{{CLUSTER_HOST}}  
-  protocol: https
+  # host: drone.{{CLUSTER_HOST}}  
+  # protocol: https
   adminUser: {{DRONE_ADMIN}}
   env:
     DRONE_RPC_SECRET: {{DRONE_SECRET}}
