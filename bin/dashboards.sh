@@ -4,7 +4,7 @@ root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)
 shopt -s expand_aliases
 . $root/bin/aliases
 
-provider=${1:-'gce'}
+provider=${1:-'local'}
 . $root/secrets/${provider}.sh
 
 printf "${COLOR_WHITE}Starting SYSTEM app proxies${COLOR_NC}\n"
