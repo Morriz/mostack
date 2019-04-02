@@ -18,7 +18,7 @@ kubeScheduler:
       component: kube-scheduler
 prometheus:
   externalUrl: http://127.0.0.1:9090
-  additionalServiceMonitors:
+  # additionalServiceMonitors:
     # - name: prometheus-operator-grafana
     #   additionalLabels:
     #     prometheus: prometheus-operator-prometheus
@@ -29,19 +29,19 @@ prometheus:
     #     - port: service
     #       interval: 30s
     #       path: /metrics
-    - name: nginx-ingress
-      additionalLabels:
-        prometheus: prometheus-operator-prometheus
-      selector:
-        matchLabels:
-          app: nginx-ingress
-      endpoints:
-        - port: stats
-          interval: 30s
-          path: /metrics
-      namespaceSelector:
-        matchNames:
-        - system
+    # - name: nginx-ingress
+    #   additionalLabels:
+    #     prometheus: prometheus-operator-prometheus
+    #   selector:
+    #     matchLabels:
+    #       app: nginx-ingress
+    #   endpoints:
+    #     - port: stats
+    #       interval: 30s
+    #       path: /metrics
+    #   namespaceSelector:
+    #     matchNames:
+    #     - system
 alertmanager:
   config:
     global:

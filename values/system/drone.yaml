@@ -3,7 +3,7 @@ ingress:
   hosts:
     - drone.{{CLUSTER_HOST}}
   annotations:
-    # kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
   tls:
     - secretName: drone-tls
@@ -20,7 +20,6 @@ server:
   protocol: https
   adminUser: {{DRONE_ADMIN}}
   env:
-    DRONE_TLS_AUTOCERT: true
     DRONE_OPEN: true
     DRONE_RPC_SECRET: {{DRONE_SECRET}}
     DRONE_LOGS_DEBUG: true
