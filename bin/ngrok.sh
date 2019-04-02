@@ -9,7 +9,7 @@ shopt -s expand_aliases
 which mo >/dev/null
 if [ $? -ne 0 ]; then
   echo "'mo' needs to be installed:"
-  echo "curl https://raw.githubusercontent.com/tests-always-included/mo/master/mo -o mo&& chmod u+x mo && mv mo /usr/local/bin"
+  echo "curl https://raw.githubusercontent.com/tests-always-included/mo/master/mo -o mo && chmod u+x mo && mv mo /usr/local/bin"
   exit 1
 fi
 

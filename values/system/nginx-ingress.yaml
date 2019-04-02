@@ -13,7 +13,7 @@ controller:
       enabled: true
       additionalLabels: # needed to be picked up by our one and only prometheus-operator:
         release: prometheus-operator
-  hostNetwork: true
+  # hostNetwork: true
   service:
     type: LoadBalancer
     loadBalancerIP: {{LOAD_BALANCER_IP}}

@@ -9,13 +9,13 @@ provider=${1:-'local'}
 
 printf "${COLOR_WHITE}Starting SYSTEM app proxies${COLOR_NC}\n"
 
-killall kubectl >/dev/null 2>&1
-k proxy &
+# killall kubectl >/dev/null 2>&1
+# k proxy &
 
-ks rollout status -w deploy/nginx-ingress-controller
-printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}\n"
-kpk 32080 >/dev/null 2>&1
-ks port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
+# ks rollout status -w deploy/nginx-ingress-controller
+# printf "${COLOR_BLUE}Forwarding local 32080,32443 to nginx controller${COLOR_NC}\n"
+# kpk 32080 >/dev/null 2>&1
+# ks port-forward $(ks get po --selector=app=nginx-ingress,component=controller --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
 # ks port-forward $(ks get po --selector=app=ambassador --output=jsonpath={.items..metadata.name}) 32080:80 32443:443 &
 
 if [ "$provider" = "local" ]; then
@@ -24,7 +24,7 @@ if [ "$provider" = "local" ]; then
 fi
 
 printf "${COLOR_PURPLE}[system] Waiting for necessary pods to become available${COLOR_BROWN}\n"
-ks rollout status -w deploy/weave-scope-frontend-system-weave-scope
+ks rollout status -w deploy/weave-scope-frontend-weave-scope
 kl rollout status -w deploy/elasticsearch
 km rollout status -w statefulset.apps/prometheus-prometheus-operator-prometheus
 km rollout status -w statefulset.apps/alertmanager-prometheus-operator-alertmanager
