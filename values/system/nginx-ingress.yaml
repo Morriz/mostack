@@ -11,6 +11,8 @@ controller:
     enabled: true
     serviceMonitor:
       enabled: true
+      additionalLabels: # needed to be picked up by our one and only prometheus-operator:
+        release: prometheus-operator
   hostNetwork: true
   service:
     type: LoadBalancer
