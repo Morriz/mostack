@@ -1,17 +1,17 @@
 apiVersion: flux.weave.works/v1beta1
 kind: HelmRelease
 metadata:
-  name: cert-manager-cluster-issuer-staging
+  name: cert-manager-cluster-issuer
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.1
 spec:
-  releaseName: cert-manager-cluster-issuer-staging
+  releaseName: cert-manager-cluster-issuer
   chart:
     git: git@github.com:Morriz/mostack
     path: charts/cert-manager-cluster-issuer
     ref: master
   valueFileSecrets:
-  - name: cert-manager-cluster-issuer-staging-values
+  - name: cert-manager-cluster-issuer-values
   values: {}

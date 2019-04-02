@@ -7,3 +7,4 @@ secrets/*.sh
 !secrets/sample.sh
 secrets.tmp
 values.tmp
+sealed-secrets-key.yaml
