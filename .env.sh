@@ -1,3 +1,2 @@
 export CLUSTERTYPE=minikube
-export NGINX_SERVICE_TYPE=NodePort
-export LOAD_BALANCER_IP=
+export LOAD_BALANCER_IP=192.168.99.100

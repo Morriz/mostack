@@ -9,11 +9,8 @@ controller:
     enabled: true
   hostNetwork: true
   service:
-    type: {{NGINX_SERVICE_TYPE}}
+    type: LoadBalancer
     loadBalancerIP: {{LOAD_BALANCER_IP}}
-    nodePorts:
-      http: 32080
-      https: 32443
 
   # resources:
   #    limits:

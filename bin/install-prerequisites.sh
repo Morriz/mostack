@@ -65,7 +65,9 @@ ksk rollout status -w deploy/tiller-deploy
 # fi
 
 printf "${COLOR_BLUE}[cluster] Installing needed CRDs${COLOR_NC}\n"
-ks apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.7/deploy/manifests/00-crds.yaml
+
+ks apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+k label namespace system certmanager.k8s.io/disable-validation="true"
 
 k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml
 k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheus.crd.yaml

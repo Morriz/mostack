@@ -8,23 +8,28 @@ root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)
 provider=${1:-'local'}
 . $root/secrets/${provider}.sh
 
-rm -rf $root/values/_tmp >/dev/null 2>&1
-mkdir $root/values/_tmp >/dev/null
-
 parseFiles() {
+  type=$1
+  shift
+  rm -rf $root/$type.tmp >/dev/null 2>&1
+  rm -rf /tmp/$type >/dev/null 2>&1
   for f in "$@"; do
     ns=$(dirname $f)
-    echo generating values.tmp/$f
-    mkdir _tmp/$ns >/dev/null 2>&1
-    cat $f | mo >_tmp/$f
+    echo generating $type.tmp/$f
+    mkdir -p /tmp/$type/$ns
+    cat $f | mo >/tmp/$type/$f
   done
 }
 
 printf "${COLOR_WHITE}GENERATING TMP VALUE FILES:${COLOR_NC}\n"
 
-cd $root/values >/dev/null
-baseFiles=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
-parseFiles $baseFiles
-cd - >/dev/null
-rm -rf values.tmp
-mv $root/values/_tmp $root/values.tmp
+cd values >/dev/null
+files=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
+parseFiles values $files
+cd ../secrets >/dev/null
+files=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
+parseFiles secrets $files
+cd .. >/dev/null
+
+mv /tmp/values $root/values.tmp
+mv /tmp/secrets $root/secrets.tmp

@@ -3,7 +3,7 @@ ingress:
   hosts:
     - drone.{{CLUSTER_HOST}}
   annotations:
-    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
   tls:
     - secretName: drone-tls
@@ -13,16 +13,17 @@ sourceControl:
   provider: github
   secret: drone-server-secrets
   github:
-    clientID: {{DRONE_GITHUB_CLIENT}}
+    clientID: {{DRONE_GITHUB_CLIENT_ID}}
     server: https://github.com        
 server:
   host: drone.{{CLUSTER_HOST}}  
   protocol: https
   adminUser: {{DRONE_ADMIN}}
   env:
+    DRONE_TLS_AUTOCERT: true
     DRONE_OPEN: true
     DRONE_RPC_SECRET: {{DRONE_SECRET}}
-    DRONE_DEBUG: false
+    DRONE_LOGS_DEBUG: true
     DRONE_DATABASE_DRIVER: sqlite3
     DRONE_DATABASE_DATASOURCE: /var/lib/drone/drone.sqlite
     DRONE_GITHUB_SKIP_VERIFY: true

@@ -1,5 +1,6 @@
 authtoken: {{NGROK_TOKEN}}
 log_level: debug
+console_ui: false
 log: stdout
 region: eu
 update: true
