@@ -79,4 +79,7 @@ k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/e
 k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml
 k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml
 
+if [ -f tls/server-key.pem ]; then
+	ks create secret generic flux-git-deploy --from-file=identity=tls/server-key.pem
+fi
 printf "${COLOR_WHITE}ALL DONE!${COLOR_NC}\n"

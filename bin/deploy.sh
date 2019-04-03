@@ -62,4 +62,4 @@ if [ -f sealed-secrets-key.yaml ]; then
     kubectl delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
 fi
 
-[ -n "$ISLOCAL" ] && bin/dashboards.sh
+[ -n "$ISLOCAL" ] && bin/ngrok.sh
