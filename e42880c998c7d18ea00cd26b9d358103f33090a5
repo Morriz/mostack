@@ -1,0 +1,1 @@
+{"jobID":"630618c2-64e5-f142-2df2-01d6a60d6357","spec":{"type":"policy","cause":{"Message":"","User":"Maurice Faber \u003cmorriz@idiotz.nl\u003e"},"spec":{"system:helmrelease/drone":{"add":{},"remove":{"automated":"true"}}}},"result":null}
