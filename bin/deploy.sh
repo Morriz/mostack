@@ -51,8 +51,9 @@ To restore from backup after a disaster, replace the newly-created secret and re
 
 k replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
 k delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
+
 EOF
-echo ""
+
 if [ -f sealed-secrets-key.yaml ]; then
     k replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
     k delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
@@ -60,9 +61,18 @@ fi
 ks delete secret flux-git-deploy
 ks create secret generic flux-git-deploy --from-file=identity=tls/server-key.pem
 ks delete pod -l app=flux
-echo ""
-echo "FINISHED DEPLOYING!"
-echo "If not done before then add the following public key in your repo's settings as deploy key:"
+
+echo <<"EOF"
+
+FINISHED DEPLOYING!
+
+If not done before then add the following public key in your repo's settings as deploy key:
+
 ks logs deployment/flux | grep identity.pub | cut -d '"' -f2
 
+And restart cert-manager when all deployments have come up to make sure it acquires certs:
+
+ks delete pod -l app=cert-manager
+
+EOF
 [ -n "$ISLOCAL" ] && bin/ngrok.sh
