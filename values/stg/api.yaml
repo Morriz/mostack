@@ -1,6 +1,7 @@
-replicaCount: 1
-autoscaler:
-  maxReplicas: 2
+annotations:
+  hpa.autoscaling.banzaicloud.io/minReplicas: "2"
+  hpa.autoscaling.banzaicloud.io/maxReplicas: "10"
+  cpu.hpa.autoscaling.banzaicloud.io/targetAverageUtilization: "60"
 image:
   repository: {{REGISTRY_HOST}}/api
   # pullSecrets: regcred-api
@@ -8,4 +9,6 @@ image:
 ingress:
   tls: true
   hostname: api.stg.{{CLUSTER_HOST}}
-  certmanager.k8s.io/cluster-issuer: letsencrypt-staging
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
