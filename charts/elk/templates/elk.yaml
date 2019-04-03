@@ -66,7 +66,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:6.6.2
+        image: docker.elastic.co/beats/filebeat:6.3.2
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
@@ -414,7 +414,7 @@ spec:
           privileged: true
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.6.2
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
         imagePullPolicy: IfNotPresent
         # workarounds until https://github.com/kubernetes/kubernetes/issues/30120
         env:
@@ -630,7 +630,8 @@ spec:
     spec:
       containers:
       - name: kibana
-        image: morriz/kibana-logtrail:6.6.2
+        # image: morriz/kibana-logtrail-sentinl:5.6.3
+        image: tgbyte/kibana:6.3.2
         imagePullPolicy: IfNotPresent
         resources:
           # keep request = limit to keep this container in guaranteed class
