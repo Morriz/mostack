@@ -5,6 +5,7 @@ metadata:
   name: nginx-ingress
   namespace: system
   annotations:
+    flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:~0.23.0
 spec:
   releaseName: nginx-ingress
