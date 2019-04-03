@@ -11,7 +11,9 @@ spec:
   chart:
     repository: https://kubernetes-charts.banzaicloud.com
     name: banzaicloud-stable/hpa-operator
-    version: 0.0.7
+    version: 0.0.8
   valueFileSecrets:
     - name: hpa-operator-values
-  values: {}
+  values:
+    metricsServer:
+      enabled: true
