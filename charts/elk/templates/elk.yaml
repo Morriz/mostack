@@ -630,8 +630,7 @@ spec:
     spec:
       containers:
       - name: kibana
-        # image: morriz/kibana-logtrail-sentinl:5.6.3
-        image: tgbyte/kibana:6.3.2
+        image: morriz/kibana-logtrail:6.6.0
         imagePullPolicy: IfNotPresent
         resources:
           # keep request = limit to keep this container in guaranteed class
