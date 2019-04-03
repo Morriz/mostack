@@ -32,13 +32,6 @@ if [ "$CLUSTERTYPE" = "minikube" ]; then
 	ksk rollout status -w daemonset.extensions/calico-node
 fi
 
-# @todo: fix policies and re-enable
-# printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"
-# for ns in default kube-system system monitoring logging team-backend; do k apply -n $ns -f k8s/policies/each-namespace/defaults.yaml; done
-# k apply -f k8s/policies
-
-# for ns in default kube-system system monitoring logging team-backend; do k apply -n $ns -f k8s/policies/each-namespace/allow-all.yaml; done
-
 printf "${COLOR_BLUE}[tiller] Installing Tiller${COLOR_NC}\n"
 if [ ! -d "$root/tls" ]; then
 	sh $root/bin/gen-tiller-certs.sh
@@ -79,7 +72,10 @@ k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/e
 k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml
 k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml
 
-if [ -f tls/server-key.pem ]; then
-	ks create secret generic flux-git-deploy --from-file=identity=tls/server-key.pem
-fi
+# @todo: fix policies and re-enable
+# printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"
+# for ns in default kube-system system monitoring logging team-backend; do k apply -n $ns -f k8s/policies/each-namespace/defaults.yaml; done
+# k apply -f k8s/policies
+# for ns in default kube-system system monitoring logging team-backend; do k apply -n $ns -f k8s/policies/each-namespace/allow-all.yaml; done
+
 printf "${COLOR_WHITE}ALL DONE!${COLOR_NC}\n"

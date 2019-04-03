@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+shopt -s expand_aliases
+. bin/aliases
 . ./.env.sh
 
 helm repo add weaveworks https://weaveworks.github.io/flux
@@ -8,12 +10,7 @@ helm repo add weaveworks https://weaveworks.github.io/flux
 # helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 
 helm repo update
-helm --namespace=system upgrade --install --force flux \
-    --tls --tls-verify \
-    --tls-ca-cert ./tls/ca.pem \
-    --tls-cert ./tls/flux-helm-operator.pem \
-    --tls-key ././tls/flux-helm-operator-key.pem \
-    --tls-hostname tiller-deploy.kube-system \
+hs flux \
     --set rbac.create=true \
     --set helmOperator.create=true \
     --set helmOperator.tls.enable=true \
@@ -27,12 +24,10 @@ helm --namespace=system upgrade --install --force flux \
     --set git.pollInterval=15s \
     weaveworks/flux
 
-export FLUX_POD=$(kubectl get pods --namespace system -l "app=flux,release=flux" -o jsonpath="{.items[0].metadata.name}")
-kubectl -n system rollout status deployment/flux-helm-operator
-echo ""
-echo "Now add the following public key in your repo's settings as deploy key:"
-kubectl -n system logs $FLUX_POD | grep identity.pub | cut -d '"' -f2
+ks rollout status deployment/flux
+
 cat <<"EOF"
+
 If all is well the repo will become accessible, the deployment will slowly unfold, and we have to wait for the sealed-secrets pod to come up.
 Run a watch with:
 
@@ -51,15 +46,23 @@ Finally commit the changes in this repo and let The HelmRelease operator do it's
 
 To prepare for disaster recovery you should backup the sealed-secrets controller private key with:
 
-kubectl get secret -n adm sealed-secrets-key -o yaml --export > sealed-secrets-key.yaml
+k get secret -n adm sealed-secrets-key -o yaml --export > sealed-secrets-key.yaml
 To restore from backup after a disaster, replace the newly-created secret and restart the controller:
 
-kubectl replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
-kubectl delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
+k replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
+k delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
 EOF
+echo ""
 if [ -f sealed-secrets-key.yaml ]; then
-    kubectl replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
-    kubectl delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
+    k replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
+    k delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
 fi
+ks delete secret flux-git-deploy
+ks create secret generic flux-git-deploy --from-file=identity=tls/server-key.pem
+ks delete pod -l app=flux
+echo ""
+echo "FINISHED DEPLOYING!"
+echo "If not done before then add the following public key in your repo's settings as deploy key:"
+ks logs deployment/flux | grep identity.pub | cut -d '"' -f2
 
 [ -n "$ISLOCAL" ] && bin/ngrok.sh

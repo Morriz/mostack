@@ -19,7 +19,7 @@ alias h="helm --tls --tls-verify \
   --tls-cert ./tls/flux-helm-operator.pem \
   --tls-key ./tls/flux-helm-operator-key.pem \
   --tls-hostname tiller-deploy.kube-system"
-alias hi="h upgrade --install"
+alias hi="h upgrade --install --force"
 alias hk="h delete --purge"
 alias kk="killall kubectl"
 alias mkk="killall ngrok; kk; killall fswatch; sudo killall ssh"
