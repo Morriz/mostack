@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+. ./.env.sh
 
 helm repo add weaveworks https://weaveworks.github.io/flux
 # helm repo add rook-stable https://charts.rook.io/stable
 # helm repo add istio.io https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
 # helm repo add jetstack https://charts.jetstack.io
+# helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 
 helm repo update
 helm --namespace=system upgrade --install --force flux \
@@ -53,5 +55,11 @@ kubectl get secret -n adm sealed-secrets-key -o yaml --export > sealed-secrets-k
 To restore from backup after a disaster, replace the newly-created secret and restart the controller:
 
 kubectl replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
-kubectl delete pod -n adm -l app=sealed-secrets
+kubectl delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
 EOF
+if [ -f sealed-secrets-key.yaml ]; then
+    kubectl replace secret -n adm sealed-secrets-key -f sealed-secrets-key.yaml
+    kubectl delete pod -n adm -l app.kubernetes.io/name=sealed-secrets
+fi
+
+[ -n "$ISLOCAL" ] && bin/dashboards.sh

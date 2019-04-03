@@ -1,6 +1,4 @@
 replicaCount: 1
-autoscaler:
-  maxReplicas: 1
 image:
   repository: {{REGISTRY_HOST}}/api
   # pullSecrets: regcred-api

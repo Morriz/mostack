@@ -1,6 +1,7 @@
-replicaCount: 2
-autoscaler:
-  maxReplicas: 20
+annotations:
+  hpa.autoscaling.banzaicloud.io/minReplicas: "3"
+  hpa.autoscaling.banzaicloud.io/maxReplicas: "20"
+  cpu.hpa.autoscaling.banzaicloud.io/targetAverageUtilization: "60"
 image:
   repository: {{REGISTRY_HOST}}/api
   # pullSecrets: regcred-api

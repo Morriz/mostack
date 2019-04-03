@@ -65,7 +65,7 @@ ksk rollout status -w deploy/tiller-deploy
 # 	k apply -f k8s/pv-gce.yaml
 # fi
 
-printf "${COLOR_BLUE}[cluster] Installing needed CRDs and other stuff${COLOR_NC}\n"
+printf "${COLOR_BLUE}[cluster] Installing needed CRDs and other prerequisites${COLOR_NC}\n"
 
 hi --namespace=adm sealed-secrets stable/sealed-secrets
 
