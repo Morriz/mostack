@@ -62,7 +62,7 @@ ks delete secret flux-git-deploy
 ks create secret generic flux-git-deploy --from-file=identity=tls/server-key.pem
 ks delete pod -l app=flux
 
-echo <<"EOF"
+cat <<"EOF"
 
 FINISHED DEPLOYING!
 

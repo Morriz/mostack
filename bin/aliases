@@ -38,6 +38,7 @@ function kck() {
   for ns in adm istio-system system monitoring logging team-backend dev stg prod; do
     k delete ns $ns
   done
+  
 }
 
 #h() { helm template "$@" | k apply -f -; }
