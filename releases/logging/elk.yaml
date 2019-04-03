@@ -5,14 +5,13 @@ metadata:
   namespace: logging
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1
+    flux.weave.works/tag.chart-image: glob:*
 spec:
   releaseName: elk
   chart:
     git: git@github.com:Morriz/mostack
     path: charts/elk
     ref: master
-  chartFitPTH: elk
   valueFileSecrets:
   - name: elk-values
   values: {}
