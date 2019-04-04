@@ -13,15 +13,10 @@ until k get nodes >/dev/null 2>&1; do
 done
 
 printf "\n${COLOR_WHITE}Now deploying Kubernetes resources\n"
+k apply -f releases/namespaces
 
 printf "${COLOR_BLUE}[cluster] Setting up tiller RBAC${COLOR_NC}\n"
 k apply -f k8s/rbac/tiller.yaml
-
-# help calico: add extra namespace label for kube-system
-k label namespace kube-system name=kube-system
-k label namespace default name=default
-k create ns adm
-k create ns system
 
 if [ "$CLUSTERTYPE" = "minikube" ]; then
 	printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"
@@ -61,6 +56,7 @@ ksk rollout status -w deploy/tiller-deploy
 printf "${COLOR_BLUE}[cluster] Installing needed CRDs and other prerequisites${COLOR_NC}\n"
 
 hi --namespace=adm sealed-secrets stable/sealed-secrets
+his istio-init istio.io/istio-init --set=cert-manager=true --set=global.tag=1.1.1
 
 ks apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
 k label namespace system certmanager.k8s.io/disable-validation="true"

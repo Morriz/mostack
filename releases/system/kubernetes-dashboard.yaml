@@ -10,7 +10,7 @@ spec:
   releaseName: kubernetes-dashboard
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: kubernetes-dashboard
+    name: stable/kubernetes-dashboard
     version: 1.4.0
   valueFileSecrets:
   - name: kubernetes-dashboard-values

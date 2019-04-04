@@ -13,5 +13,5 @@ spec:
     path: charts/api
     ref: master
   valueFileSecrets:
-  - name: api.morriz-local-values
+  - name: api-morriz-local-values
   values: {}

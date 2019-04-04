@@ -10,6 +10,6 @@ spec:
   releaseName: weave-scope
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: weave-scope
+    name: stable/weave-scope
     version: 0.11.0
   values: {}

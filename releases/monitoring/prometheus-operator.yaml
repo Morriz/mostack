@@ -11,8 +11,8 @@ spec:
   releaseName: prometheus-operator
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: prometheus-operator
+    name: stable/prometheus-operator
     version: 5.0.3
   valueFileSecrets:
-  - name: prometheus-operator-values
+  - name: stable/prometheus-operator-values
   values: {}

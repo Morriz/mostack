@@ -11,7 +11,7 @@ spec:
   releaseName: nginx-ingress
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: nginx-ingress
+    name: stable/nginx-ingress
     version: 1.4.0
   valueFileSecrets:
   - name: nginx-ingress-values

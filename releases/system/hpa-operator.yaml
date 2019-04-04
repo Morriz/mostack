@@ -10,7 +10,7 @@ spec:
   releaseName: hpa-operator
   chart:
     repository: https://kubernetes-charts.banzaicloud.com
-    name: hpa-operator
+    name: banzaicloud-stable/hpa-operator
     version: 0.0.7
   values:
     metricsServer:

@@ -1,19 +1,17 @@
----
 apiVersion: flux.weave.works/v1beta1
 kind: HelmRelease
 metadata:
-  name: drone
+  name: cert-manager
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.server: semver:~1.0.0
-    flux.weave.works/tag.agent: semver:~1.0.0
+    flux.weave.works/tag.chart-image: glob:v0.6.*
 spec:
-  releaseName: drone
+  releaseName: cert-manager
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: stable/drone
-    version: 2.0.0-rc.8
+    name: stable/cert-manager
+    version: v0.6.6
   valueFileSecrets:
-  - name: drone-values
+  - name: cert-manager-values
   values: {}

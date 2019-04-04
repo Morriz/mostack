@@ -1,0 +1,170 @@
+repositories:
+  - name: roboll
+    url: http://roboll.io/charts
+  - name: banzaicloud-stable
+    url: https://kubernetes-charts.banzaicloud.com
+  - name: istio
+    url: https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
+  - name: jetstack
+    url: https://charts.jetstack.io
+  - name: stable
+    url: https://kubernetes-charts.storage.googleapis.com
+  - name: rook
+    url: https://charts.rook.io/stable
+  - name: weaveworks
+    url: https://weaveworks.github.io/flux
+
+
+helmDefaults:
+  tillerNamespace: kube-system
+  # kubeContext: docker-desktop
+  # atomic: true
+  wait: true
+  timeout: 600
+  # recreatePods: true
+  force: true
+  # enable TLS for request to Tiller
+  tls: true
+  # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
+  tlsCACert: "tls/ca.pem"
+  # path to TLS certificate file (default "$HELM_HOME/cert.pem")
+  tlsCert: "tls/flux-helm-operator.pem"
+  # path to TLS key file (default "$HELM_HOME/key.pem")
+  tlsKey: "tls/flux-helm-operator-key.pem"
+
+releases:
+    # Local chart example
+  - name: ambassador
+    installed: true
+    namespace: system
+    version: 2.0.1
+    chart: stable/ambassador
+    values:
+      - values.tmp/system/ambassador.yaml 
+  - name: api-morriz-local
+    installed: true
+    namespace: dev
+    # version: 0.2.0
+    chart: ./charts/api
+    values:
+      - values.tmp/dev/api-morriz-local.yaml 
+  - name: cert-manager
+    installed: true
+    namespace: system
+    version: v0.6.6
+    chart: stable/cert-manager
+    values:
+      - values.tmp/system/cert-manager.yaml 
+  - name: cert-manager-cluster-issuer
+    installed: true
+    namespace: system
+    # version: 0.1.0
+    chart: ./charts/cert-manager-cluster-issuer
+    values:
+      - values.tmp/system/cert-manager-cluster-issuer.yaml 
+  - name: docker-registry
+    installed: true
+    namespace: system
+    version: 1.7.0
+    chart: stable/docker-registry
+    values:
+      - values.tmp/system/docker-registry.yaml 
+  - name: drone
+    installed: true
+    namespace: system
+    version: 2.0.0-rc.8
+    chart: stable/drone
+    values:
+      - values.tmp/system/drone.yaml 
+  - name: elk
+    installed: true
+    namespace: logging
+    # version: 0.1.0
+    chart: ./charts/elk
+    values:
+      - values.tmp/logging/elk.yaml 
+  - name: flux
+    installed: false
+    namespace: system
+    version: 1.7.1
+    chart: weaveworks/flux
+    values:
+      - rbac:
+          create: true
+        helmOperator:
+          create: true
+          tls:
+            enable: true
+            verify: true
+            secretName: helm-client
+            caContent: "{{ requiredEnv "HELMOPERATOR_CA" }}"
+        git:
+          url: git@github.com:Morriz/mostack
+          branch: {{ env "GIT_BRANCH" | default "master" }}
+          path: releases
+          ciSkip: true
+          pollInterval: 15s
+  - name: istio-init
+    installed: true
+    labels:
+      phase: init
+    namespace: istio
+    version: 1.1.1
+    chart: istio.io/istio-init
+    values:
+      - cert-manager: true
+        global:
+          tag: 1.1.1 
+  - name: istio
+    installed: true
+    namespace: istio
+    version: 1.1.1
+    chart: istio.io/istio
+    values:
+      - values.tmp/istio-system/istio.yaml 
+      - global:
+          tag: 1.1.1 
+  - name: kubernetes-dashboard
+    installed: false
+    namespace: kube-system
+    version: 1.4.0
+    chart: stable/kubernetes-dashboard
+  - name: hpa-operator
+    installed: true
+    namespace: system
+    version: 0.0.7
+    chart: banzaicloud-stable/hpa-operator
+  - name: nginx-ingress
+    installed: false
+    namespace: system
+    version: 1.4.0
+    chart: stable/nginx-ingress
+    values:
+      - values.tmp/system/nginx-ingress.yaml 
+  # - name: prometheus-operator-init
+  #   installed: true
+  #   labels:
+  #     phase: init
+  #   namespace: monitoring
+  #   version: 5.0.3
+  #   chart: stable/prometheus-operator
+  #   values:
+  #     - values.tmp/monitoring/prometheus-operator.yaml 
+  - name: prometheus-operator
+    installed: true
+    namespace: monitoring
+    version: 5.0.3
+    chart: stable/prometheus-operator
+    values:
+      - values.tmp/monitoring/prometheus-operator.yaml 
+      - createCustomResource: false
+  - name: rook-ceph
+    installed: false
+    namespace: system
+    version: v0.9.3
+    chart: rook-stable/rook-ceph
+  - name: weave-scope
+    installed: true
+    namespace: system
+    version: 0.11.0
+    chart: stable/weave-scope

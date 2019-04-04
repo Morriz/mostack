@@ -10,5 +10,5 @@ ingress:
   tls: true
   hostname: api.stg.{{CLUSTER_HOST}}
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: {{INGRESS_CLASS}}
     kubernetes.io/tls-acme: "true"

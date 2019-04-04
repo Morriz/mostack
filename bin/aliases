@@ -33,6 +33,7 @@ function kadnp() {
   done
 }
 function kck() {
+  kk
   hk $(h ls --all --short)
   k delete crd --all
   for ns in adm istio-system system monitoring logging team-backend dev stg prod; do

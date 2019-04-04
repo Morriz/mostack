@@ -51,7 +51,7 @@ The next boot should thus be faster :)
   _ by manipulating your firewall
   _ or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
   _ free account: only http works (set `TLS_ENABLE=false` in `secrets/local.sh`) since we can't load multiple tunnels (80 & 443) for one domain
-  _ biz account: see provided `templates/ngrok.yaml`
+  _ biz account: see provided `tpl/ngrok.yaml`
 - When using letsencrypt staging certs: For (Github) repo webhooks to be able to talk to drone in our cluster it needs to trust it's staging certs. So the previous Letsencrypt staging CA should be added to the cluster node list of trusted CA's. See `morriz/k8s-dev-cluster/bin/add-trusted-ca-to-docker-domains.sh` how I do it for minikube.
 - Create an oAuth app for our Drone and copy the key & secret in [GitHub](https://github.com/settings/developers) so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
 
@@ -80,15 +80,33 @@ Follow the instructions on the screen, as some keys will be generated. The publi
 
 ### 2.2 Developing
 
+To avoid going through the flux mechanism for testing your modifications, you may deploy the stack directly with [helmfile](https://github.com/roboll/helmfile/releases).
+
+First generate the secrets and values:
+
+    bin/gen-values-tmp.sh
+
+To install the entire stack:
+
+    helmfile apply
+
+Or to just deploy some apps:
+
+    helmfile --selector name=istio
+
+Or to deploy first the prerequisites (like needed CRDs etc):
+
+    helmfile --selector phase=init
+
+And then later the rest:
+
+    helmfile --selector phase=final
+
 After editing generate the final GitOps release files into `releases/` by running:
 
     bin/seal-secrets.sh
 
-To not go through the git commit cycle, you may directly deploy the releases like this:
-
-    kubectl apply -f releases/ --recursive
-
-Once satisfied with the results, you may commit to see the next environment benefit.
+And commit and push to git.
 
 ## 3. Testing the apps
 

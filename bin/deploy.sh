@@ -4,10 +4,12 @@ shopt -s expand_aliases
 . ./.env.sh
 
 helm repo add weaveworks https://weaveworks.github.io/flux
-# helm repo add rook-stable https://charts.rook.io/stable
-# helm repo add istio.io https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
-# helm repo add jetstack https://charts.jetstack.io
-# helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo add rook-stable https://charts.rook.io/stable
+helm repo add istio.io https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
+helm repo add jetstack https://charts.jetstack.io
+helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+helm repo add rook-stable https://charts.rook.io/stable
+helm repo add istio.io https://storage.googleapis.com/istio-release/releases/1.1.1/charts/
 
 helm repo update
 hs flux \

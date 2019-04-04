@@ -2,3 +2,6 @@ kibanaPassword: {{KIBANA_PASSWORD}}
 hostname: logging.{{CLUSTER_HOST}}
 tls: true
 containersLocation: /var/lib/docker/containers
+service:
+  annotations:
+    kubernetes.io/ingress.class: {{INGRESS_CLASS}}

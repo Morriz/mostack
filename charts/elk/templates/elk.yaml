@@ -802,7 +802,6 @@ metadata:
   labels:
     app: kibana
   annotations:
-    kubernetes.io/ingress.class: nginx
     ingress.kubernetes.io/auth-type: basic
     ingress.kubernetes.io/auth-secret: basic-auth
     ingress.kubernetes.io/auth-realm: 'Authentication Required - admin'
@@ -812,6 +811,7 @@ metadata:
     {{- if not .Values.tls }}
     ingress.kubernetes.io/ssl-redirect: 'false'
     {{- end }}
+{{ toYaml .Values.service.annotations | indent 4 }}
 spec:
   rules:
   - host: {{ .Values.hostname }}

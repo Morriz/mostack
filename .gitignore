@@ -8,3 +8,4 @@ secrets/*.sh
 secrets.tmp
 values.tmp
 sealed-secrets-key.yaml
+istio/

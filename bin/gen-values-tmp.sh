@@ -12,12 +12,18 @@ parseFiles() {
   type=$1
   shift
   rm -rf $root/$type.tmp >/dev/null 2>&1
-  rm -rf /tmp/$type >/dev/null 2>&1
+  mkdir $root/$type.tmp
+  [ "$type" = "values" ] && touch $root/$type.tmp/all.yaml
   for f in "$@"; do
     ns=$(dirname $f)
+    app=$(basename $f)
     echo generating $type.tmp/$f
-    mkdir -p /tmp/$type/$ns
-    cat $f | mo >/tmp/$type/$f
+    mkdir -p $root/$type.tmp/$ns
+    cat $f | mo >$root/$type.tmp/$f
+    if [ "$type" = "values" ]; then
+      printf "${app::-5}:\n" >>$root/$type.tmp/all.yaml
+      echo "$(cat $root/$type.tmp/$f | sed 's/^/  /')" >>$root/$type.tmp/all.yaml
+    fi
   done
 }
 
@@ -30,6 +36,3 @@ cd ../secrets >/dev/null
 files=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
 parseFiles secrets $files
 cd .. >/dev/null
-
-mv /tmp/values $root/values.tmp
-mv /tmp/secrets $root/secrets.tmp

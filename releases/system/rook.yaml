@@ -1,0 +1,15 @@
+# apiVersion: flux.weave.works/v1beta1
+# kind: HelmRelease
+# metadata:
+#   name: rook
+#   namespace: system
+#   annotations:
+#     flux.weave.works/automated: "true"
+#     flux.weave.works/tag.chart-image: glob:v0.9.*
+# spec:
+#   releaseName: rook-ceph
+#   chart:
+#     repository: https://charts.rook.io/stable
+#     name: rook-stable/rook-ceph
+#     version: v0.9.3
+#   values: {}

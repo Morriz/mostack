@@ -3,3 +3,6 @@ kibanaPassword:
 hostname:
 tls:
 containersLocation:
+service:
+  annotations:
+    kubernetes.io/ingress.class: nginx
