@@ -1,19 +1,19 @@
 
-apiVersion: flux.weave.works/v1beta1
-kind: HelmRelease
-metadata:
-  name: ambassador
-  namespace: system
-  annotations:
-    flux.weave.works/ignore: true
-    flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:0.52.0
-spec:
-  releaseName: ambassador
-  chart:
-    repository: https://kubernetes-charts.storage.googleapis.com
-    name: stable/ambassador
-    version: 2.0.1
-  valueFileSecrets:
-  - name: ambassador-values
-  values: {}
+# apiVersion: flux.weave.works/v1beta1
+# kind: HelmRelease
+# metadata:
+#   name: ambassador
+#   namespace: system
+#   annotations:
+#     flux.weave.works/ignore: true
+#     flux.weave.works/automated: "true"
+#     flux.weave.works/tag.chart-image: semver:0.52.0
+# spec:
+#   releaseName: ambassador
+#   chart:
+#     repository: https://kubernetes-charts.storage.googleapis.com
+#     name: stable/ambassador
+#     version: 2.0.1
+#   valueFileSecrets:
+#   - name: ambassador-values
+#   values: {}
