@@ -48,11 +48,11 @@ The next boot should thus be faster :)
 - [Letsencrypt staging CA](https://letsencrypt.org/certs/fakelerootx1.pem) (click and add to your browser's cert manager temporarily if you'd like to bypass browser warnings about https)
 - ssh passwordless sudo access. On OSX I have to add my key like this: `ssh-add -K ~/.ssh/id_rsa`.
 - For `cert-manager` to work (it autogenerates letsencrypt certs), make sure port 80 and 443 are forwarded to your local machine:
-  _ by manipulating your firewall
-  _ or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
-  _ free account: only http works (set `TLS_ENABLE=false` in `secrets/local.sh`) since we can't load multiple tunnels (80 & 443) for one domain
-  _ biz account: see provided `tpl/ngrok.yaml`
-- When using letsencrypt staging certs: For (Github) repo webhooks to be able to talk to drone in our cluster it needs to trust it's staging certs. So the previous Letsencrypt staging CA should be added to the cluster node list of trusted CA's. See `morriz/k8s-dev-cluster/bin/add-trusted-ca-to-docker-domains.sh` how I do it for minikube.
+  - by manipulating your firewall
+  - or by tunneling a domain from [ngrok](https://ngrok.io) (and using that as `$CLUSTER_HOST` in the config below):
+    - free account: just run `ngrok http 80` in a dedicated terminal window that you will want to keep open, because it creates a temporary host until the tunnel dies.
+    - biz account: see provided `tpl/ngrok.yaml` that you can modify and then run `bin/ngrok.sh`.
+- When using letsencrypt staging certs: For (Github) repo webhooks to be able to talk to drone in our cluster these hooks need to have `https` disabled.
 - Create an oAuth app for our Drone and copy the key & secret in [GitHub](https://github.com/settings/developers) so that drone can operate on your forked `Morriz/nodejs-api-demo` repo. Fill in those secrets in the `drone.yaml` values below.
 
 ## 1. Configuration

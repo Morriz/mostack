@@ -79,4 +79,3 @@ And restart cert-manager when all deployments have come up to make sure it acqui
 ks delete pod -l app=cert-manager
 
 EOF
-[ -n "$ISLOCAL" ] && bin/ngrok.sh
