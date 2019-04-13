@@ -66,7 +66,7 @@ IMPORTANT: The `$CLUSTER_HOST` subdomains must all point to your laptop ip (I us
 
 ### 2.1 Deployment
 
-Start by installing the prerequisites like PVs, some RBAC and Helm's Tiller:
+Start by installing the prerequisites like Helm's Tiller, PVs, some RBAC and some CRDs:
 
     sh bin/install-prerequisites.sh
 
@@ -89,18 +89,20 @@ First generate the secrets and values:
 To install the entire stack:
 
     helmfile apply
+    # or to do both with the alias hf="bin/gen-values-tmp.sh && helmfile"
+    hf apply
 
 Or to just deploy some apps:
 
-    helmfile --selector name=istio
+    hf --selector name=istio apply
 
 Or to deploy first the prerequisites (like needed CRDs etc):
 
-    helmfile --selector phase=init
+    hf --selector phase=init apply
 
 And then later the rest:
 
-    helmfile --selector phase=final
+    hf --selector phase=final apply
 
 After editing generate the final GitOps release files into `releases/` by running:
 

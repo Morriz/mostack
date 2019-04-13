@@ -1,0 +1,68 @@
+# gateway:
+#   name: 'istio-gateway'
+#   selector: ingressgateway
+# hosts:
+#   default:
+#     host: '*'
+#     port: 80
+#     # httpsRedirect: true
+#   drone:
+#     host: drone.{{CLUSTER_HOST}}
+#     port: 443
+#     ingressClass: {{INGRESS_CLASS}}
+#     tls:
+#       enabled: true
+#       acme: http01
+#       issuer:
+#         kind: ClusterIssuer
+#         name: letsencrypt-staging
+#   # grafana:
+#   #   host: grafana.{{CLUSTER_HOST}}
+#   #   port: 443
+#   #   ingressClass: {{INGRESS_CLASS}}
+#   #   tls:
+#   #     enabled: true
+#   #     acme: http01
+#   #     issuer:
+#   #       kind: ClusterIssuer
+#   #       name: letsencrypt-staging
+#   # kibana:
+#   #   host: kibana.{{CLUSTER_HOST}}
+#   #   port: 443
+#   #   ingressClass: {{INGRESS_CLASS}}
+#   #   tls:
+#   #     enabled: true
+#   #     acme: http01
+#   #     issuer:
+#   #       kind: ClusterIssuer
+#   #       name: letsencrypt-staging
+#   reg:
+#     host: reg.{{CLUSTER_HOST}}
+#     port: 443
+#     ingressClass: {{INGRESS_CLASS}}
+#     tls:
+#       enabled: true
+#       acme: http01
+#       issuer:
+#         kind: ClusterIssuer
+#         name: letsencrypt-staging
+#   telemetry:
+#     host: telemetry.{{CLUSTER_HOST}}
+#     port: 443
+#     ingressClass: {{INGRESS_CLASS}}
+#     tls:
+#       enabled: true
+#       acme: http01
+#       issuer:
+#         kind: ClusterIssuer
+#         name: letsencrypt-staging
+#   # hello:
+#   #   host: hello.{{CLUSTER_HOST}}
+#   #   port: 443
+#   #   ingressClass: {{INGRESS_CLASS}}
+#   #   tls:
+#   #     enabled: true
+#   #     acme: http01
+#   #     issuer:
+#   #       kind: ClusterIssuer
+#   #       name: letsencrypt-staging

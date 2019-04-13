@@ -1,0 +1,17 @@
+# apiVersion: flux.weave.works/v1beta1
+# kind: HelmRelease
+# metadata:
+#   name: custom-gateway
+#   namespace: istio-system
+#   annotations:
+#     flux.weave.works/automated: "true"
+#     flux.weave.works/tag.chart-image: semver:~0.8.0
+# spec:
+#   releaseName: custom-gateway
+#   chart:
+#     git: git@github.com:Morriz/mostack
+#     name: charts/istio-gateway
+#     version: 0.1.0
+#   valueFileSecrets:
+#   - name: custom-gateway-values
+#   values: {}
