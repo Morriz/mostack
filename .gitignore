@@ -7,5 +7,10 @@ secrets/*.sh
 !secrets/sample.sh
 secrets.tmp
 values.tmp
+tls/
 sealed-secrets-key.yaml
 istio/
+charts/
+!charts/api
+!charts/cert-manager-cluster-issuer
+!charts/elk
