@@ -11,7 +11,7 @@ image:
 service:
   http:
     externalPort: 80
-    internalPort: 3000
+    internalPort: 5000
   type: ClusterIP
 ingress:
   enabled: true

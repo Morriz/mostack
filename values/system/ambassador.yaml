@@ -6,12 +6,19 @@ service:
       ---
       apiVersion: ambassador/v1
       kind: Module
+      name: ambassador
+      # ambassador_id: ambassador-development
+      config:
+        service_port: 8443
+      ---
+      apiVersion: ambassador/v1
+      kind: Module
       name: tls
       # ambassador_id: ambassador-development
       config:
         server:
           enabled: True
-          redirect_cleartext_from: 80
+          redirect_cleartext_from: 8080
         client:
           enabled: False
         upstream:

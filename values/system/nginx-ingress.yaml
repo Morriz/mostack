@@ -1,6 +1,8 @@
 rbac:
   create: true
 controller:
+  extraArgs:
+    v: 3
   config:
     ssl-redirect: "true"
     hsts: "true"
@@ -16,6 +18,10 @@ controller:
   # hostNetwork: true
   service:
     type: LoadBalancer
+    # type: NodePort
+    # nodePorts:
+    #   http: 32080
+    #   https: 32443
     loadBalancerIP: {{LOAD_BALANCER_IP}}
 
   # resources:

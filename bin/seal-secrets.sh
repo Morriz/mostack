@@ -38,4 +38,4 @@ parseFiles secrets $files
 cd .. >/dev/null
 
 cat $root/README.md | mo >$root/docgen/README.md
-cat $root/templates/service-index.html | mo >$root/docgen/service-index.html
+cat $root/tpl/service-index.html | mo >$root/docgen/service-index.html

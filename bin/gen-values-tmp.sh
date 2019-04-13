@@ -36,3 +36,6 @@ cd ../secrets >/dev/null
 files=$(find . -name "*.yaml" -maxdepth 2 | cut -c 3-)
 parseFiles secrets $files
 cd .. >/dev/null
+
+cat $root/README.md | mo >$root/docgen/README.md
+cat $root/tpl/service-index.html | mo >$root/docgen/service-index.html

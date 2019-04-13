@@ -4,6 +4,7 @@ metadata:
   name: ambassador-monitor
   namespace: system
   labels:
+    flux.weave.works/ignore: true
     app.kubernetes.io/name: ambassador
 spec:
   type: ClusterIP

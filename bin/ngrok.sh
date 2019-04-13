@@ -13,8 +13,8 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-[ "$CLUSTERTYPE" = "minikube" ] && $root/bin/tunnel-to-ingress.sh
+# [ "$CLUSTERTYPE" = "minikube" ] && $root/bin/tunnel-to-ingress.sh
 
 killall ngrok
 cat $root/tpl/ngrok.yaml | mo >/tmp/ngrok.yaml
-ngrok start --log-level "debug" -config=/tmp/ngrok.yaml dev dev-tls &
+ngrok start -config=/tmp/ngrok.yaml dev dev-tls &

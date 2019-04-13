@@ -1,4 +1,4 @@
 description: Temp chart for ClusterIssuer
 engine: gotpl
-name: ClusterIssuer
+name: cert-manager-cluster-issuer
 version: 0.1.0

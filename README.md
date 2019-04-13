@@ -161,7 +161,7 @@ The alertmanager view will show the alerts concerning the unreachable endpoints.
 
 ### 3.3 Kibana log view
 
-Look at a pre-installed [Kibana dashboard with Logtrail](https://logging.{{CLUSTER_HOST}}/app/logtrail) showing the cluster logs.
+Look at a pre-installed [Kibana dashboard with Logtrail](https://kibana.{{CLUSTER_HOST}}/app/logtrail) showing the cluster logs.
 
 Creds: Same as Grafana.
 

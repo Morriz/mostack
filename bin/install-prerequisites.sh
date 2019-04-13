@@ -18,14 +18,17 @@ k apply -f releases/namespaces
 printf "${COLOR_BLUE}[cluster] Setting up tiller RBAC${COLOR_NC}\n"
 k apply -f k8s/rbac/tiller.yaml
 
-if [ "$CLUSTERTYPE" = "minikube" ]; then
-	printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"
-	k apply -f k8s/calico-kdd/rbac.yaml
-	k apply -f k8s/calico-kdd/calico.yaml
+printf "${COLOR_BLUE}[cluster] Setting up PVC for Drone${COLOR_NC}\n"
+k apply -f k8s/pv-minikube.yaml
 
-	printf "${COLOR_PURPLE}[tiller]Waiting for Calico to become available${COLOR_BROWN}\n"
-	ksk rollout status -w daemonset.extensions/calico-node
-fi
+# if [ -n "$ISLOCAL" ]; then
+# 	printf "${COLOR_BLUE}[tiller] Installing Calico${COLOR_NC}\n"
+# 	k apply -f k8s/calico-kdd/rbac.yaml
+# 	k apply -f k8s/calico-kdd/calico.yaml
+
+# 	printf "${COLOR_PURPLE}[tiller]Waiting for Calico to become available${COLOR_BROWN}\n"
+# 	ksk rollout status -w daemonset.extensions/calico-node
+# fi
 
 printf "${COLOR_BLUE}[tiller] Installing Tiller${COLOR_NC}\n"
 if [ ! -d "$root/tls" ]; then
@@ -39,7 +42,7 @@ helm init --upgrade --service-account tiller \
 	--tiller-tls-key ./tls/server-key.pem \
 	--tiller-tls-verify \
 	--tls-ca-cert ./tls/ca.pem \
-	--history-max 2
+	--history-max 1
 
 printf "${COLOR_PURPLE}[tiller]Waiting for Tiller to become available${COLOR_BROWN}\n"
 ksk rollout status -w deploy/tiller-deploy
@@ -55,18 +58,10 @@ ksk rollout status -w deploy/tiller-deploy
 
 printf "${COLOR_BLUE}[cluster] Installing needed CRDs and other prerequisites${COLOR_NC}\n"
 
-hi --namespace=adm sealed-secrets stable/sealed-secrets
-his istio-init istio.io/istio-init --set=cert-manager=true --set=global.tag=1.1.1
+# k label namespace istio-system certmanager.k8s.io/disable-validation="true"
 
-ks apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
-k label namespace system certmanager.k8s.io/disable-validation="true"
-
-k apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.7.0/sealedsecret-crd.yaml
-
-k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml
-k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheus.crd.yaml
-k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml
-k apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml
+k apply -f $root/releases/_crds/ --recursive
+k apply -f secrets.tmp/ --recursive
 
 # @todo: fix policies and re-enable
 # printf "${COLOR_BLUE}[tiller] Installing policies${COLOR_NC}\n"

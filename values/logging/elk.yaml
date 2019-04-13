@@ -1,5 +1,5 @@
 kibanaPassword: {{KIBANA_PASSWORD}}
-hostname: logging.{{CLUSTER_HOST}}
+hostname: kibana.{{CLUSTER_HOST}}
 tls: true
 containersLocation: /var/lib/docker/containers
 service:

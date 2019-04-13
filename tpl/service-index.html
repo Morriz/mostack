@@ -1,21 +1,25 @@
-<h1> Service index for domain {{CLUSTER_HOST}}</h1>
-<a target="_blank" href="http://127.0.0.1:4040">Ngrok Dashboard</a><br/>
-<br/>
-<b>SYSTEM:</b><br/>
-<br/>
-<a target="_blank" href="http://localhost:8001/api/v1/namespaces/system/services/https:kubernetes-dashboard:/proxy/#!/overview?namespace=_all">Kubernetes Dashboard</a><br/>
-<a target="_blank" href="http://127.0.0.1:4041">Weave Scope</a><br/>
-<a target="_blank" href="http://127.0.0.1:18080/nginx_status">Nginx ingress</a><br/>
-<a target="_blank" href="http{{TLSS}}://grafana.{{CLUSTER_HOST}}">Monitoring: Grafana</a><br/>
-<a target="_blank" href="http://127.0.0.1:9090/targets">Monitoring: Prometheus</a><br/>
-<a target="_blank" href="http://127.0.0.1:9093/">Monitoring: Alertmanager</a><br/>
-<a target="_blank" href="http{{TLSS}}://logging.{{CLUSTER_HOST}}/app/logtrail#/?_g=()">Logging: Kibana</a><br/>
-<a target="_blank" href="http://127.0.0.1:9200">Logging: Elastic Search</a><br/>
-<br/>
-<b>TEAM FRONTEND:</b><br/>
-<br/>
-<a target="_blank" href="http://127.0.0.1:9190/targets">Monitoring: Prometheus Team Frontend</a><br/>
-<a target="_blank" href="http://127.0.0.1:9193/">Monitoring: Alertmanager Team Frontend</a><br/>
-<br/>
-<a target="_blank" href="http{{TLSS}}://drone.{{CLUSTER_HOST}}/">CI/CD: Drone</a><br/>
-<a target="_blank" href="http{{TLSS}}://api.{{CLUSTER_HOST}}/api/publicmethod">API</a><br/>
+<h1>Service index for domain {{ CLUSTER_HOST }}</h1>
+<a target="_blank" href="http://127.0.0.1:4040">Ngrok Dashboard</a><br />
+<br />
+<b>SYSTEM:</b><br />
+<br />
+<a
+  target="_blank"
+  href="http://localhost:8001/api/v1/namespaces/system/services/https:kubernetes-dashboard:/proxy/#!/overview?namespace=_all"
+  >Kubernetes Dashboard</a
+><br />
+<a target="_blank" href="http://127.0.0.1:4041">Weave Scope</a><br />
+<a target="_blank" href="http://127.0.0.1:18080/nginx_status">Nginx ingress</a><br />
+<a target="_blank" href="http{{ TLSS }}://grafana.{{ CLUSTER_HOST }}">Monitoring: Grafana</a><br />
+<a target="_blank" href="http://127.0.0.1:9090/targets">Monitoring: Prometheus</a><br />
+<a target="_blank" href="http://127.0.0.1:9093/">Monitoring: Alertmanager</a><br />
+<a target="_blank" href="http{{ TLSS }}://kibana.{{ CLUSTER_HOST }}/app/logtrail#/?_g=()">Logging: Kibana</a><br />
+<a target="_blank" href="http://127.0.0.1:9200">Logging: Elastic Search</a><br />
+<br />
+<b>TEAM FRONTEND:</b><br />
+<br />
+<a target="_blank" href="http://127.0.0.1:9190/targets">Monitoring: Prometheus Team Frontend</a><br />
+<a target="_blank" href="http://127.0.0.1:9193/">Monitoring: Alertmanager Team Frontend</a><br />
+<br />
+<a target="_blank" href="http{{ TLSS }}://drone.{{ CLUSTER_HOST }}/">CI/CD: Drone</a><br />
+<a target="_blank" href="http{{ TLSS }}://api.{{ CLUSTER_HOST }}/api/publicmethod">API</a><br />

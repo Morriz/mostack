@@ -5,6 +5,7 @@ metadata:
   name: ambassador
   namespace: system
   annotations:
+    flux.weave.works/ignore: true
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: semver:0.52.0
 spec:

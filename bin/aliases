@@ -3,6 +3,7 @@ alias ksk="kubectl -n kube-system"
 alias ks="k -n system"
 alias km="k -n monitoring"
 alias kis="k -n istio-system"
+alias ky="k -n kyma-system"
 alias kl="k -n logging"
 alias kt="k -n tiller"
 alias ktb="k -n team-backend"
@@ -14,15 +15,12 @@ alias kcv="k config view"
 alias kcg="k config view | grep 'current-context:' | sed -n -e 's/^.*current-context: //p'"
 alias kcu="k config use-context"
 alias kp="k proxy &"
-alias h="helm --tls --tls-verify \
-  --tls-ca-cert ./tls/ca.pem \
-  --tls-cert ./tls/flux-helm-operator.pem \
-  --tls-key ./tls/flux-helm-operator-key.pem \
-  --tls-hostname tiller-deploy.kube-system"
+alias h="helm --tls --tls-verify --tls-ca-cert ./tls/ca.pem --tls-cert ./tls/flux-helm-operator.pem --tls-key ./tls/flux-helm-operator-key.pem --tls-hostname tiller-deploy.kube-system"
 alias hi="h upgrade --install --force"
+alias hf="bin/gen-values-tmp.sh && helmfile"
 alias hk="h delete --purge"
 alias kk="killall kubectl"
-alias mkk="killall ngrok; kk; killall fswatch; sudo killall ssh"
+alias kkt="killall ngrok; kk; killall fswatch; sudo killall ssh"
 alias mkd="bin/backup-images.sh; mkk; minikube delete"
 
 function kpk() { ps aux|grep "$@" | awk '{print $2}' | xargs kill; }
@@ -32,14 +30,17 @@ function kadnp() {
     kad networkpolicy -n $ns
   done
 }
+function kkns() {
+  k get ns | grep Terminating | awk '{print $1}' | xargs  -n1 -- bash -c 'kubectl get ns "$0" -o json | jq "del(.spec.finalizers[0])" > "$0.json"; curl -k -H "Content-Type: application/json" -X PUT --data-binary @"$0.json" "http://127.0.0.1:8001/api/v1/namespaces/$0/finalize" '
+}
 function kck() {
   kk
   hk $(h ls --all --short)
   k delete crd --all
-  for ns in adm istio-system system monitoring logging team-backend dev stg prod; do
+  for ns in adm knative-eventing kyma-installer kyma-integration kyma-system istio-system system monitoring logging team-backend dev stg prod; do
     k delete ns $ns
   done
-  
+  kkns
 }
 
 #h() { helm template "$@" | k apply -f -; }
@@ -56,3 +57,5 @@ function hl() { hi --namespace=logging "$@"; }
 function htb() { hi --namespace=team-backend "$@"; }
 
 function ifTls() { [ "$TLS_ENABLE" = "true" ] && print s; }
+
+#function h() { ~/Downloads/helm "$@" --tls; }
