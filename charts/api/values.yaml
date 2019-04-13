@@ -7,7 +7,7 @@ annotations:
 image:
   tag: latest
   pullPolicy: Always
-  pullSecrets:
+  # pullSecrets:
 service:
   http:
     externalPort: 80

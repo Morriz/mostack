@@ -5,7 +5,7 @@ metadata:
   namespace: prod
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: glob:prod-*
+    flux.weave.works/tag.chart-image: semver:0.2.0
 spec:
   releaseName: team-backend-api-prod
   chart:
@@ -13,5 +13,5 @@ spec:
     path: charts/api
     ref: master
   valueFileSecrets:
-  - name: api-values
+  - name: api-prod-values
   values: {}

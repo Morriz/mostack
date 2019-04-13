@@ -5,7 +5,7 @@ metadata:
   namespace: dev
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: glob:master-*
+    flux.weave.works/tag.chart-image: glob:mozfeat-*
 spec:
   releaseName: team-backend-api-morriz-local
   chart:
