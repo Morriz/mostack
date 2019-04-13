@@ -11,6 +11,7 @@ tls/
 sealed-secrets-key.yaml
 istio/
 charts/
-!charts/api
-!charts/cert-manager-cluster-issuer
-!charts/elk
+!charts/api/
+!charts/cert-manager-cluster-issuer/
+!charts/elk/
+!charts/istio-gateway/

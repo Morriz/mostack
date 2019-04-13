@@ -1,0 +1,10 @@
+gateway:
+  name: 'istio-gateway'
+certs:
+  default:
+    host: your.doma.in
+    ingressClass: istio
+    acme: http01
+    issuer:
+      kind: ClusterIssuer
+      name: letsencrypt-staging

@@ -1,0 +1,24 @@
+{{- range $key, $spec := .Values.hosts }}
+{{- if (index $spec "tls") and (index $spec.tls "enabled") and ($spec.tls.enabled) }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: ingress-cert-{{ $spec.tls.issuer.name }}-{{ $key }}
+  namespace: {{ $spec.namespace | default $.Release.Namespace }}
+spec:
+  secretName: ingress-cert-{{ $spec.tls.issuer.name }}-{{ $key }}
+  issuerRef:
+    name: {{ $spec.tls.issuer.name }}
+    kind: {{ $spec.tls.issuer.kind }}
+  commonName: {{ $spec.host }}
+  dnsNames:
+  - {{ $spec.host }}
+  acme:
+    config:
+    - {{ $spec.tls.acme | default "http01" }}:
+        ingressClass: {{ $spec.ingressClass }}
+      domains:
+      - {{ $spec.host }}
+---
+{{- end }}
+{{- end }}
