@@ -41,7 +41,7 @@ releases:
     chart: stable/ambassador
     values:
       - values.tmp/system/ambassador.yaml 
-  - name: api-morriz-local
+  - name: team-backend-api-morriz-local
     installed: true
     namespace: dev
     # version: 0.2.0
