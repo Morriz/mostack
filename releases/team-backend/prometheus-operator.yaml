@@ -34,4 +34,4 @@ spec:
     grafana:
       image:
         repository: grafana/grafana
-        tag: 6.0.2
+        tag: 6.1.3
