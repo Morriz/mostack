@@ -21,7 +21,7 @@ export GRAFANA_PASSWORD='jaja'
 export REGISTRY_HOST="reg.$CLUSTER_HOST"
 export REG_USER=drone
 export REG_PASS=blabla
-export REGISTRY_HTPASSWD= # htpasswd -nb $REG_USER $REG_PASS
+export REGISTRY_HTPASSWD= # htpasswd -nbB $REG_USER $REG_PASS
 export REGISTRY_SHARED_SECRET=
 
 export RBAC_ENABLE=true
