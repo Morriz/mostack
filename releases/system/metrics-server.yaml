@@ -14,5 +14,5 @@ spec:
     version: 2.6.0
   valueFileSecrets:
     - metrics-server-values
-
+  values: {}
 
