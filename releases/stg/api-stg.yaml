@@ -14,4 +14,7 @@ spec:
     ref: master
   valueFileSecrets:
   - name: api-stg-values
-  values: {}
+  values:
+    image:
+      repository: reg.dev.idiotz.nl/api
+      tag: stg-0.2.11
