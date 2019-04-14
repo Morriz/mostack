@@ -4,7 +4,7 @@ metadata:
   name: docker-registry
   namespace: system
   annotations:
-    flux.weave.works/automated: "true"
+    flux.weave.works/automated: "false"
     flux.weave.works/tag.chart-image: semver:~2.6
 spec:
   releaseName: docker-registry
