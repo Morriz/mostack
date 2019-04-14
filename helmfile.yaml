@@ -145,6 +145,16 @@ releases:
     namespace: system
     version: 0.0.10
     chart: banzaicloud-stable/hpa-operator
+    values:
+      - metricsServer:
+          enabled: false
+  - name: metrics-server
+    installed: true
+    namespace: system
+    version: 2.6.0
+    chart: stable/metrics-server
+    values: 
+      - values.tmp/system/metrics-server.yaml 
   - name: nginx-ingress
     installed: true
     namespace: system
