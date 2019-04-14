@@ -7,9 +7,9 @@ metadata:
   annotations:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.prometheus-operator: glob:v0.29.*
-    flux.weave.works/tag.prometheus: glob:~v2.7.*
+    flux.weave.works/tag.prometheus: glob:~v2.8.*
     flux.weave.works/tag.alertmanager: glob:v0.16.*
-    flux.weave.works/tag.grafana: semver:~6.0
+    flux.weave.works/tag.grafana: semver:~6.1
 spec:
   releaseName: prometheus-operator-team-backend
   chart:
