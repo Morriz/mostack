@@ -8,7 +8,7 @@ image:
   repository: localhost:5000
   tag: latest
   pullPolicy: Always
-  # pullSecrets:
+  pullSecrets: regcred-api
 service:
   http:
     externalPort: 80

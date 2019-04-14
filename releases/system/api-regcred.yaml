@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5naXRsYWIuY29tIjp7InVzZXJuYW1lIjoiZHJvbmUiLCJwYXNzd29yZCI6ImJsYWJsYSIsImVtYWlsIjoiZGV2b3BzQHlvdXJkb21hLmluIiwiYXV0aCI6IlpISnZibVU2WW14aFlteGgifX19
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: regcred-api
+  namespace: system
+type: kubernetes.io/dockerconfigjson

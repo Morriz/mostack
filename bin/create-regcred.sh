@@ -1,7 +1,7 @@
 . ./.env.sh
 . secrets/${PROVIDER}.sh
 
-ns=prod
+ns=system
 service=api
 # create a deploy token @ your git repo and insert user+pass:
 user=$REG_USER
