@@ -5,7 +5,7 @@ metadata:
   namespace: stg
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: glob:stg-*
+    flux.weave.works/tag.api: glob:stg-*
 spec:
   releaseName: team-backend-api-stg
   chart:
