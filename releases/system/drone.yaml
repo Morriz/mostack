@@ -17,5 +17,5 @@ spec:
   - name: drone-values
   values:
     image:
-      repository: drone.io/drone/drone
+      repository: drone/drone
       tag: 1.0.0
