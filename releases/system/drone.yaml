@@ -18,4 +18,4 @@ spec:
   values:
     image:
       repository: drone/drone
-      tag: 1.0.0
+      tag: 1.0.1
