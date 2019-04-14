@@ -1,3 +1,4 @@
+export PROVIDER=local
 export ISLOCAL=1
 export CLUSTERTYPE=docker-for-desktop # minikube
 export INGRESS_CLASS=nginx

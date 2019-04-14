@@ -1,6 +1,7 @@
 replicaCount: 1
 image:
   repository: {{REGISTRY_HOST}}/api
+  tag: mozfeat
   # pullSecrets: regcred-api
 ingress:
   tls: true
