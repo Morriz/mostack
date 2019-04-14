@@ -5,7 +5,7 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~2.6.2
+    flux.weave.works/tag.chart-image: semver:~2.6
 spec:
   releaseName: docker-registry
   chart:
@@ -14,4 +14,7 @@ spec:
     version: 1.7.0
   valueFileSecrets:
   - name: docker-registry-values
-  values: {}
+  values:
+    image:
+      repository: docker-registry
+      tag: 2.6.2

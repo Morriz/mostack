@@ -11,7 +11,10 @@ spec:
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
     name: cert-manager
-    version: v0.6.6
+    version: v0.6.7
   valueFileSecrets:
   - name: cert-manager-values
-  values: {}
+  values:
+    image:
+      repository: quay.io/jetstack/cert-manager-controller
+      tag: v0.6.2

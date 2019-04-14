@@ -6,8 +6,7 @@ metadata:
   namespace: monitoring
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.prometheusOperator: glob:0.29.*
-    flux.weave.works/tag.alertManager.alertManagerSpec: glob:v0.16.*
+    flux.weave.works/tag.prometheusOperator: glob:v0.29.*
     flux.weave.works/tag.alertManager: glob:v0.16.*
 spec:
   releaseName: prometheus-operator
@@ -26,7 +25,3 @@ spec:
       image:
         repository: quay.io/prometheus/alertmanager
         tag: v0.16.2
-      alertManagerSpec:
-        image:
-          repository: quay.io/prometheus/alertmanager
-          tag: v0.16.1

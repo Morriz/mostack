@@ -14,5 +14,8 @@
 #     version: 2.6.0
 #   valueFileSecrets:
 #     - metrics-server-values
-#   values: {}
+#   values:
+#     image:
+#       repository: gcr.io/google_containers/metrics-server-amd64
+#       tag: v0.3.2
 

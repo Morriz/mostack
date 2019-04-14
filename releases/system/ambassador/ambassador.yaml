@@ -7,7 +7,7 @@
 #   annotations:
 #     flux.weave.works/ignore: true
 #     flux.weave.works/automated: "true"
-#     flux.weave.works/tag.chart-image: semver:0.52.0
+#     flux.weave.works/tag.chart-image: semver:0.53.0
 # spec:
 #   releaseName: ambassador
 #   chart:
@@ -16,4 +16,7 @@
 #     version: 2.0.1
 #   valueFileSecrets:
 #   - name: ambassador-values
-#   values: {}
+#   values:
+#     image:
+#       repository: quay.io/datawire/ambassador
+#       tag: v0.53.1

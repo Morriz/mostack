@@ -6,14 +6,16 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.server: semver:~1.0.0
-    flux.weave.works/tag.agent: semver:~1.0.0
+    flux.weave.works/tag.chart-image: semver:~1.0
 spec:
   releaseName: drone
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
     name: drone
-    version: 2.0.0-rc.9
+    version: 2.0.0-rc.10
   valueFileSecrets:
   - name: drone-values
-  values: {}
+  values:
+    image:
+      repository: drone.io/drone/drone
+      tag: 1.0.0

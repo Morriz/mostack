@@ -15,4 +15,7 @@ spec:
     version: 1.4.0
   valueFileSecrets:
   - name: nginx-ingress-values
-  values: {}
+  values:
+    image:
+      repository: quay.io/kubernetes-ingress-controller/nginx-ingress-controller
+      tag: 0.23.0

@@ -5,7 +5,7 @@
 #   namespace: istio-system
 #   annotations:
 #     flux.weave.works/automated: "true"
-#     flux.weave.works/tag.chart-image: semver:~0.8.0
+#     flux.weave.works/tag.chart-image: glob:release-1.1-latest-daily
 # spec:
 #   releaseName: istio
 #   chart:
@@ -14,4 +14,7 @@
 #     version: 1.1.0
 #   valueFileSecrets:
 #   - name: istio-values
-#   values: {}
+#   values:
+#     image:
+#       repository: istio.io/istio
+#       tag: release-1.1-latest-daily
