@@ -1,17 +1,17 @@
-apiVersion: flux.weave.works/v1beta1
-kind: HelmRelease
-metadata:
-  name: hpa-operator
-  namespace: system
-  annotations:
-    flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.1.0
-spec:
-  releaseName: hpa-operator
-  chart:
-    repository: https://kubernetes-charts.banzaicloud.com
-    name: hpa-operator
-    version: 0.0.10
-  values:
-    metricsServer:
-      enabled: false
+# apiVersion: flux.weave.works/v1beta1
+# kind: HelmRelease
+# metadata:
+#   name: hpa-operator
+#   namespace: system
+#   annotations:
+#     flux.weave.works/automated: "true"
+#     flux.weave.works/tag.chart-image: semver:~0.1.0
+# spec:
+#   releaseName: hpa-operator
+#   chart:
+#     repository: https://kubernetes-charts.banzaicloud.com
+#     name: hpa-operator
+#     version: 0.0.10
+#   values:
+#     metricsServer:
+#       enabled: false
