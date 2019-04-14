@@ -1,12 +1,15 @@
+---
 apiVersion: flux.weave.works/v1beta1
 kind: HelmRelease
 metadata:
   name: prometheus-operator-team-backend
-  namespace: team-backend
+  namespace: monitoring
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.prometheusOperator: glob:v0.29.*
-    flux.weave.works/tag.alertManager: glob:v0.16.*
+    flux.weave.works/tag.prometheus-operator: glob:v0.29.*
+    flux.weave.works/tag.prometheus: glob:~v2.7.*
+    flux.weave.works/tag.alertmanager: glob:v0.16.*
+    flux.weave.works/tag.grafana: semver:~6.0
 spec:
   releaseName: prometheus-operator-team-backend
   chart:
@@ -16,11 +19,19 @@ spec:
   valueFileSecrets:
   - name: prometheus-operator-values
   values:
-    prometheusOperator:
+    prometheus-operator:
       image:
         repository: quay.io/coreos/prometheus-operator
         tag: v0.29.0
-    alertManager:
+    prometheus:
+      image:
+        repository: quay.io/prometheus/prometheus
+        tag: v2.7.1
+    alertmanager:
       image:
         repository: quay.io/prometheus/alertmanager
         tag: v0.16.2
+    grafana:
+      image:
+        repository: grafana/grafana
+        tag: 6.0.2
