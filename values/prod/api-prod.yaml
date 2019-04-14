@@ -1,3 +1,4 @@
+replicaCount: 3
 annotations:
   hpa.autoscaling.banzaicloud.io/minReplicas: "3"
   hpa.autoscaling.banzaicloud.io/maxReplicas: "20"
