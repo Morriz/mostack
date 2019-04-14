@@ -1,3 +1,4 @@
+---
 apiVersion: flux.weave.works/v1beta1
 kind: HelmRelease
 metadata:
@@ -23,9 +24,9 @@ spec:
         tag: v0.29.0
     alertManager:
       image:
-        repository:  quay.io/prometheus/alertmanager
-        tag: v0.16.1
+        repository: quay.io/prometheus/alertmanager
+        tag: v0.16.2
       alertManagerSpec:
         image:
-          repository:  quay.io/prometheus/alertmanager
+          repository: quay.io/prometheus/alertmanager
           tag: v0.16.1
