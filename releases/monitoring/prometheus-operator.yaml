@@ -1,18 +1,18 @@
-apiVersion: flux.weave.works/v1beta1
-kind: HelmRelease
-metadata:
-  name: prometheus-operator
-  namespace: monitoring
-  annotations:
-    flux.weave.works/automated: "true"
-    flux.weave.works/tag.prometheus-operator: glob:0.29.*
-    flux.weave.works/tag.alertmanager: glob:v0.15.*
-spec:
-  releaseName: prometheus-operator
-  chart:
-    repository: https://kubernetes-charts.storage.googleapis.com
-    name: prometheus-operator
-    version: 5.0.3
-  valueFileSecrets:
-  - name: prometheus-operator-values
-  values: {}
+# apiVersion: flux.weave.works/v1beta1
+# kind: HelmRelease
+# metadata:
+#   name: prometheus-operator
+#   namespace: monitoring
+#   annotations:
+#     flux.weave.works/automated: "true"
+#     flux.weave.works/tag.prometheus-operator: glob:0.29.*
+#     flux.weave.works/tag.alertmanager: glob:v0.15.*
+# spec:
+#   releaseName: prometheus-operator
+#   chart:
+#     repository: https://kubernetes-charts.storage.googleapis.com
+#     name: prometheus-operator
+#     version: 5.0.3
+#   valueFileSecrets:
+#   - name: prometheus-operator-values
+#   values: {}

@@ -6,7 +6,7 @@ metadata:
   namespace: system
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: semver:~0.23.0
+    flux.weave.works/tag.chart-image: semver:~0.23
 spec:
   releaseName: nginx-ingress
   chart:

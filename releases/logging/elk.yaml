@@ -1,17 +1,17 @@
-apiVersion: flux.weave.works/v1beta1
-kind: HelmRelease
-metadata:
-  name: elk
-  namespace: logging
-  annotations:
-    flux.weave.works/automated: "true"
-    flux.weave.works/tag.chart-image: glob:*
-spec:
-  releaseName: elk
-  chart:
-    git: git@github.com:Morriz/mostack
-    path: charts/elk
-    ref: master
-  valueFileSecrets:
-  - name: elk-values
-  values: {}
+# apiVersion: flux.weave.works/v1beta1
+# kind: HelmRelease
+# metadata:
+#   name: elk
+#   namespace: logging
+#   annotations:
+#     flux.weave.works/automated: "true"
+#     flux.weave.works/tag.chart-image: glob:*
+# spec:
+#   releaseName: elk
+#   chart:
+#     git: git@github.com:Morriz/mostack
+#     path: charts/elk
+#     ref: master
+#   valueFileSecrets:
+#   - name: elk-values
+#   values: {}
