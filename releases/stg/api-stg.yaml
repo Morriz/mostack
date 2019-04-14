@@ -1,3 +1,4 @@
+---
 apiVersion: flux.weave.works/v1beta1
 kind: HelmRelease
 metadata:
@@ -17,4 +18,4 @@ spec:
   values:
     image:
       repository: reg.dev.idiotz.nl/api
-      tag: stg-0.2.11
+      tag: stg-0.2.12
