@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: {{REGISTRY_HOST}}/api
   tag: mozfeat
-  # pullSecrets: regcred-api
+  pullSecrets: regcred-api
 ingress:
   tls: true
   hostname: api.morriz-local.{{CLUSTER_HOST}}
