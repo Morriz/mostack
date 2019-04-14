@@ -5,6 +5,7 @@ replicaCount: 1
 annotations:
   sidecar.istio.io/inject: 'false'
 image:
+  repository: localhost:5000
   tag: latest
   pullPolicy: Always
   # pullSecrets:
