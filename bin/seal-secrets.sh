@@ -16,7 +16,6 @@ parseFiles() {
     ns=$(dirname $f)
     package=$(basename $f | rev | cut -c 6- | rev)
     echo sealing $type/$f
-    exit
     if [ "$type" = "values" ]; then
       cat $f | mo >/tmp/values.yaml
       kubectl -n $ns create secret generic $package-$type --from-file=/tmp/values.yaml --dry-run -o yaml | kubeseal --format=yaml --cert=$root/pub-cert.pem - >$root/releases/$ns/$package-$type.yaml
