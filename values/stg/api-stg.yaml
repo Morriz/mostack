@@ -3,6 +3,8 @@ annotations:
   hpa.autoscaling.banzaicloud.io/minReplicas: "2"
   hpa.autoscaling.banzaicloud.io/maxReplicas: "10"
   cpu.hpa.autoscaling.banzaicloud.io/targetAverageUtilization: "60"
+  flux.weave.works/automated: "true"
+  flux.weave.works/tag.chart-image: glob:stg-*
 image:
   repository: {{REGISTRY_HOST}}/api
   tag: stg-0.2.10
