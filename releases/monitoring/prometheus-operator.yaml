@@ -6,10 +6,9 @@ metadata:
   namespace: monitoring
   annotations:
     flux.weave.works/automated: "true"
-    flux.weave.works/tag.prometheus-operator: glob:v0.29.*
+    flux.weave.works/tag.prometheusOperator: glob:v0.29.*
     flux.weave.works/tag.prometheus: glob:~v2.8.*
-    flux.weave.works/tag.alertmanager: glob:v0.16.*
-    flux.weave.works/tag.grafana: semver:~6.1
+    flux.weave.works/tag.alertmanager.alertmanagerSpec: glob:v0.16.*
 spec:
   releaseName: prometheus-operator
   chart:
@@ -19,7 +18,7 @@ spec:
   valueFileSecrets:
   - name: prometheus-operator-values
   values:
-    prometheus-operator:
+    prometheusOperator:
       image:
         repository: quay.io/coreos/prometheus-operator
         tag: v0.29.0
@@ -28,9 +27,10 @@ spec:
         repository: quay.io/prometheus/prometheus
         tag: v2.7.1
     alertmanager:
-      image:
-        repository: quay.io/prometheus/alertmanager
-        tag: v0.16.2
+      alertmanagerSpec:
+        image:
+          repository: quay.io/prometheus/alertmanager
+          tag: v0.16.2
     grafana:
       image:
         repository: grafana/grafana
