@@ -12,7 +12,7 @@
 #   releaseName: ambassador
 #   chart:
 #     repository: https://kubernetes-charts.storage.googleapis.com
-#     name: stable/ambassador
+#     name: ambassador
 #     version: 2.0.1
 #   valueFileSecrets:
 #   - name: ambassador-values

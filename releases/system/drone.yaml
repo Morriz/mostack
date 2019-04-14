@@ -12,7 +12,7 @@ spec:
   releaseName: drone
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: stable/drone
+    name: drone
     version: 2.0.0-rc.9
   valueFileSecrets:
   - name: drone-values

@@ -10,7 +10,7 @@ spec:
   releaseName: cert-manager
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: stable/cert-manager
+    name: cert-manager
     version: v0.6.6
   valueFileSecrets:
   - name: cert-manager-values

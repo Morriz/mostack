@@ -10,7 +10,7 @@ spec:
   releaseName: docker-registry
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com
-    name: stable/docker-registry
+    name: docker-registry
     version: 1.7.0
   valueFileSecrets:
   - name: docker-registry-values
