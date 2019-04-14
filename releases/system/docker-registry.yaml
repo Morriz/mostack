@@ -16,5 +16,5 @@ spec:
   - name: docker-registry-values
   values:
     image:
-      repository: docker-registry
+      repository: registry
       tag: 2.6.2
