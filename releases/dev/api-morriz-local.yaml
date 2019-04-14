@@ -18,4 +18,4 @@ spec:
   values:
     image:
       repository: reg.dev.idiotz.nl/api
-      tag: mozfeat-485ef722852ffabc8bcaa5883bf314262019bbdd
+      tag: mozfeat-9d23cc56919c209e6c62b40e89585e7b6462a248
