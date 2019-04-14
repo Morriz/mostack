@@ -14,4 +14,7 @@ spec:
     ref: master
   valueFileSecrets:
   - name: api-prod-values
-  values: {}
+  values:
+    image:
+      repository: reg.dev.idiotz.nl/api
+      tag: 0.2.11  

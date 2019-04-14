@@ -14,4 +14,7 @@ spec:
     ref: master
   valueFileSecrets:
   - name: api-morriz-local-values
-  values: {}
+  values:
+    image:
+      repository: reg.dev.idiotz.nl/api
+      tag: mozfeat
