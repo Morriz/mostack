@@ -143,7 +143,7 @@ releases:
   - name: hpa-operator
     installed: true
     namespace: system
-    version: 0.0.7
+    version: 0.0.10
     chart: banzaicloud-stable/hpa-operator
   - name: nginx-ingress
     installed: true
