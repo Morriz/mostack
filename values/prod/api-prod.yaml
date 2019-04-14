@@ -4,6 +4,7 @@ annotations:
   cpu.hpa.autoscaling.banzaicloud.io/targetAverageUtilization: "60"
 image:
   repository: {{REGISTRY_HOST}}/api
+  tag: 0.2.5
   pullSecrets: regcred-api
   pullPolicy: IfNotPresent
 ingress:

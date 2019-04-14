@@ -22,3 +22,6 @@ persistence:
   enabled: true
   # storageClass: slow
   existingClaim: slow-pvc
+secrets:
+  htpasswd: {{REGISTRY_HTPASSWD}}
+  haSharedSecret: {{REGISTRY_SHARED_SECRET}}
